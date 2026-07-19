@@ -5,9 +5,9 @@
 - Repository: `5qln/hermes-5qln-plugin`
 - Visibility: public
 - Default branch: `main`
-- License: not selected
+- License: 5QLN mixed license — CC BY-ND 4.0 plus Specific Extension Exception for the Immutable Kernel; Apache 2.0 for the Mutable Implementation
 
-Public visibility is not itself a software license. Until the owner adds a license, downstream users should not assume permission to reuse, modify, or redistribute the source beyond applicable law.
+The licensing map is in `LICENSE`; complete terms and attribution are in `LICENSE-5QLN-KERNEL.md`, `LICENSE-APACHE-2.0.txt`, and `NOTICE`.
 
 ## Repository setup
 
@@ -21,6 +21,8 @@ Recommended repository settings:
 - require pull requests for integrity-critical files;
 - create signed or annotated release tags where practical.
 
+The exact `main` policy and application command are documented in [Main-branch Protection](BRANCH_PROTECTION.md).
+
 ## Pre-release checklist
 
 ```bash
@@ -33,7 +35,7 @@ Then verify:
 
 - `plugin.yaml` version matches `CHANGELOG.md`;
 - documentation uses `5qln/hermes-5qln-plugin`;
-- the license decision is recorded; when a license is selected, its text exists at repository root;
+- the licensing map, kernel terms, Apache 2.0 text, and NOTICE exist at repository root;
 - no generated inventories, manifests, reports, credentials, or private sources are committed;
 - the full skill bundle is present;
 - a clean Hermes installation succeeds with `hermes plugins install 5qln/hermes-5qln-plugin --enable`;

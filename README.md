@@ -104,7 +104,7 @@ python -m compileall -q .
 python -m unittest discover -s tests -v
 ```
 
-See [Development](docs/DEVELOPMENT.md), [Provenance](docs/PROVENANCE.md), [Contributing](CONTRIBUTING.md), and [Security](SECURITY.md).
+See [Development](docs/DEVELOPMENT.md), [Main-branch Protection](docs/BRANCH_PROTECTION.md), [Provenance](docs/PROVENANCE.md), [Contributing](CONTRIBUTING.md), and [Security](SECURITY.md).
 
 ## Compatibility
 
@@ -112,4 +112,10 @@ The repository targets the standalone general-plugin contract documented by Herm
 
 ## License
 
-No public license has been selected. The source is publicly visible, but no permission to reuse, modify, or redistribute it is granted beyond rights supplied by applicable law. The repository owner may add a license in a later release. See [Publishing](docs/PUBLISHING.md).
+This repository follows the [5QLN Constitution & Open Source License](https://www.5qln.com/5qln-open-source-license/):
+
+- the Immutable Constitutional Kernel is licensed under CC BY-ND 4.0 with the 5QLN Specific Extension Exception;
+- the Mutable Implementation—including code, technical documentation, agent skills, instructions, and prompt configurations—is licensed under Apache 2.0;
+- use of the 5QLN framework requires attribution, and the 5QLN trademark and visual identity remain reserved.
+
+See [LICENSE](LICENSE), [Kernel License](LICENSE-5QLN-KERNEL.md), [Apache 2.0](LICENSE-APACHE-2.0.txt), and [NOTICE](NOTICE).

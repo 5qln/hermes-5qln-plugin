@@ -2,12 +2,15 @@
 
 Contributions should increase clarity, preservation, portability, or verifiability without converting uncertainty into authority.
 
+By submitting a contribution for inclusion, you agree that Mutable Implementation contributions are provided under Apache License 2.0. Contributions do not grant authority to mutate or subtract from the Immutable Constitutional Kernel. See `LICENSE` and `LICENSE-5QLN-KERNEL.md`.
+
 ## Before opening a change
 
 - Read [Architecture](docs/ARCHITECTURE.md) and [Integrity Model](docs/INTEGRITY_MODEL.md).
 - Open an issue before changing the manifest format, notation, constitution, status vocabulary, or corruption taxonomy.
 - Keep unrelated changes separate.
 - Never include private conversion sources, generated manifests, credentials, or human attestations without authorization.
+- Preserve the required 5QLN attribution and existing copyright, license, and trademark notices.
 
 ## Implementation requirements
 
@@ -44,4 +47,3 @@ Describe:
 - tests performed;
 - compatibility and migration impact;
 - any state that remains open.
-

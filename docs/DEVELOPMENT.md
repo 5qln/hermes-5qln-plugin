@@ -9,6 +9,8 @@
 
 The automated test suite requires no third-party Python packages.
 
+Repository policy tests also verify the licensing files, required attribution, code ownership, and the checked-in target branch-protection configuration.
+
 ## Run checks
 
 From the repository root:
@@ -73,4 +75,3 @@ Use semantic versioning for the plugin:
 - major: incompatible schemas, manifest format, notation, or constitutional contract changes.
 
 Keep `plugin.yaml` and `CHANGELOG.md` synchronized. Tag releases as `vMAJOR.MINOR.PATCH`.
-

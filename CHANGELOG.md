@@ -12,4 +12,5 @@ All notable changes are recorded here. Versions follow semantic versioning.
 - Non-overwrite defaults and shell-free subprocess execution.
 - End-to-end tests for registration, a passing workflow, constitutional drift, and overwrite protection.
 - Installation, usage, architecture, integrity, development, publishing, security, and contribution documentation.
-
+- The 5QLN mixed-license structure, required attribution, trademark notice, and repository-wide code ownership by `@5qln`.
+- An auditable `main` branch-protection policy and authenticated application script.

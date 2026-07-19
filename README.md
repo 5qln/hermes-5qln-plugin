@@ -11,7 +11,7 @@ This distinction is deliberate. The tools can verify structure, traceability, sy
 
 ## Install from GitHub
 
-After this directory is published as a dedicated GitHub repository:
+Install directly from the dedicated GitHub repository:
 
 ```bash
 hermes plugins install 5qln/hermes-5qln-plugin --enable

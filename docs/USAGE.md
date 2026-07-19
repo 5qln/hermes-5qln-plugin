@@ -11,7 +11,7 @@
 
 ## 1. Install and verify
 
-Publish this directory at the root of a dedicated GitHub repository. Install it with:
+Install the dedicated repository with:
 
 ```bash
 hermes plugins install 5qln/hermes-5qln-plugin --enable

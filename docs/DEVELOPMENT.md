@@ -22,11 +22,13 @@ python -m unittest discover -s tests -v
 
 The tests verify:
 
-- Hermes-style registration of all three tools and the skill;
+- Hermes-style registration of all four tools and both skills;
 - source inventory and manifest creation;
 - a minimally complete manifest passing compilation;
 - constitutional drift failing compilation;
-- refusal to overwrite an output without explicit consent.
+- valid and invalid deep-research prompt review states;
+- synchronization of the research contract with the canonical constitution;
+- refusal to overwrite an output or report without explicit consent.
 
 ## Test in a Hermes project
 
@@ -47,11 +49,11 @@ Verify in the session:
 /plugins
 ```
 
-Then ask Hermes to load `5qln:5qln-converter` and run a small Markdown workflow.
+Then ask Hermes to load `5qln:5qln-converter` and run a small Markdown workflow. Load `5qln:5qln-deep-research`, create a file-based prompt, and call `fiveqln_validate_research_prompt` for the research path.
 
 ## Editing the plugin surface
 
-Keep schemas specific enough for the model to select the right tool. Do not add a deterministic `convert` tool unless conversion semantics truly become deterministic; today they are governed by the skill and human evidence.
+Keep schemas specific enough for the model to select the right tool. Do not add a deterministic `convert` or `research` tool unless those semantics truly become deterministic; today they are governed by skills and human evidence. Validation tools may check only their declared contracts.
 
 Handlers must:
 
@@ -62,9 +64,9 @@ Handlers must:
 - protect existing outputs by default;
 - make uncertainty and failure visible.
 
-## Editing the skill bundle
+## Editing the skill bundles
 
-Keep `SKILL.md` procedural and load detailed law from the one-level `references/` directory. Run the plugin tests after any change. For integrity-critical edits, follow the change-control requirements in [Integrity Model](INTEGRITY_MODEL.md).
+Keep each `SKILL.md` procedural and load detailed contracts from the one-level `references/` directory. Keep the deep-research kernel synchronized with the canonical converter constitution. Run the plugin tests after any change. For integrity-critical edits, follow the change-control requirements in [Integrity Model](INTEGRITY_MODEL.md).
 
 ## Versioning
 

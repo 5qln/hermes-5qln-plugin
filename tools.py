@@ -15,7 +15,8 @@ from typing import Any
 
 
 _PLUGIN_DIR = Path(__file__).resolve().parent
-_SCRIPT_DIR = _PLUGIN_DIR / "skills" / "5qln-converter" / "scripts"
+_CONVERTER_SCRIPT_DIR = _PLUGIN_DIR / "skills" / "5qln-converter" / "scripts"
+_RESEARCH_SCRIPT_DIR = _PLUGIN_DIR / "skills" / "5qln-deep-research" / "scripts"
 _TIMEOUT_SECONDS = 300
 
 
@@ -43,8 +44,10 @@ def _output_path(value: Any, field: str, overwrite: bool) -> Path:
     return path
 
 
-def _run(script_name: str, arguments: list[str]) -> subprocess.CompletedProcess[str]:
-    script = _SCRIPT_DIR / script_name
+def _run(
+    script_dir: Path, script_name: str, arguments: list[str]
+) -> subprocess.CompletedProcess[str]:
+    script = script_dir / script_name
     if not script.is_file():
         raise RuntimeError(f"Bundled script is missing: {script_name}")
     return subprocess.run(
@@ -74,7 +77,7 @@ def inventory_source(args: dict[str, Any], **kwargs: Any) -> str:
         command = [*(str(path) for path in sources), "--out", str(output)]
         if bool(args.get("compact", False)):
             command.append("--compact")
-        completed = _run("inventory_source.py", command)
+        completed = _run(_CONVERTER_SCRIPT_DIR, "inventory_source.py", command)
         if completed.returncode != 0:
             return _json(
                 {
@@ -112,6 +115,7 @@ def create_manifest(args: dict[str, Any], **kwargs: Any) -> str:
         if not isinstance(title, str) or not title.strip():
             raise ValueError("title must be non-empty text")
         completed = _run(
+            _CONVERTER_SCRIPT_DIR,
             "new_manifest.py",
             [str(inventory), "--out", str(output), "--title", title.strip()],
         )
@@ -159,7 +163,11 @@ def compile_manifest(args: dict[str, Any], **kwargs: Any) -> str:
         else:
             report = _output_path(report_value, "report_path", overwrite)
 
-        completed = _run("5qln_compiler.py", [str(manifest), "--report", str(report)])
+        completed = _run(
+            _CONVERTER_SCRIPT_DIR,
+            "5qln_compiler.py",
+            [str(manifest), "--report", str(report)],
+        )
         if completed.returncode not in {0, 1} or not report.is_file():
             return _json(
                 {
@@ -191,3 +199,57 @@ def compile_manifest(args: dict[str, Any], **kwargs: Any) -> str:
             except OSError:
                 pass
 
+
+def validate_research_prompt(args: dict[str, Any], **kwargs: Any) -> str:
+    """Validate one standalone 5QLN deep-research prompt."""
+    del kwargs
+    operation = "validate_research_prompt"
+    try:
+        prompt = _input_path(args.get("prompt_path"), "prompt_path")
+        overwrite = bool(args.get("overwrite", False))
+        report_value = args.get("report_path")
+        report_path = (
+            None
+            if report_value is None
+            else _output_path(report_value, "report_path", overwrite)
+        )
+
+        completed = _run(
+            _RESEARCH_SCRIPT_DIR,
+            "validate_research_prompt.py",
+            [str(prompt), "--json"],
+        )
+        if completed.returncode not in {0, 1}:
+            return _json(
+                {
+                    "success": False,
+                    "operation": operation,
+                    "exit_code": completed.returncode,
+                    "stdout": completed.stdout.strip(),
+                    "stderr": completed.stderr.strip(),
+                }
+            )
+
+        try:
+            report = json.loads(completed.stdout)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"Validator returned invalid JSON: {exc}") from exc
+
+        if report_path is not None:
+            report_path.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+        return _json(
+            {
+                "success": True,
+                "operation": operation,
+                "valid": report.get("valid") is True,
+                "report_path": None if report_path is None else str(report_path),
+                "report": report,
+                "stderr": completed.stderr.strip(),
+            }
+        )
+    except Exception as exc:
+        return _failure(operation, exc)

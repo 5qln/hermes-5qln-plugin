@@ -1,11 +1,12 @@
 # 5QLN for Hermes Agent
 
-An installable [Hermes Agent](https://hermes-agent.nousresearch.com/) plugin for integrity-preserving 5QLN conversion.
+An installable [Hermes Agent](https://hermes-agent.nousresearch.com/) plugin for integrity-preserving 5QLN conversion and deep-research prompt formation.
 
-The plugin combines two different capabilities:
+The plugin combines semantic skills with deterministic validation:
 
-- a namespaced 5QLN skill that governs semantic conversion;
-- deterministic tools that inventory source material, create an exact manifest scaffold, and compile the completed manifest.
+- `5qln:5qln-converter` governs semantic conversion;
+- `5qln:5qln-deep-research` creates or audits phase-gated prompts for deep-research agents;
+- native tools inventory sources, scaffold and compile conversion manifests, and validate standalone research prompts.
 
 This distinction is deliberate. The tools can verify structure, traceability, symbols, and declared evidence. They cannot originate or certify human emergence, resonance, value alignment, or a return to ∞0'.
 
@@ -46,14 +47,28 @@ Hermes can then call the native tools in sequence:
 
 See [Usage](docs/USAGE.md) for concrete calls and expected outputs.
 
+## Create a deep-research prompt
+
+Load the research skill explicitly and give it a researchable inquiry:
+
+```text
+Load the 5qln:5qln-deep-research skill. Turn this inquiry into a copy-ready
+prompt for a deep research agent: How should a city evaluate a heat-resilience
+pilot? Keep human attestations open and require claim-level evidence.
+```
+
+The skill makes `S → G → Q → P → V` operational through dependent phase records, evidence and counterevidence gates, adaptive `δE/δV → ∇` branching, two-pass B'' composition, and a question-bearing return. If the prompt is saved to a file, Hermes can call `fiveqln_validate_research_prompt` and repair it until the encoded contract passes.
+
 ## What is registered
 
 | Surface | Name | Purpose |
 |---|---|---|
 | Skill | `5qln:5qln-converter` | Governs semantic conversion, preservation, derivation, attestation boundaries, and return |
+| Skill | `5qln:5qln-deep-research` | Creates single-agent or coordinated research prompts governed by native 5QLN flow |
 | Tool | `fiveqln_inventory_source` | Builds an atomic SHA-256-addressed source ledger |
 | Tool | `fiveqln_create_manifest` | Creates the exact manifest scaffold and all 25 lens-audit entries |
 | Tool | `fiveqln_compile_manifest` | Audits exact syntax, coverage, traceability, formation, and completion claims |
+| Tool | `fiveqln_validate_research_prompt` | Validates the kernel, phase gates, provenance contract, flow, and open return of one prompt |
 
 ## Supported source files
 
@@ -76,18 +91,19 @@ PDF extraction is not visual verification. Rendered pages, tables, diagrams, sli
 ├── schemas.py                  Tool descriptions and JSON schemas
 ├── tools.py                    Safe wrappers around deterministic scripts
 ├── skills/5qln-converter/      Complete 5QLN skill bundle
+├── skills/5qln-deep-research/  Deep-research prompt skill and validator
 ├── docs/                       User, architecture, integrity, and development guides
 ├── tests/                      Registration and end-to-end tests
 └── .github/workflows/test.yml  Python 3.11/3.12 CI
 ```
 
-The original `agents/openai.yaml` is retained inside the skill bundle for provenance and cross-surface portability. Hermes does not use it.
+The original `agents/openai.yaml` from each skill is retained for provenance and cross-surface portability. Hermes does not use these files.
 
 ## Integrity boundary
 
 The plugin operates within `A = K`.
 
-- A passed compiler report means that the manifest satisfied the encoded checks.
+- A passed compiler or research-prompt report means only that the encoded checks succeeded.
 - A hash proves byte identity for captured text; it does not prove truth or authority.
 - `attested` and `human-recognized` states require explicit human evidence.
 - Honest `open` or `candidate` completion is a valid result.
@@ -108,7 +124,7 @@ See [Development](docs/DEVELOPMENT.md), [Main-branch Protection](docs/BRANCH_PRO
 
 ## Compatibility
 
-The repository targets the standalone general-plugin contract documented by Hermes Agent in 2026: root `plugin.yaml`, root `__init__.py`, `register(ctx)`, JSON-string tool returns, and `ctx.register_skill(...)` for a read-only namespaced skill. CI covers Python 3.11 and 3.12.
+The repository targets the standalone general-plugin contract documented by Hermes Agent in 2026: root `plugin.yaml`, root `__init__.py`, `register(ctx)`, JSON-string tool returns, and `ctx.register_skill(...)` for read-only namespaced skills. CI covers Python 3.11 and 3.12.
 
 ## License
 

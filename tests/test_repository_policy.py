@@ -1,8 +1,9 @@
 """Repository policy and licensing invariants."""
 
-from pathlib import Path
+import hashlib
 import json
 import unittest
+from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,7 +35,32 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertFalse(policy["allow_force_pushes"])
         self.assertFalse(policy["allow_deletions"])
 
+    def test_manifest_version_and_registered_surface_are_documented(self) -> None:
+        manifest = (ROOT / "plugin.yaml").read_text(encoding="utf-8")
+        version_line = next(line for line in manifest.splitlines() if line.startswith("version:"))
+        version = version_line.split(":", 1)[1].strip()
+        changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        self.assertIn(f"## {version} -", changelog)
+        for tool in (
+            "fiveqln_inventory_source",
+            "fiveqln_create_manifest",
+            "fiveqln_compile_manifest",
+            "fiveqln_validate_research_prompt",
+        ):
+            self.assertIn(f"  - {tool}", manifest)
+
+    def test_deep_research_import_checksums_match_provenance(self) -> None:
+        provenance = (ROOT / "docs" / "PROVENANCE.md").read_text(encoding="utf-8")
+        skill_root = ROOT / "skills" / "5qln-deep-research"
+        for relative in (
+            "SKILL.md",
+            "agents/openai.yaml",
+            "references/research-prompt-contract.md",
+            "scripts/validate_research_prompt.py",
+        ):
+            digest = hashlib.sha256((skill_root / relative).read_bytes()).hexdigest()
+            self.assertIn(f"| `{relative}` | `{digest}` |", provenance)
+
 
 if __name__ == "__main__":
     unittest.main()
-

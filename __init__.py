@@ -6,7 +6,7 @@ from . import schemas, tools
 
 
 def register(ctx):
-    """Register deterministic 5QLN tools and the namespaced conversion skill."""
+    """Register deterministic 5QLN tools and namespaced semantic skills."""
     ctx.register_tool(
         name="fiveqln_inventory_source",
         toolset="5qln",
@@ -28,12 +28,20 @@ def register(ctx):
         handler=tools.compile_manifest,
         description="Compile a 5QLN manifest and return its full integrity report.",
     )
+    ctx.register_tool(
+        name="fiveqln_validate_research_prompt",
+        toolset="5qln",
+        schema=schemas.FIVEQLN_VALIDATE_RESEARCH_PROMPT,
+        handler=tools.validate_research_prompt,
+        description="Validate a standalone 5QLN deep-research prompt contract.",
+    )
 
-    skill_md = Path(__file__).resolve().parent / "skills" / "5qln-converter" / "SKILL.md"
-    if not skill_md.is_file():
-        raise FileNotFoundError(f"Bundled 5QLN skill is missing: {skill_md}")
-    ctx.register_skill("5qln-converter", skill_md)
+    skill_root = Path(__file__).resolve().parent / "skills"
+    for skill_name in ("5qln-converter", "5qln-deep-research"):
+        skill_md = skill_root / skill_name / "SKILL.md"
+        if not skill_md.is_file():
+            raise FileNotFoundError(f"Bundled 5QLN skill is missing: {skill_md}")
+        ctx.register_skill(skill_name, skill_md)
 
 
 __all__ = ["register"]
-

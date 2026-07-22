@@ -49,6 +49,9 @@ See [Usage](docs/USAGE.md) for concrete calls and expected outputs.
 
 ## Create a deep-research prompt
 
+> [!IMPORTANT]
+> **Experimental:** `5qln:5qln-deep-research` is under active evaluation. Its prompt contract, validation rules, and Hermes integration may change as real workflows expose gaps. Use it for non-critical work first, review every generated prompt, and [share feedback or report a problem](https://github.com/5qln/hermes-5qln-plugin/issues/new).
+
 Load the research skill explicitly and give it a researchable inquiry:
 
 ```text
@@ -59,12 +62,14 @@ pilot? Keep human attestations open and require claim-level evidence.
 
 The skill makes `S → G → Q → P → V` operational through dependent phase records, evidence and counterevidence gates, adaptive `δE/δV → ∇` branching, two-pass B'' composition, and a question-bearing return. If the prompt is saved to a file, Hermes can call `fiveqln_validate_research_prompt` and repair it until the encoded contract passes.
 
+See the [5QLN Deep Research User Guide](docs/DEEP_RESEARCH_USER_GUIDE.md) for an input checklist, single-agent and coordinator/specialist examples, validation steps, execution handoff, troubleshooting, limitations, and the feedback checklist.
+
 ## What is registered
 
 | Surface | Name | Purpose |
 |---|---|---|
 | Skill | `5qln:5qln-converter` | Governs semantic conversion, preservation, derivation, attestation boundaries, and return |
-| Skill | `5qln:5qln-deep-research` | Creates single-agent or coordinated research prompts governed by native 5QLN flow |
+| Skill | `5qln:5qln-deep-research` | **Experimental.** Creates single-agent or coordinated research prompts governed by native 5QLN flow |
 | Tool | `fiveqln_inventory_source` | Builds an atomic SHA-256-addressed source ledger |
 | Tool | `fiveqln_create_manifest` | Creates the exact manifest scaffold and all 25 lens-audit entries |
 | Tool | `fiveqln_compile_manifest` | Audits exact syntax, coverage, traceability, formation, and completion claims |

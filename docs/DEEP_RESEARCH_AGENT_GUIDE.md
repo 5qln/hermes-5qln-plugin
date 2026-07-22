@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > This guide addresses the AI agent that creates, rewrites, or audits deep-research prompts. `5qln:5qln-deep-research` is **experimental**. Treat the bundled `SKILL.md`, `references/research-prompt-contract.md`, and validator as the operative contract. This guide explains how to apply them; it does not replace or relax them.
 
-This guide applies to the 5QLN Hermes plugin v0.2.0.
+This guide applies to the 5QLN Hermes plugin v0.2.0 and later.
 
 ## Your role
 

@@ -1,6 +1,6 @@
 name: 5qln
-version: 0.2.0
-description: Integrity-preserving 5QLN conversion and deep-research prompt formation with deterministic validation
+version: 0.3.0
+description: 5QLN language runtime for Hermes Agent — constitutional grammar activation, formation cycle engine, conversion pipeline, and experimental features. Designed to grow: agents produce their own skills from sessions, verifiable through the converter.
 provides_tools:
   - fiveqln_inventory_source
   - fiveqln_create_manifest

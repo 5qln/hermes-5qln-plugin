@@ -55,6 +55,25 @@ def load_research_validator():
 RESEARCH_VALIDATOR = load_research_validator()
 
 
+def load_centrifuge():
+    """Load the experimental centrifuge script for focused regression tests."""
+    name = "hermes_5qln_centrifuge"
+    existing = sys.modules.get(name)
+    if existing is not None:
+        return existing
+    path = ROOT / "skills" / "5qln-centrifuge" / "scripts" / "centrifuge.py"
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Could not load centrifuge script")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+CENTRIFUGE = load_centrifuge()
+
+
 class FakeContext:
     def __init__(self) -> None:
         self.tools: dict[str, dict] = {}
@@ -80,12 +99,31 @@ class PluginRegistrationTests(unittest.TestCase):
                 "fiveqln_validate_research_prompt",
             },
         )
-        self.assertEqual(set(ctx.skills), {"5qln-converter", "5qln-deep-research"})
+        self.assertEqual(
+            set(ctx.skills),
+            {
+                "5qln-agent",
+                "5qln-cycle",
+                "5qln-initiation",
+                "symbolic-interpretation",
+                "5qln-converter",
+                "5qln-learning-aligner",
+                "5qln-manifest-compilation",
+                "5qln-deep-research",
+                "5qln-centrifuge",
+                "5qln-signature-engine",
+            },
+        )
         for skill_path in ctx.skills.values():
             self.assertTrue(skill_path.is_file())
         for registered in ctx.tools.values():
             self.assertEqual(registered["toolset"], "5qln")
             self.assertTrue(callable(registered["handler"]))
+
+    def test_empty_centrifuge_does_not_report_false_contamination(self) -> None:
+        card = CENTRIFUGE.signature_card([])
+        self.assertIn("Integrity: NO DATA", card)
+        self.assertNotIn("K contamination detected", card)
 
     def test_research_contract_uses_canonical_constitution(self) -> None:
         constitution = (

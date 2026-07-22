@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > `5qln:5qln-deep-research` is an **experimental skill**. Its prompt contract, validation rules, and Hermes integration may change as they are tested on real research workflows. Use it for non-critical work first, review every generated prompt, and [share feedback or report a problem](https://github.com/5qln/hermes-5qln-plugin/issues/new).
 
-This guide applies to the 5QLN Hermes plugin v0.2.0.
+This guide applies to the 5QLN Hermes plugin v0.2.0 and later.
 
 If you are an AI agent creating or auditing the prompt, follow the [5QLN Deep Research AI Agent Guide](DEEP_RESEARCH_AGENT_GUIDE.md). It includes the agent operating contract and the background of how the skill was formed and adapted to Hermes.
 

@@ -37,7 +37,20 @@ def register(ctx):
     )
 
     skill_root = Path(__file__).resolve().parent / "skills"
-    for skill_name in ("5qln-converter", "5qln-deep-research"):
+    for skill_name in (
+        # Base 5QLN — language runtime
+        "5qln-agent",
+        "5qln-cycle",
+        "5qln-initiation",
+        "symbolic-interpretation",
+        "5qln-converter",
+        "5qln-learning-aligner",
+        "5qln-manifest-compilation",
+        # Experimental
+        "5qln-deep-research",
+        "5qln-centrifuge",
+        "5qln-signature-engine",
+    ):
         skill_md = skill_root / skill_name / "SKILL.md"
         if not skill_md.is_file():
             raise FileNotFoundError(f"Bundled 5QLN skill is missing: {skill_md}")

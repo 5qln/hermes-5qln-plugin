@@ -42,6 +42,8 @@ For supported local files, run:
 python3 scripts/inventory_source.py SOURCE... --out source-inventory.json
 ```
 
+**PITFALL — HTML Sources:** `inventory_source.py` does not support `.html` files (returns "Unsupported source type: .html"). Workaround: read the HTML file directly with `read_file` in full, then create a manual source ledger in the artifact-level cell. Mark the source as visually inspected per the protocol's fallback path for layout-dependent documents.
+
 Visually inspect PDFs, slides, spreadsheets, diagrams, and layout-dependent documents with the relevant file skill. Extraction is an aid, not proof of preservation.
 
 ### 2. Form the artifact-level cell
@@ -105,7 +107,17 @@ python3 scripts/5qln_compiler.py conversion-manifest.json --report compiler-repo
 
 Do not deliver while the compiler reports errors. Treat warnings as visible review items, not text to hide.
 
+When the compiler reports errors, expect an iterative fix loop (5+ rounds is normal for a first conversion). Fix error CLASSES, not individual errors — each round addresses one class (symbol drift → schema mismatch → hash mismatch → cell references → target mismatch). See `references/compiler-error-fixing-loop.md` for the complete pattern, error class taxonomy, and typical round counts.
+
 When producing DOCX, PDF, slides, spreadsheets, or another rendered artifact, use the corresponding file skill and inspect every rendered page or surface. Validate source counts, IDs, priorities, tables, exact symbols, lens orientation, and traceability independently of visual quality.
+
+## Self-Evolution — Running the Converter on the Wiki
+
+After significant ingest sessions (5+ new entries), run the converter reflexively on the wiki's own formation entries. This surfaces lawful relations between independently-written entries: α thread maps, integrity audits, format divergence detection. See `references/wiki-self-evolution.md` for the execution pattern and deliverable format.
+
+## Format Divergence Pitfall
+
+The wiki may accumulate entries in multiple formats (YAML frontmatter vs markdown sections). The converter audit catches this. Standardize on one format for future entries — the operational protocol should name which. Format drift is L4-adjacent: the grammar's form is present but inconsistently applied.
 
 ## Return the result
 
@@ -118,6 +130,10 @@ Deliver the converted artifact and, when created, its manifest and compiler repo
 - the return question offered from K, explicitly avoiding self-certification as ∞0'.
 
 Keep this handoff concise. Let the artifact carry the formation.
+
+## Multi-Source Synthesis
+
+When the conversion involves two or more independent research passes covering the same domain, see `references/research-synthesis.md` for the cross-referencing methodology — source tagging convention (`[A]`/`[B]`/`[A+B]`/`[DERIVED]`), de-duplication rules, coverage gap detection, priority reconciliation, and composition order.
 
 ## Failure conditions
 

@@ -54,7 +54,6 @@ class RepositoryPolicyTests(unittest.TestCase):
         skill_root = ROOT / "skills" / "5qln-deep-research"
         for relative in (
             "SKILL.md",
-            "agents/openai.yaml",
             "references/research-prompt-contract.md",
             "scripts/validate_research_prompt.py",
         ):

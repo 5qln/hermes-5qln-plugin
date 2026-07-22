@@ -3,11 +3,12 @@
 ## Contents
 
 1. Install and verify
-2. Load the semantic skill
-3. Run the deterministic workflow
-4. Interpret results
-5. Update and remove
-6. Troubleshoot
+2. Load a semantic skill
+3. Run a conversion workflow
+4. Create and validate a deep-research prompt
+5. Interpret results
+6. Update and remove
+7. Troubleshoot
 
 ## 1. Install and verify
 
@@ -18,7 +19,7 @@ hermes plugins install 5qln/hermes-5qln-plugin --enable
 hermes plugins list
 ```
 
-The plugin name is `5qln`. It registers three tools in the `5qln` toolset and one namespaced skill.
+The plugin name is `5qln`. It registers four tools in the `5qln` toolset and two namespaced skills.
 
 If installation used no `--enable` flag and the prompt was declined, enable it later:
 
@@ -26,17 +27,18 @@ If installation used no `--enable` flag and the prompt was declined, enable it l
 hermes plugins enable 5qln
 ```
 
-## 2. Load the semantic skill
+## 2. Load a semantic skill
 
-Plugin skills are explicit and namespaced in Hermes. Ask Hermes to load:
+Plugin skills are explicit and namespaced in Hermes. Load the skill that matches the task:
 
 ```text
 5qln:5qln-converter
+5qln:5qln-deep-research
 ```
 
-The skill instructs the agent to read the constitutional and conversion references before converting. Loading the skill is essential: the native tools do not perform the semantic formation by themselves.
+The converter governs source-preserving semantic conversion. The deep-research skill creates or audits copy-ready prompts whose research behavior is gated by `S → G → Q → P → V`. Loading the relevant skill is essential: native tools validate declared structure but do not perform semantic formation by themselves.
 
-## 3. Run the deterministic workflow
+## 3. Run a conversion workflow
 
 ### Inventory the source
 
@@ -49,9 +51,7 @@ Tool arguments:
 }
 ```
 
-The output ledger records source locations, normalized atomic text, SHA-256 hashes, original IDs where detected, normative terms, priorities, hierarchy, and extraction warnings.
-
-For multiple files, pass them in authoritative source order.
+The output ledger records source locations, normalized atomic text, SHA-256 hashes, original IDs where detected, normative terms, priorities, hierarchy, and extraction warnings. For multiple files, pass them in authoritative source order.
 
 ### Create the manifest
 
@@ -76,7 +76,7 @@ The scaffold deliberately starts incomplete. It contains:
 
 ### Perform the semantic conversion
 
-Under the loaded skill, Hermes should complete the manifest while composing the requested artifact. It must:
+Under `5qln:5qln-converter`, Hermes should complete the manifest while composing the requested artifact. It must:
 
 - preserve every source unit and its normative force;
 - separate `source`, `derived`, and `proposal` material;
@@ -100,11 +100,37 @@ Tool arguments:
 
 If `report_path` is omitted, the full report is returned to Hermes without retaining a file.
 
-All three tools refuse to replace an existing output by default. Add `"overwrite": true` only after checking the target.
+## 4. Create and validate a deep-research prompt
 
-## 4. Interpret results
+Load `5qln:5qln-deep-research` and supply the inquiry, audience, time scope, constraints, known sources, and desired deliverable when known. Hermes should preserve the inquiry verbatim and mark unresolved inputs `[open: reason]` instead of inventing them.
 
-`success` describes tool execution. `valid` describes compilation.
+Example:
+
+```text
+Load 5qln:5qln-deep-research. Create one standalone prompt for a deep research
+agent to investigate how a mid-sized city should evaluate a heat-reflective
+roof subsidy pilot in 2027. The audience is municipal climate and budget staff.
+Require primary sources, counterevidence, uncertainty, and an as-of date.
+```
+
+The result should contain dependent `S_RECORD`, `G_RECORD`, `Q_RECORD`, `P_RECORD`, and `V_RECORD` gates. Later phases must cite the earlier records they receive. A prompt suite adds a coordinator and non-overlapping specialist packets while preserving one inquiry and α candidate.
+
+When the prompt is saved to a UTF-8 Markdown or text file, validate it with:
+
+```json
+{
+  "prompt_path": "/absolute/path/research-prompt.md",
+  "report_path": "/absolute/path/research-prompt-report.json"
+}
+```
+
+The registered tool is `fiveqln_validate_research_prompt`. If `report_path` is omitted, the complete report is returned without writing a report file. When the prompt exists only inline and no safe writable file exists, the skill performs the same audit manually and must not claim deterministic validation ran.
+
+Repair all errors and review all warnings before returning a prompt. Validate every standalone prompt in a suite separately.
+
+## 5. Interpret results
+
+`success` describes tool execution. `valid` describes the compiled manifest or research prompt.
 
 ```json
 {
@@ -117,11 +143,13 @@ All three tools refuse to replace an existing output by default. Add `"overwrite
 }
 ```
 
-A failed compilation is an expected review state, not a crashed tool. Repair errors before delivery. Keep warnings visible as review items.
+A failed validation is an expected review state, not a crashed tool. Repair errors before delivery and keep warnings visible.
 
-A passed compilation means only that the encoded integrity rules passed. It does not prove source truth, human resonance, or an authentic return.
+A passed manifest report means only that encoded conversion-integrity rules passed. A passed prompt report means only that the exact kernel, phase order, declared evidence gates, flow fields, corruption guards, and question-bearing return were present. Neither result proves source truth, research quality, human resonance, value alignment, or an authentic return.
 
-## 5. Update and remove
+All four tools refuse to replace an existing output by default. Add `"overwrite": true` only after checking the target.
+
+## 6. Update and remove
 
 ```bash
 hermes plugins update 5qln
@@ -131,7 +159,7 @@ hermes plugins remove 5qln
 
 Review release notes and repository changes before updating third-party code.
 
-## 6. Troubleshoot
+## 7. Troubleshoot
 
 ### Plugin is installed but tools are absent
 
@@ -150,7 +178,7 @@ HERMES_PLUGINS_DEBUG=1 hermes plugins list
 
 ### Skill is not visible in the normal skill index
 
-This is expected for plugin-bundled skills. Load the explicit namespaced name `5qln:5qln-converter`.
+This is expected for plugin-bundled skills. Load the explicit namespaced name `5qln:5qln-converter` or `5qln:5qln-deep-research`.
 
 ### DOCX or PDF inventory reports a missing module
 
@@ -165,3 +193,7 @@ Use the interpreter associated with the Hermes installation, not an unrelated sy
 ### Compiler reports all lenses as unreviewed
 
 The scaffold is working as intended. Review every address and set it to `used`, `released`, or `not_applicable`. Do not populate generic cells merely to make the report pass.
+
+### Research prompt validation fails
+
+Read the returned error codes before editing. Common causes are constitutional drift, missing or reordered phase gates, unresolved template tokens, missing evidence or counterevidence contracts, generic L4 phase substitutions, and a final line that is not a real question.

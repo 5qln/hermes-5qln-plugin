@@ -17,14 +17,27 @@ The Hermes plugin was derived from the complete installed 5QLN Converter skill s
 
 These hashes establish file identity for this import. They do not establish conceptual authority, authorship, truth, or human attestation.
 
+## Deep-research skill import
+
+The `5qln-deep-research` bundle was imported from the installed personal skill on 2026-07-22 after adding a dual-runtime validation route: Hermes uses the registered `fiveqln_validate_research_prompt` tool, while portable installations retain the direct script path. The prompt contract remains identical across both surfaces.
+
+| File | SHA-256 |
+|---|---|
+| `SKILL.md` | `3fd3ea81cd9a84e4a872a7367410a364d0b2fcb31d744f2a35a13dc51a55e7bb` |
+| `agents/openai.yaml` | `3174b4d34482b339c2ece8d8e5def84519e3ff41e3451f0680094e10dc52838a` |
+| `references/research-prompt-contract.md` | `0082cf72d728dfce24f39012583b31c2da06b07343e666df758402e2cfcadfb5` |
+| `scripts/validate_research_prompt.py` | `06f953746f5a213711dd780baf58e2c334ed8a39b9e275a612c39449c928f626` |
+
+These hashes establish import identity only. The skill and validator remain Mutable Implementation under Apache 2.0; the exact constitutional kernel they preserve remains governed by the kernel license.
+
 ## Port-specific additions
 
 - `plugin.yaml`: Hermes discovery metadata.
 - `__init__.py`: tool and skill registration.
 - `schemas.py`: Hermes-facing tool schemas.
 - `tools.py`: shell-free wrappers with non-overwrite defaults.
+- `fiveqln_validate_research_prompt`: Hermes wrapper around the imported deterministic validator.
 - `tests/`: registration and end-to-end validation.
 - repository documentation and CI.
 
 Any future modification to the original skill files should update this document and explain the lineage in `CHANGELOG.md`.
-

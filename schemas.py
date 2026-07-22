@@ -101,3 +101,34 @@ FIVEQLN_COMPILE_MANIFEST = {
     },
 }
 
+
+FIVEQLN_VALIDATE_RESEARCH_PROMPT = {
+    "name": "fiveqln_validate_research_prompt",
+    "description": (
+        "Validate one file-based standalone 5QLN deep-research prompt for the exact constitutional kernel, "
+        "ordered phase records, evidence and counterevidence gates, source/derived/proposal separation, "
+        "delta_E/delta_V flow, two-pass composition, corruption guards, and a question-bearing return. "
+        "A passing report is structural evidence; it does not prove research quality, source truth, "
+        "human resonance, value alignment, or completion."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "prompt_path": {
+                "type": "string",
+                "description": "Path to one UTF-8 Markdown or text research prompt.",
+            },
+            "report_path": {
+                "type": "string",
+                "description": "Optional path at which to persist the full validation report JSON.",
+            },
+            "overwrite": {
+                "type": "boolean",
+                "default": False,
+                "description": "Permit replacing an existing report file.",
+            },
+        },
+        "required": ["prompt_path"],
+        "additionalProperties": False,
+    },
+}

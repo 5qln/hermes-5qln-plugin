@@ -1,8 +1,8 @@
 name: 5qln
-version: 0.1.0
-description: Integrity-preserving 5QLN conversion, source inventory, manifest scaffolding, and deterministic compilation
+version: 0.2.0
+description: Integrity-preserving 5QLN conversion and deep-research prompt formation with deterministic validation
 provides_tools:
   - fiveqln_inventory_source
   - fiveqln_create_manifest
   - fiveqln_compile_manifest
-
+  - fiveqln_validate_research_prompt

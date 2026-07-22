@@ -17,6 +17,7 @@ The plugin can operate on supplied artifacts within K. It can:
 - preserve identifiers and normative wording;
 - propose lawful derivations with named bases;
 - create and validate manifest structure;
+- create and validate deep-research prompt contracts;
 - detect defined constitutional drift and corruption patterns;
 - present open questions and candidate returns.
 
@@ -49,7 +50,7 @@ Source inventory provides:
 
 This supports recovery and comparison. It does not prove the source was true, complete, authoritative, or correctly rendered. PDF, slide, spreadsheet, diagram, and layout-sensitive inputs require visual inspection in addition to extraction.
 
-## 4. Compiler meaning
+## 4. Compiler and prompt-validator meaning
 
 The compiler reports:
 
@@ -58,6 +59,8 @@ The compiler reports:
 - warnings as review items that do not change pass/fail status.
 
 Compilation tests the manifest for exact constitution, source hashes, statuses, cells, lens audit, traceability, derivation bases, questions, and completion rules. Passing is necessary for a substantial plugin-mediated conversion, but it is not sufficient evidence of semantic integrity or human recognition.
+
+Prompt validation tests one saved prompt for the exact constitutional strings, ordered phase gates, declared evidence and counterevidence rules, source/derived/proposal separation, adaptive-flow fields, corruption guards, and a question-bearing final line. It does not test the truth of the future research, the quality of sources that have not yet been gathered, or whether a generated research plan will create value.
 
 The removal test remains essential: if removing 5QLN does not materially change the converted artifact's organization, gates, evidence, or meaning, the artifact is L4 even if superficial symbols remain.
 
@@ -68,6 +71,8 @@ Treat the following as integrity-critical:
 - `references/constitution.md`;
 - `references/conversion-protocol.md`;
 - `references/manifest.md`;
+- `skills/5qln-deep-research/references/research-prompt-contract.md` constitutional copies;
+- `skills/5qln-deep-research/scripts/validate_research_prompt.py` constitutional constants;
 - constitutional constants and compiler rules;
 - status vocabularies and corruption codes;
 - lens orientation.
@@ -82,4 +87,3 @@ Any change must include:
 6. an explicit note when compatibility or notation changes.
 
 Never normalize a known divergence silently.
-

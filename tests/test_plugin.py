@@ -36,6 +36,25 @@ PLUGIN = load_plugin()
 TOOLS = sys.modules["hermes_5qln_plugin.tools"]
 
 
+def load_research_validator():
+    """Load the bundled prompt validator without importing a hyphenated package."""
+    name = "hermes_5qln_research_validator"
+    existing = sys.modules.get(name)
+    if existing is not None:
+        return existing
+    path = ROOT / "skills" / "5qln-deep-research" / "scripts" / "validate_research_prompt.py"
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Could not load research prompt validator")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+RESEARCH_VALIDATOR = load_research_validator()
+
+
 class FakeContext:
     def __init__(self) -> None:
         self.tools: dict[str, dict] = {}
@@ -49,7 +68,7 @@ class FakeContext:
 
 
 class PluginRegistrationTests(unittest.TestCase):
-    def test_registers_tools_and_namespaced_skill(self) -> None:
+    def test_registers_tools_and_namespaced_skills(self) -> None:
         ctx = FakeContext()
         PLUGIN.register(ctx)
         self.assertEqual(
@@ -58,13 +77,30 @@ class PluginRegistrationTests(unittest.TestCase):
                 "fiveqln_inventory_source",
                 "fiveqln_create_manifest",
                 "fiveqln_compile_manifest",
+                "fiveqln_validate_research_prompt",
             },
         )
-        self.assertEqual(set(ctx.skills), {"5qln-converter"})
-        self.assertTrue(ctx.skills["5qln-converter"].is_file())
+        self.assertEqual(set(ctx.skills), {"5qln-converter", "5qln-deep-research"})
+        for skill_path in ctx.skills.values():
+            self.assertTrue(skill_path.is_file())
         for registered in ctx.tools.values():
             self.assertEqual(registered["toolset"], "5qln")
             self.assertTrue(callable(registered["handler"]))
+
+    def test_research_contract_uses_canonical_constitution(self) -> None:
+        constitution = (
+            ROOT / "skills" / "5qln-converter" / "references" / "constitution.md"
+        ).read_text(encoding="utf-8")
+        contract = (
+            ROOT
+            / "skills"
+            / "5qln-deep-research"
+            / "references"
+            / "research-prompt-contract.md"
+        ).read_text(encoding="utf-8")
+        for exact in RESEARCH_VALIDATOR.REQUIRED_EXACT:
+            self.assertIn(exact, constitution)
+            self.assertIn(exact, contract)
 
 
 class ToolWorkflowTests(unittest.TestCase):
@@ -184,7 +220,42 @@ class ToolWorkflowTests(unittest.TestCase):
         self.assertIn("overwrite=true", result["error"])
         self.assertEqual(output.read_text(encoding="utf-8"), "keep")
 
+    def test_research_prompt_validation_passes(self) -> None:
+        prompt = ROOT / "tests" / "fixtures" / "valid-research-prompt.md"
+        report_path = self.work / "research-prompt-report.json"
+        result = json.loads(
+            TOOLS.validate_research_prompt(
+                {"prompt_path": str(prompt), "report_path": str(report_path)}
+            )
+        )
+        self.assertTrue(result["success"], result)
+        self.assertTrue(result["valid"], result)
+        self.assertEqual(result["report"]["status"], "passed")
+        self.assertEqual(result["report"]["counts"], {"errors": 0, "warnings": 0})
+        self.assertTrue(report_path.is_file())
+
+    def test_invalid_research_prompt_is_a_review_state(self) -> None:
+        result = json.loads(
+            TOOLS.validate_research_prompt({"prompt_path": str(self.source)})
+        )
+        self.assertTrue(result["success"], result)
+        self.assertFalse(result["valid"], result)
+        self.assertEqual(result["report"]["status"], "failed")
+        self.assertGreater(result["report"]["counts"]["errors"], 0)
+
+    def test_research_report_is_not_overwritten_without_consent(self) -> None:
+        prompt = ROOT / "tests" / "fixtures" / "valid-research-prompt.md"
+        report_path = self.work / "existing-research-report.json"
+        report_path.write_text("keep", encoding="utf-8")
+        result = json.loads(
+            TOOLS.validate_research_prompt(
+                {"prompt_path": str(prompt), "report_path": str(report_path)}
+            )
+        )
+        self.assertFalse(result["success"], result)
+        self.assertIn("overwrite=true", result["error"])
+        self.assertEqual(report_path.read_text(encoding="utf-8"), "keep")
+
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -62,7 +62,7 @@ pilot? Keep human attestations open and require claim-level evidence.
 
 The skill makes `S → G → Q → P → V` operational through dependent phase records, evidence and counterevidence gates, adaptive `δE/δV → ∇` branching, two-pass B'' composition, and a question-bearing return. If the prompt is saved to a file, Hermes can call `fiveqln_validate_research_prompt` and repair it until the encoded contract passes.
 
-See the [5QLN Deep Research User Guide](docs/DEEP_RESEARCH_USER_GUIDE.md) for an input checklist, single-agent and coordinator/specialist examples, validation steps, execution handoff, troubleshooting, limitations, and the feedback checklist.
+See the [5QLN Deep Research User Guide](docs/DEEP_RESEARCH_USER_GUIDE.md) for the human operating workflow. AI agents that create, audit, or execute the prompts should follow the [5QLN Deep Research AI Agent Guide](docs/DEEP_RESEARCH_AGENT_GUIDE.md), which also records how the portable skill was formed and adapted to Hermes.
 
 ## What is registered
 

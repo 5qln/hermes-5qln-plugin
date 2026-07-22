@@ -5,6 +5,8 @@
 
 This guide applies to the 5QLN Hermes plugin v0.2.0.
 
+If you are an AI agent creating or auditing the prompt, follow the [5QLN Deep Research AI Agent Guide](DEEP_RESEARCH_AGENT_GUIDE.md). It includes the agent operating contract and the background of how the skill was formed and adapted to Hermes.
+
 ## What the skill does
 
 The skill turns a researchable inquiry into a copy-ready prompt governed by the native 5QLN flow `S → G → Q → P → V`. It can create:

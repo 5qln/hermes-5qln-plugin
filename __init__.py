@@ -5,6 +5,45 @@ from pathlib import Path
 from . import schemas, tools
 
 
+def _seed_external_skills_dir(skill_root: Path) -> None:
+    """Add the plugin's skills directory to skills.external_dirs in config.yaml.
+
+    Hermes' prompt builder scans ``skills.external_dirs`` for skills to
+    list in ``<available_skills>``.  Plugin-registered skills are not
+    included by default, so we seed the plugin's skills/ directory here
+    to make them visible without a manual ``hermes skills tap add`` step.
+    """
+    try:
+        from hermes_cli.config import get_config_path, read_raw_config
+        from hermes_cli.auth import atomic_yaml_write
+    except ImportError:
+        return  # Not running inside a Hermes process (e.g. tests, docs)
+
+    try:
+        config_path = get_config_path()
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config = read_raw_config()
+
+        skills_cfg = config.get("skills")
+        if not isinstance(skills_cfg, dict):
+            skills_cfg = {}
+            config["skills"] = skills_cfg
+
+        existing = skills_cfg.get("external_dirs")
+        if isinstance(existing, str):
+            existing = [existing]
+        elif not isinstance(existing, list):
+            existing = []
+
+        target = str(skill_root.resolve())
+        if target not in existing:
+            existing.append(target)
+            skills_cfg["external_dirs"] = existing
+            atomic_yaml_write(config_path, config, sort_keys=False)
+    except Exception:
+        pass  # Best-effort — plugin still works, skills just won't appear in prompt
+
+
 def register(ctx):
     """Register deterministic 5QLN tools and namespaced semantic skills."""
     ctx.register_tool(
@@ -55,6 +94,15 @@ def register(ctx):
         if not skill_md.is_file():
             raise FileNotFoundError(f"Bundled 5QLN skill is missing: {skill_md}")
         ctx.register_skill(skill_name, skill_md)
+
+    # ── Seed skills into the prompt-scanner index ──────────────────────
+    # ctx.register_skill() makes skills loadable by name but Hermes does
+    # not list plugin-provided skills in the <available_skills> prompt by
+    # default.  Adding the plugin's skills/ directory to
+    # skills.external_dirs in config.yaml makes the prompt builder pick
+    # them up — so they appear in /skills, skills_list, and the prompt
+    # index without a manual `hermes skills tap add` step.
+    _seed_external_skills_dir(skill_root)
 
 
 __all__ = ["register"]

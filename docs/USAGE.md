@@ -178,7 +178,12 @@ HERMES_PLUGINS_DEBUG=1 hermes plugins list
 
 ### Skill is not visible in the normal skill index
 
-This is expected for plugin-bundled skills. Load the explicit namespaced name `5qln:5qln-converter` or `5qln:5qln-deep-research`.
+If 5QLN skills don't appear in `/skills` or the agent's skill list after installation:
+
+1. Restart Hermes fully after installation
+2. Verify the plugin is enabled: `hermes plugins list`
+3. Check that the skills directory was seeded: `hermes config get skills.external_dirs` — it should include a path ending in `hermes-5qln-plugin/skills`
+4. If the directory is missing, re-enable the plugin to trigger seeding: `hermes plugins disable 5qln && hermes plugins enable 5qln`
 
 ### DOCX or PDF inventory reports a missing module
 

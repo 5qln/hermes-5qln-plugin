@@ -34,8 +34,8 @@ The skills control interpretation and composition. The tools make repeatable fac
 Hermes discovers the root `plugin.yaml` and imports root `__init__.py`. `register(ctx)` wires:
 
 - four JSON-schema tools under toolset `5qln`;
-- `skills/5qln-converter/SKILL.md` as `5qln:5qln-converter`;
-- `skills/5qln-deep-research/SKILL.md` as `5qln:5qln-deep-research`.
+- ten namespaced skills via `ctx.register_skill()` (loadable as `5qln:skill-name`);
+- the plugin's `skills/` directory is auto-seeded into `skills.external_dirs` in config.yaml so all ten skills appear in the normal skill index (`/skills`, `skills_list`, and the agent's `<available_skills>` prompt).
 
 The skills are read-only from Hermes' perspective. Their namespace prevents collisions with built-in or user-managed skills.
 

@@ -44,8 +44,9 @@ hermes plugins install 5qln/hermes-5qln-plugin --enable
 ```
 
 Restart Hermes fully. Skills are namespaced — load with `5qln:skill-name`.
+They also appear in the normal skill index (`/skills`, `skills_list`) after restart.
 
-If skills don't appear: `hermes skills tap add 5qln/hermes-5qln-plugin` then restart.
+If skills don't appear after restart, verify the plugin is enabled: `hermes plugins list`.
 
 ## Use
 

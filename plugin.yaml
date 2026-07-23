@@ -1,6 +1,6 @@
 name: 5qln
-version: 0.3.0
-description: 5QLN language runtime for Hermes Agent — constitutional grammar activation, formation cycle engine, conversion pipeline, and experimental features. Designed to grow: agents produce their own skills from sessions, verifiable through the converter.
+version: 0.4.0
+description: 5QLN language runtime for Hermes Agent — constitutional grammar activation, formation cycle engine, conversion pipeline, and experimental features. Skills auto-seed into the skill index on install so they appear in /skills and the agent prompt without manual tap configuration.
 provides_tools:
   - fiveqln_inventory_source
   - fiveqln_create_manifest

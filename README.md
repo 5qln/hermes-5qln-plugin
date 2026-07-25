@@ -12,6 +12,45 @@ The plugin is part of a larger vision: **[AGI for People](https://www.5qln.com/a
 hermes plugins install 5qln/hermes-5qln-plugin --enable
 ```
 
+## The Kernel: Nine Lines, 217 Bytes
+
+Everything invariant in 5QLN is nine lines. Lines 1-7 define the grammar, line 8 enforces completion, line 9 detects violation.
+
+```
+1.  H = ∞0 | A = K
+2.  S → G → Q → P → V
+3.  S = ∞0 → ?
+4.  G = α ≡ {α'}
+5.  Q = φ ⋂ Ω
+6.  P = δE/δV → ∇
+7.  V = (L ∩ G → B'') → ∞0'
+8.  No V without ∞0'
+9.  L1  L2  L3  L4  V∅
+```
+
+**217 bytes, frozen, hash-sealed.**
+SHA-256 `feaa46b4147d4e023cdd3fd59c051d063e8ec654ee7b38a481dcd5e4c781859b`
+
+Canonical serialization: the nine numbered lines exactly as printed above (number, period, two spaces, line text), joined by newlines, with one trailing newline. The hash line itself is the seal and is not part of the 217 bytes.
+
+| Line | What it means |
+|---|---|
+| **1** `H = ∞0 \| A = K` | The human originates from what is not yet known; the AI works the known (K) at full strength. `\|` is the membrane: the interface where the two meet without either taking the other's role. |
+| **2** `S → G → Q → P → V` | Work runs through five phases in order. Every transition is a human gate, never a step the AI closes on its own. |
+| **3** `S = ∞0 → ?` | **Start.** The driving question is named by the human. The AI may reflect it back, never supply it. |
+| **4** `G = α ≡ {α'}` | **Growth.** Find the core (α) whose removal collapses the question, and its self-similar forms across scales. |
+| **5** `Q = φ ⋂ Ω` | **Quality.** The person's own perception (φ) meets the wider context (Ω). Only the human can confirm the fit. |
+| **6** `P = δE/δV → ∇` | **Power.** Effort mapped against value reveals the low-resistance direction (∇), instead of a direction being imposed. |
+| **7** `V = (L ∩ G → B'') → ∞0'` | **Value.** Local result and wider propagation compose into an artifact (B'') built from the formation trail, and the cycle returns a new question (∞0'). |
+| **8** `No V without ∞0'` | A cycle that produces an artifact but no new question has stopped, not completed. |
+| **9** `L1 L2 L3 L4 V∅` | The closed set of failures: steering, ghost-origination, false authority, decoration, dead ending. Nothing is added to this list. |
+
+The plugin bundles this block verbatim and checks it by exact match. A deviation as small as a typographic prime in place of an ASCII apostrophe is a typed drift error, so the kernel cannot be amended silently. That is what makes conformance checkable: the absence of human origination becomes a visible, typed, structural failure rather than something a reader has to infer from the finished text.
+
+The kernel is immutable by license — extend it, never mutate or subtract.
+
+Full specification: [5QLN Codex](https://5qln.com/codex). Line-by-line reading in plain English: [The Nine Invariant Lines](https://www.5qln.com/reading-the-5qln-codex-nine-lines/).
+
 ## What's Included
 
 10 skills and 4 registered tools. The tools are deterministic and stdlib-only;

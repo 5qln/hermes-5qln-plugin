@@ -78,12 +78,16 @@ class FakeContext:
     def __init__(self) -> None:
         self.tools: dict[str, dict] = {}
         self.skills: dict[str, Path] = {}
+        self.hooks: dict[str, list] = {}
 
     def register_tool(self, **kwargs) -> None:
         self.tools[kwargs["name"]] = kwargs
 
     def register_skill(self, name, path) -> None:
         self.skills[name] = Path(path)
+
+    def register_hook(self, name, callback) -> None:
+        self.hooks.setdefault(name, []).append(callback)
 
 
 class PluginRegistrationTests(unittest.TestCase):
@@ -97,6 +101,7 @@ class PluginRegistrationTests(unittest.TestCase):
                 "fiveqln_create_manifest",
                 "fiveqln_compile_manifest",
                 "fiveqln_validate_research_prompt",
+                "fiveqln_fractal_memory",
             },
         )
         self.assertEqual(
@@ -119,6 +124,9 @@ class PluginRegistrationTests(unittest.TestCase):
         for registered in ctx.tools.values():
             self.assertEqual(registered["toolset"], "5qln")
             self.assertTrue(callable(registered["handler"]))
+        self.assertEqual(set(ctx.hooks), {"pre_llm_call"})
+        self.assertEqual(len(ctx.hooks["pre_llm_call"]), 1)
+        self.assertTrue(callable(ctx.hooks["pre_llm_call"][0]))
 
     def test_empty_centrifuge_does_not_report_false_contamination(self) -> None:
         card = CENTRIFUGE.signature_card([])
@@ -257,6 +265,43 @@ class ToolWorkflowTests(unittest.TestCase):
         self.assertFalse(result["success"])
         self.assertIn("overwrite=true", result["error"])
         self.assertEqual(output.read_text(encoding="utf-8"), "keep")
+
+    def test_fractal_memory_tool_excludes_evidence_bearing_calibration(self) -> None:
+        seed_path = ROOT / "examples" / "parametric-fractal.example.json"
+        home = self.work / "profile"
+        exported_path = self.work / "portable.json"
+
+        installed = json.loads(
+            TOOLS.fractal_memory(
+                {
+                    "action": "install",
+                    "seed_path": str(seed_path),
+                    "hermes_home": str(home),
+                }
+            )
+        )
+        shown = json.loads(
+            TOOLS.fractal_memory(
+                {"action": "show", "hermes_home": str(home)}
+            )
+        )
+        exported = json.loads(
+            TOOLS.fractal_memory(
+                {
+                    "action": "export",
+                    "hermes_home": str(home),
+                    "output_path": str(exported_path),
+                }
+            )
+        )
+
+        self.assertTrue(installed["success"], installed)
+        self.assertTrue(shown["success"], shown)
+        self.assertTrue(exported["success"], exported)
+        self.assertTrue(exported_path.is_file())
+        schema = PLUGIN.schemas.FIVEQLN_FRACTAL_MEMORY["parameters"]
+        self.assertNotIn("calibrate", schema["properties"]["action"]["enum"])
+        self.assertNotIn("evidence", schema["properties"])
 
     def test_research_prompt_validation_passes(self) -> None:
         prompt = ROOT / "tests" / "fixtures" / "valid-research-prompt.md"

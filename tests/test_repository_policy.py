@@ -41,11 +41,13 @@ class RepositoryPolicyTests(unittest.TestCase):
         version = version_line.split(":", 1)[1].strip()
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
         self.assertIn(f"## {version} -", changelog)
+        self.assertIn("provides_hooks:\n  - pre_llm_call", manifest)
         for tool in (
             "fiveqln_inventory_source",
             "fiveqln_create_manifest",
             "fiveqln_compile_manifest",
             "fiveqln_validate_research_prompt",
+            "fiveqln_fractal_memory",
         ):
             self.assertIn(f"  - {tool}", manifest)
 

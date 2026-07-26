@@ -17,12 +17,16 @@ From the repository root:
 
 ```bash
 python -m compileall -q .
+python -m unittest tests.test_fractal_memory -v
+python -m unittest tests.test_plugin -v
 python -m unittest discover -s tests -v
 ```
 
 The tests verify:
 
-- Hermes-style registration of all four tools and both skills;
+- Hermes-style registration of all five tools, the pre-LLM hook, and all ten skills;
+- strict fixed-shape seed validation and the 4096-byte bound;
+- seed installation, calibration, export, and evidence non-retention;
 - source inventory and manifest creation;
 - a minimally complete manifest passing compilation;
 - constitutional drift failing compilation;
@@ -50,6 +54,23 @@ Verify in the session:
 ```
 
 Then ask Hermes to load `5qln:5qln-converter` and run a small Markdown workflow. Load `5qln:5qln-deep-research`, create a file-based prompt, and call `fiveqln_validate_research_prompt` for the research path.
+
+For a clean parametric-fractal smoke test, use a separate Hermes home and the synthetic seed:
+
+```bash
+PROFILE=$(mktemp -d /tmp/5qln-profile.XXXXXX)
+mkdir -p "$PROFILE/plugins"
+ln -s /absolute/path/hermes-5qln-plugin "$PROFILE/plugins/5qln"
+HERMES_HOME="$PROFILE" hermes plugins enable 5qln --no-allow-tool-override
+HERMES_HOME="$PROFILE" hermes plugins list --plain --no-bundled
+python3 /absolute/path/hermes-5qln-plugin/fractal_memory.py install \
+  /absolute/path/hermes-5qln-plugin/examples/parametric-fractal.example.json \
+  --hermes-home "$PROFILE"
+python3 /absolute/path/hermes-5qln-plugin/fractal_memory.py show \
+  --hermes-home "$PROFILE"
+```
+
+This proves plugin discovery and portable state mechanics, not human resonance. See [Portable Parametric Fractal](PARAMETRIC_FRACTAL.md) for the clean-profile A/B protocol.
 
 ## Editing the plugin surface
 

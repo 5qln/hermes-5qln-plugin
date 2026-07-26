@@ -53,7 +53,7 @@ Full specification: [5QLN Codex](https://5qln.com/codex). Line-by-line reading i
 
 ## What's Included
 
-10 skills and 4 registered tools. The tools are deterministic and stdlib-only;
+10 skills and 5 registered tools. The tools are deterministic and stdlib-only;
 the experimental skills also bundle stdlib-only scripts.
 
 | Skill | Does |
@@ -67,7 +67,7 @@ the experimental skills also bundle stdlib-only scripts.
 | `5qln-manifest-compilation` | Manifest structure and compiler rules |
 | `5qln-deep-research` | Phase-gated research prompts _(experimental)_ |
 | `5qln-centrifuge` | Cross-session pattern extraction _(experimental)_ |
-| `5qln-signature-engine` | Memory layer for session continuity _(experimental, tools planned)_ |
+| `5qln-signature-engine` | Experimental signature and continuity interpretation; the bounded native orchestrator is documented separately |
 
 | Tool | Does |
 |------|------|
@@ -75,6 +75,7 @@ the experimental skills also bundle stdlib-only scripts.
 | `fiveqln_create_manifest` | Integrity checklist from inventory |
 | `fiveqln_compile_manifest` | Manifest audit |
 | `fiveqln_validate_research_prompt` | Research prompt contract validation |
+| `fiveqln_fractal_memory` | Install, inspect, or export bounded session-orchestrator state; evidence-bearing calibration is CLI-only |
 
 ## Install
 
@@ -102,6 +103,18 @@ Load 5qln:5qln-deep-research. Turn this inquiry into a prompt that enforces
 provenance and counterevidence at the prompt level.
 ```
 
+Test the bounded orchestrator with the synthetic seed:
+
+```bash
+python3 fractal_memory.py install examples/parametric-fractal.example.json \
+  --hermes-home /tmp/5qln-fractal-profile
+python3 fractal_memory.py show --hermes-home /tmp/5qln-fractal-profile
+```
+
+This proves the portable mechanism, not human resonance. See the
+[Portable Parametric Fractal guide](docs/PARAMETRIC_FRACTAL.md) for the trust
+boundary and fresh-profile A/B protocol.
+
 [Usage Guide](docs/USAGE.md) — step-by-step with expected outputs.
 
 ## How It Works
@@ -128,6 +141,7 @@ The plugin ships the runtime. Your agent produces the rest — session distillat
 | [Deep Research — User](docs/DEEP_RESEARCH_USER_GUIDE.md) | Human workflow for research prompts |
 | [Deep Research — Agent](docs/DEEP_RESEARCH_AGENT_GUIDE.md) | AI agent guide for research prompts |
 | [Development](docs/DEVELOPMENT.md) | Setup, testing, contributing |
+| [Portable Parametric Fractal](docs/PARAMETRIC_FRACTAL.md) | Bounded session orchestration, portability, and trust boundary |
 | [Changelog](CHANGELOG.md) | Version history |
 
 ## License

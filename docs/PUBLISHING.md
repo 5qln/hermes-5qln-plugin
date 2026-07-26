@@ -39,7 +39,7 @@ Then verify:
 - no generated inventories, manifests, reports, credentials, or private sources are committed;
 - both full skill bundles are present;
 - a clean Hermes installation succeeds with `hermes plugins install 5qln/hermes-5qln-plugin --enable`;
-- `/plugins` shows `5qln` and all four tools;
+- `/plugins` shows `5qln`, all five tools, the `pre_llm_call` hook, and all ten skills;
 - `5qln:5qln-converter` loads;
 - `5qln:5qln-deep-research` loads;
 - a small end-to-end conversion produces the expected pass/fail behavior.

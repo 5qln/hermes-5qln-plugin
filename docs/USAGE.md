@@ -6,9 +6,10 @@
 2. Load a semantic skill
 3. Run a conversion workflow
 4. Create and validate a deep-research prompt
-5. Interpret results
-6. Update and remove
-7. Troubleshoot
+5. Operate a portable parametric fractal
+6. Interpret results
+7. Update and remove
+8. Troubleshoot
 
 ## 1. Install and verify
 
@@ -19,7 +20,7 @@ hermes plugins install 5qln/hermes-5qln-plugin --enable
 hermes plugins list
 ```
 
-The plugin name is `5qln`. It registers four tools in the `5qln` toolset and two namespaced skills.
+The plugin name is `5qln`. It registers five tools in the `5qln` toolset and ten namespaced skills.
 
 If installation used no `--enable` flag and the prompt was declined, enable it later:
 
@@ -128,7 +129,65 @@ The registered tool is `fiveqln_validate_research_prompt`. If `report_path` is o
 
 Repair all errors and review all warnings before returning a prompt. Validate every standalone prompt in a suite separately.
 
-## 5. Interpret results
+## 5. Operate a portable parametric fractal
+
+The portable parametric fractal is experimental bounded state for the live session orchestrator. It contains a fixed profile, five three-decimal mechanical phase values, and a checksum derived from the complete state. It contains no transcript, wiki, summary, source path, identity, counter, arbitrary digest payload, or attestation wording.
+
+### Install a synthetic test seed
+
+```bash
+python3 fractal_memory.py install \
+  examples/parametric-fractal.example.json \
+  --hermes-home /tmp/5qln-fractal-profile
+```
+
+Installation protects existing state unless `--replace` is explicit.
+
+### Inspect installed state
+
+```bash
+python3 fractal_memory.py show \
+  --hermes-home /tmp/5qln-fractal-profile
+```
+
+The state is stored at `/tmp/5qln-fractal-profile/5qln/parametric-fractal.json` in this example.
+
+### Apply one explicit calibration
+
+```bash
+python3 fractal_memory.py calibrate \
+  --hermes-home /tmp/5qln-fractal-profile \
+  --phase Q \
+  --source-tag lived \
+  --evidence-stdin
+```
+
+Type the explicit human evidence and press Enter. The program requires non-empty evidence but discards it immediately. It does not write, echo, return, or hash that wording into portable state. External terminal auditing can still capture stdin.
+
+Canonical tags are:
+
+| Phase | Positive | Negative |
+|---|---|---|
+| S | `emergent` | `mechanical` |
+| G | `revealed` | `logical` |
+| Q | `lived` | `logical` |
+| P | `felt` | `calculated` |
+| V | `opened` | `closed` |
+
+### Export updated state
+
+```bash
+python3 fractal_memory.py export /tmp/portable-fractal.json \
+  --hermes-home /tmp/5qln-fractal-profile
+```
+
+The native tool `fiveqln_fractal_memory` supports `install`, `show`, and `export`. Calibration is intentionally CLI-only: exact evidence never crosses a Hermes tool-call boundary, where it would be persisted in session history.
+
+After a full Hermes restart, the plugin's `pre_llm_call` hook injects fixed K-language and the five phase values into every turn. With no installed seed, the hook is inert.
+
+A passing mechanical test does not establish signature or resonance. Use the clean-profile A/B protocol in [Portable Parametric Fractal](PARAMETRIC_FRACTAL.md), and reserve recognition for explicit H evidence.
+
+## 6. Interpret results
 
 `success` describes tool execution. `valid` describes the compiled manifest or research prompt.
 
@@ -147,9 +206,9 @@ A failed validation is an expected review state, not a crashed tool. Repair erro
 
 A passed manifest report means only that encoded conversion-integrity rules passed. A passed prompt report means only that the exact kernel, phase order, declared evidence gates, flow fields, corruption guards, and question-bearing return were present. Neither result proves source truth, research quality, human resonance, value alignment, or an authentic return.
 
-All four tools refuse to replace an existing output by default. Add `"overwrite": true` only after checking the target.
+The inventory, manifest, compiler-report, prompt-report, seed-install, and seed-export operations refuse to replace an existing output by default. Use their explicit overwrite or replace option only after checking the target.
 
-## 6. Update and remove
+## 7. Update and remove
 
 ```bash
 hermes plugins update 5qln
@@ -159,7 +218,7 @@ hermes plugins remove 5qln
 
 Review release notes and repository changes before updating third-party code.
 
-## 7. Troubleshoot
+## 8. Troubleshoot
 
 ### Plugin is installed but tools are absent
 

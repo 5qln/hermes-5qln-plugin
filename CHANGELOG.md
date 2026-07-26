@@ -2,6 +2,27 @@
 
 All notable changes are recorded here. Versions follow semantic versioning.
 
+## 0.5.0 - 2026-07-26
+
+### Added
+- Portable, bounded parametric-fractal session orchestrator.
+- Native `fiveqln_fractal_memory` install/show/export tool and CLI-only evidence-bearing calibration.
+- Per-turn `pre_llm_call` K-context hook, inert when no seed is installed.
+- Synthetic seed example and public lifecycle documentation.
+
+### Security
+- Strict fixed-key, 4096-byte seed format uses five quantized values and a derived checksum; transcripts, counters, arbitrary digest payloads, and free-form source content are excluded.
+- Calibration evidence is required ephemerally and is never retained or hashed into portable state.
+- Cross-process locking prevents concurrent calibration updates from being lost.
+
+### Changed
+- Registered tool count increased from four to five.
+
+## 0.4.0 - 2026-07-26
+
+### Added
+- Automatic seeding of bundled plugin skills into Hermes' normal skill index on install.
+
 ## 0.3.0 - 2026-07-22
 
 ### Added

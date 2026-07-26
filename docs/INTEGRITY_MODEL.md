@@ -5,8 +5,9 @@
 1. What the plugin can know
 2. What the plugin cannot attest
 3. Preservation evidence
-4. Compiler meaning
-5. Change control
+4. Portable-state evidence
+5. Compiler meaning
+6. Change control
 
 ## 1. What the plugin can know
 
@@ -18,6 +19,9 @@ The plugin can operate on supplied artifacts within K. It can:
 - propose lawful derivations with named bases;
 - create and validate manifest structure;
 - create and validate deep-research prompt contracts;
+- validate the fixed parametric-fractal schema and Codex seal;
+- apply deterministic bounded phase updates with serialized atomic writes;
+- verify a checksum derived from the complete portable state;
 - detect defined constitutional drift and corruption patterns;
 - present open questions and candidate returns.
 
@@ -33,7 +37,11 @@ The plugin cannot self-attest:
 - genuine Z;
 - human value alignment;
 - constitutional authority;
-- a human-recognized ∞0'.
+- a human-recognized ∞0';
+- that calibration evidence was actually supplied by H;
+- that mechanical phase values encode a distinctive signature;
+- that a seeded session resonated or improved human freedom;
+- that source material does not remain in systems outside the portable seed.
 
 If evidence is missing, the state remains `open` or `candidate`. This is not an error condition.
 
@@ -50,7 +58,15 @@ Source inventory provides:
 
 This supports recovery and comparison. It does not prove the source was true, complete, authoritative, or correctly rendered. PDF, slide, spreadsheet, diagram, and layout-sensitive inputs require visual inspection in addition to extraction.
 
-## 4. Compiler and prompt-validator meaning
+## 4. Portable-state evidence
+
+The parametric-fractal runtime validates an exact-key JSON object no larger than 4096 canonical bytes. The supported state contains only a fixed operating profile, five phase values quantized to three decimal places, the Codex seal, and a checksum derived from those fields. Free-form source, identity, instruction, transcript, summary, wiki, counters, arbitrary digest payloads, and attestation fields are not part of the format.
+
+Calibration requires non-empty explicit evidence through CLI stdin. This runtime does not write, return, or hash the wording into portable state. Calibration is intentionally absent from the native Hermes tool because Hermes persists tool-call arguments in session history. The checksum detects accidental edits that leave it unchanged; it does not prove freshness, provenance, historical continuity, human evidence, or improved resonance.
+
+The supported seed has no source-bearing field and only five quantized parameters, so its capacity is sharply bounded. That is not a non-reconstruction guarantee: a malicious author can encode a short secret in numeric values and recompute the checksum. Install only trusted, inspected seeds. This also does not prove that copies are absent from session databases, logs, backups, model-provider systems, or other external stores.
+
+## 5. Compiler and prompt-validator meaning
 
 The compiler reports:
 
@@ -64,7 +80,7 @@ Prompt validation tests one saved prompt for the exact constitutional strings, o
 
 The removal test remains essential: if removing 5QLN does not materially change the converted artifact's organization, gates, evidence, or meaning, the artifact is L4 even if superficial symbols remain.
 
-## 5. Change control
+## 6. Change control
 
 Treat the following as integrity-critical:
 

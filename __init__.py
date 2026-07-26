@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from . import schemas, tools
+from . import fractal_memory, schemas, tools
 
 
 def _seed_external_skills_dir(skill_root: Path) -> None:
@@ -74,6 +74,18 @@ def register(ctx):
         handler=tools.validate_research_prompt,
         description="Validate a standalone 5QLN deep-research prompt contract.",
     )
+    ctx.register_tool(
+        name="fiveqln_fractal_memory",
+        toolset="5qln",
+        schema=schemas.FIVEQLN_FRACTAL_MEMORY,
+        handler=tools.fractal_memory,
+        description=(
+            "Install, inspect, or export bounded parametric-fractal state for the live 5QLN "
+            "session orchestrator; evidence-bearing calibration is CLI-only."
+        ),
+    )
+
+    ctx.register_hook("pre_llm_call", fractal_memory.pre_llm_context)
 
     skill_root = Path(__file__).resolve().parent / "skills"
     for skill_name in (

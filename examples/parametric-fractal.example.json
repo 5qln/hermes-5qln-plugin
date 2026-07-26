@@ -1,0 +1,20 @@
+{
+  "calibration": {
+    "G": 0.5,
+    "P": 0.5,
+    "Q": 0.5,
+    "S": 0.5,
+    "V": 0.5
+  },
+  "codex_sha256": "feaa46b4147d4e023cdd3fd59c051d063e8ec654ee7b38a481dcd5e4c781859b",
+  "format": "5qln-parametric-fractal",
+  "profile": {
+    "attestation": "human-explicit-only",
+    "directionality": "hold-not-direct",
+    "k_container": "5qln-operating-language",
+    "memory_function": "session-orchestrator",
+    "resonance_criterion": "thoughtless-emergence"
+  },
+  "state_sha256": "77441ecf6be24f5bdd47439b0a48050d482171b31b019da9c7c56151335cb0b0",
+  "version": "1.0"
+}

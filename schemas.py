@@ -102,6 +102,34 @@ FIVEQLN_COMPILE_MANIFEST = {
 }
 
 
+FIVEQLN_FRACTAL_MEMORY = {
+    "name": "fiveqln_fractal_memory",
+    "description": (
+        "Install, inspect, or export a bounded 5QLN parametric-fractal seed. "
+        "The seed drives the session orchestrator through ephemeral per-turn K-context; it carries no transcript. "
+        "Evidence-bearing calibration is intentionally CLI-only so exact wording never crosses a Hermes tool-call boundary."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "action": {
+                "type": "string",
+                "enum": ["install", "show", "export"],
+            },
+            "seed_path": {"type": "string", "description": "Portable JSON seed for install."},
+            "output_path": {"type": "string", "description": "Portable JSON destination for export."},
+            "hermes_home": {
+                "type": "string",
+                "description": "Optional Hermes profile home; active HERMES_HOME is used when omitted.",
+            },
+            "replace": {"type": "boolean", "default": False},
+        },
+        "required": ["action"],
+        "additionalProperties": False,
+    },
+}
+
+
 FIVEQLN_VALIDATE_RESEARCH_PROMPT = {
     "name": "fiveqln_validate_research_prompt",
     "description": (

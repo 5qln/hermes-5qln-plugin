@@ -33,8 +33,9 @@ The skills control interpretation and composition. The tools make repeatable fac
 
 Hermes discovers the root `plugin.yaml` and imports root `__init__.py`. `register(ctx)` wires:
 
-- four JSON-schema tools under toolset `5qln`;
+- five JSON-schema tools under toolset `5qln`;
 - ten namespaced skills via `ctx.register_skill()` (loadable as `5qln:skill-name`);
+- one `pre_llm_call` hook that is inert unless a valid profile seed is installed;
 - the plugin's `skills/` directory is auto-seeded into `skills.external_dirs` in config.yaml so all ten skills appear in the normal skill index (`/skills`, `skills_list`, and the agent's `<available_skills>` prompt).
 
 The skills are read-only from Hermes' perspective. Their namespace prevents collisions with built-in or user-managed skills.
@@ -67,6 +68,25 @@ The manifest is the bridge. It preserves the source ledger and makes semantic cl
 | Prompt validation | Saved UTF-8 prompt | JSON validation report | Encoded contract checks only |
 
 The research validator checks one standalone prompt at a time. A suite keeps shared inquiry and α identifiers but validates the coordinator and every specialist prompt separately.
+
+### Portable parametric-fractal orchestration
+
+```mermaid
+flowchart LR
+    F["Fixed-shape portable seed"] --> L["Profile loader"]
+    L --> H["pre_llm_call hook"]
+    H --> K["Ephemeral K-context"]
+    K --> C["Live H-K conversation"]
+    C --> A["Explicit human attestation"]
+    A --> U["Bounded parameter update"]
+    U --> F
+```
+
+The seed contains the Codex seal, a fixed operating profile, five three-decimal mechanical phase values, and a checksum derived from the complete state. It does not contain source text, identity, conversation, wiki context, counters, attestation wording, or an arbitrary digest payload. The hook maps fixed enums to fixed public K-language and interpolates only the mechanical values and checksum.
+
+A calibration event requires non-empty explicit evidence through the CLI stdin path. It is deliberately unavailable as a Hermes tool action because Hermes persists tool-call arguments. A cross-process lock serializes the complete load-update-write operation. The derived checksum detects accidental edits that leave the checksum unchanged; it does not prove freshness, historical continuity, or human evidence.
+
+The runtime separates six surfaces: immutable Codex DNA, plugin propagation, contextual wiki provenance, H's living fluency, the bounded seed, and the live session orchestrator. Only the bounded seed is portable state. The session orchestrator is memory in operation, not a stored conversation package.
 
 ## 4. Trust boundaries
 

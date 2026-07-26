@@ -7,11 +7,14 @@ JSON strings on success and failure, as required by Hermes' plugin contract.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any
+
+from . import fractal_memory as fractal_runtime
 
 
 _PLUGIN_DIR = Path(__file__).resolve().parent
@@ -28,6 +31,12 @@ def _path(value: Any, field: str) -> Path:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{field} must be a non-empty path string")
     return Path(value).expanduser().resolve()
+
+
+def _text(value: Any, field: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{field} must be non-empty text")
+    return value.strip()
 
 
 def _input_path(value: Any, field: str) -> Path:
@@ -198,6 +207,43 @@ def compile_manifest(args: dict[str, Any], **kwargs: Any) -> str:
                 temporary_report.unlink(missing_ok=True)
             except OSError:
                 pass
+
+
+def fractal_memory(args: dict[str, Any], **kwargs: Any) -> str:
+    """Install, inspect, or export bounded session-orchestrator state."""
+    del kwargs
+    operation = "fractal_memory"
+    try:
+        action = args.get("action")
+        home_value = args.get("hermes_home")
+        home = (
+            Path(home_value).expanduser().resolve()
+            if isinstance(home_value, str) and home_value.strip()
+            else Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes")).expanduser().resolve()
+        )
+        if action == "install":
+            seed_path = _input_path(args.get("seed_path"), "seed_path")
+            result = fractal_runtime.install_seed(
+                seed_path,
+                home,
+                replace=bool(args.get("replace", False)),
+            )
+        elif action == "show":
+            result = fractal_runtime.load_installed_seed(home)
+            if result is None:
+                raise FileNotFoundError("no parametric-fractal state is installed")
+        elif action == "export":
+            output_path = _path(args.get("output_path"), "output_path")
+            result = fractal_runtime.export_seed(
+                home,
+                output_path,
+                replace=bool(args.get("replace", False)),
+            )
+        else:
+            raise ValueError("action must be install, show, or export")
+        return _json({"success": True, "operation": operation, "action": action, "result": result})
+    except Exception as exc:
+        return _failure(operation, exc)
 
 
 def validate_research_prompt(args: dict[str, Any], **kwargs: Any) -> str:

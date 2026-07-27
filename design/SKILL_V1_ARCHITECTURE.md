@@ -131,10 +131,10 @@ Rules:
 - Paths use relative POSIX syntax, are case-sensitive, and cannot be absolute, empty, `.`, contain `..`, or contain NUL.
 - Duplicate paths across bundle categories are errors.
 - Case-fold path collisions are errors even on a case-sensitive host, because the bundle must remain portable.
-- The verifier SHALL enforce configured file-count, nesting-depth, per-file, total-byte, regex, and report-size limits. It reads each regular file once, and all parsing and hashes operate on those captured bytes to narrow TOCTOU exposure.
+- The verifier SHALL enforce configured file-count, nesting-depth, per-file, total-byte, observed-run, and report-size limits. It reads each regular file once, and all parsing and hashes operate on those captured bytes to narrow TOCTOU exposure.
 - Portable reports emit bundle-relative paths. Absolute profile or repository paths must not leak into persisted reports.
 
-v1 defaults are normative: at most 512 inventoried files, 10 MiB per file, 50 MiB total captured bundle bytes, JSON nesting depth 32, 100 observed-run records, 1,000 characters per regex, and 5 MiB per persisted report. A future implementation may lower limits for its environment but may not raise them while still claiming unqualified skill-v1 conformance.
+v1 defaults are normative: at most 512 inventoried files, 10 MiB per file, 50 MiB total captured bundle bytes, JSON nesting depth 32, 100 observed-run records, and 5 MiB per persisted report. Arbitrary regular-expression assertions are not part of v1 because Python's standard engine cannot guarantee bounded evaluation. A future implementation may lower limits for its environment but may not raise them while still claiming unqualified skill-v1 conformance.
 
 ## 5. Exact skill-v1 manifest schema
 
@@ -149,7 +149,8 @@ The manifest root SHALL contain exactly these fields:
   "skill": {
     "name": "lowercase-hyphen-name",
     "bundle_root": ".",
-    "bundle_sha256": "64 lowercase hex characters"
+    "bundle_sha256": "64 lowercase hex characters",
+    "contract_sha256": "64 lowercase hex characters"
   },
   "provenance": {
     "conversion_manifest": {
@@ -204,39 +205,90 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "format_version", "title", "skill", "provenance", "bundle", "contract",
-    "requirement_traceability", "behavioral_fixtures", "human_review", "promotion"
+    "format_version",
+    "title",
+    "skill",
+    "provenance",
+    "bundle",
+    "contract",
+    "requirement_traceability",
+    "behavioral_fixtures",
+    "human_review",
+    "promotion"
   ],
   "properties": {
-    "format_version": {"const": "skill-v1"},
-    "title": {"type": "string", "minLength": 1, "maxLength": 200},
+    "format_version": {
+      "const": "skill-v1"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
     "skill": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "bundle_root", "bundle_sha256"],
+      "required": [
+        "name",
+        "bundle_root",
+        "bundle_sha256",
+        "contract_sha256"
+      ],
       "properties": {
-        "name": {"$ref": "#/$defs/skillName"},
-        "bundle_root": {"const": "."},
-        "bundle_sha256": {"$ref": "#/$defs/sha256"}
+        "name": {
+          "$ref": "#/$defs/skillName"
+        },
+        "bundle_root": {
+          "const": "."
+        },
+        "bundle_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "contract_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
     "provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["conversion_manifest", "formation_evidence"],
+      "required": [
+        "conversion_manifest",
+        "formation_evidence"
+      ],
       "properties": {
-        "conversion_manifest": {"$ref": "#/$defs/file"},
+        "conversion_manifest": {
+          "$ref": "#/$defs/file"
+        },
         "formation_evidence": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "kind", "file", "authority"],
+            "required": [
+              "id",
+              "kind",
+              "file",
+              "authority"
+            ],
             "properties": {
-              "id": {"$ref": "#/$defs/id"},
-              "kind": {"enum": ["phase_log", "human_record", "prior_report", "other"]},
-              "file": {"$ref": "#/$defs/file"},
-              "authority": {"const": "evidence-only"}
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "kind": {
+                "enum": [
+                  "phase_log",
+                  "human_record",
+                  "prior_report",
+                  "other"
+                ]
+              },
+              "file": {
+                "$ref": "#/$defs/file"
+              },
+              "authority": {
+                "const": "evidence-only"
+              }
             }
           }
         }
@@ -245,51 +297,109 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
     "bundle": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["skill_md", "references", "scripts", "tests", "fixtures", "provenance"],
+      "required": [
+        "skill_md",
+        "references",
+        "scripts",
+        "tests",
+        "fixtures",
+        "provenance"
+      ],
       "properties": {
-        "skill_md": {"$ref": "#/$defs/file"},
-        "references": {"$ref": "#/$defs/files"},
-        "scripts": {"$ref": "#/$defs/files"},
-        "tests": {"$ref": "#/$defs/files"},
-        "fixtures": {"$ref": "#/$defs/files"},
-        "provenance": {"$ref": "#/$defs/files"}
+        "skill_md": {
+          "$ref": "#/$defs/file"
+        },
+        "references": {
+          "$ref": "#/$defs/files"
+        },
+        "scripts": {
+          "$ref": "#/$defs/files"
+        },
+        "tests": {
+          "$ref": "#/$defs/files"
+        },
+        "fixtures": {
+          "$ref": "#/$defs/files"
+        },
+        "provenance": {
+          "$ref": "#/$defs/files"
+        }
       }
     },
     "contract": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "triggers", "non_triggers", "behavioral_requirements", "completion_criteria",
-        "claimed_tools", "related_skills"
+        "triggers",
+        "non_triggers",
+        "behavioral_requirements",
+        "completion_criteria",
+        "claimed_tools",
+        "related_skills"
       ],
       "properties": {
-        "triggers": {"$ref": "#/$defs/contractItems"},
-        "non_triggers": {"$ref": "#/$defs/contractItems"},
+        "triggers": {
+          "$ref": "#/$defs/contractItems"
+        },
+        "non_triggers": {
+          "$ref": "#/$defs/contractItems"
+        },
         "behavioral_requirements": {
           "type": "array",
-          "minItems": 1,
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "statement", "verification"],
+            "required": [
+              "id",
+              "statement",
+              "verification"
+            ],
             "properties": {
-              "id": {"$ref": "#/$defs/id"},
-              "statement": {"$ref": "#/$defs/statement"},
-              "verification": {"enum": ["static", "observed", "human"]}
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "statement": {
+                "$ref": "#/$defs/statement"
+              },
+              "verification": {
+                "enum": [
+                  "static",
+                  "observed",
+                  "human"
+                ]
+              }
             }
           }
         },
-        "completion_criteria": {"$ref": "#/$defs/contractItems"},
+        "completion_criteria": {
+          "$ref": "#/$defs/contractItems"
+        },
         "claimed_tools": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["name", "provider", "required"],
+            "required": [
+              "name",
+              "provider",
+              "required"
+            ],
             "properties": {
-              "name": {"type": "string", "pattern": "^[A-Za-z0-9_.:-]{1,128}$"},
-              "provider": {"enum": ["5qln-plugin", "hermes", "bundle", "external"]},
-              "required": {"type": "boolean"}
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+              },
+              "provider": {
+                "enum": [
+                  "5qln-plugin",
+                  "hermes",
+                  "bundle",
+                  "external"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              }
             }
           }
         },
@@ -298,11 +408,25 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["name", "provider", "required"],
+            "required": [
+              "name",
+              "provider",
+              "required"
+            ],
             "properties": {
-              "name": {"$ref": "#/$defs/skillName"},
-              "provider": {"enum": ["5qln-plugin", "hermes", "external"]},
-              "required": {"type": "boolean"}
+              "name": {
+                "$ref": "#/$defs/skillName"
+              },
+              "provider": {
+                "enum": [
+                  "5qln-plugin",
+                  "hermes",
+                  "external"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              }
             }
           }
         }
@@ -310,43 +434,74 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
     },
     "requirement_traceability": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "requirement_id", "class", "statement", "basis_source_unit_ids", "basis_derived_insight_ids",
-          "skill_sections", "verifier_checks", "fixture_ids"
+          "requirement_id",
+          "class",
+          "statement",
+          "basis_source_unit_ids",
+          "basis_derived_insight_ids",
+          "skill_sections",
+          "verifier_checks",
+          "fixture_ids"
         ],
         "properties": {
-          "requirement_id": {"$ref": "#/$defs/id"},
-          "class": {"enum": ["source", "derived", "proposal"]},
-          "statement": {"$ref": "#/$defs/statement"},
+          "requirement_id": {
+            "$ref": "#/$defs/id"
+          },
+          "class": {
+            "enum": [
+              "source",
+              "derived",
+              "proposal"
+            ]
+          },
+          "statement": {
+            "$ref": "#/$defs/statement"
+          },
           "basis_source_unit_ids": {
             "type": "array",
-            "items": {"type": "string", "minLength": 1, "maxLength": 128},
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
             "uniqueItems": true
           },
           "basis_derived_insight_ids": {
             "type": "array",
-            "items": {"type": "string", "minLength": 1, "maxLength": 128},
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
             "uniqueItems": true
           },
           "skill_sections": {
             "type": "array",
             "minItems": 1,
-            "items": {"type": "string", "pattern": "^#[A-Za-z0-9._~-]+$"},
+            "items": {
+              "type": "string",
+              "pattern": "^#[A-Za-z0-9._~-]+$"
+            },
             "uniqueItems": true
           },
           "verifier_checks": {
             "type": "array",
             "minItems": 1,
-            "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_-]{2,63}$"},
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_-]{2,63}$"
+            },
             "uniqueItems": true
           },
           "fixture_ids": {
             "type": "array",
-            "items": {"$ref": "#/$defs/id"},
+            "items": {
+              "$ref": "#/$defs/id"
+            },
             "uniqueItems": true
           }
         }
@@ -357,41 +512,104 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "class", "spec", "required"],
+        "required": [
+          "id",
+          "class",
+          "spec",
+          "required"
+        ],
         "properties": {
-          "id": {"$ref": "#/$defs/id"},
+          "id": {
+            "$ref": "#/$defs/id"
+          },
           "class": {
             "enum": [
-              "positive_trigger", "near_miss_non_trigger", "human_attestation_boundary",
-              "q_phase_skip_resistance", "missing_context_open_behavior", "removal_test",
+              "positive_trigger",
+              "near_miss_non_trigger",
+              "human_attestation_boundary",
+              "q_phase_skip_resistance",
+              "missing_context_open_behavior",
+              "removal_test",
               "mutation"
             ]
           },
-          "spec": {"$ref": "#/$defs/file"},
-          "required": {"type": "boolean"}
+          "spec": {
+            "$ref": "#/$defs/file"
+          },
+          "required": {
+            "type": "boolean"
+          }
         }
       }
     },
     "human_review": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "reviewer", "evidence"],
+      "required": [
+        "status",
+        "reviewer",
+        "evidence"
+      ],
       "properties": {
-        "status": {"enum": ["open", "changes_requested", "accepted"]},
-        "reviewer": {"type": ["string", "null"], "maxLength": 200},
+        "status": {
+          "enum": [
+            "open",
+            "changes_requested",
+            "accepted"
+          ]
+        },
+        "reviewer": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 200
+        },
         "evidence": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "kind", "statement", "source", "location", "scope_bundle_sha256"],
+            "required": [
+              "id",
+              "kind",
+              "statement",
+              "source",
+              "location",
+              "scope_bundle_sha256",
+              "scope_contract_sha256",
+              "promotion_scope"
+            ],
             "properties": {
-              "id": {"$ref": "#/$defs/id"},
-              "kind": {"enum": ["review_acceptance", "promotion_authorization"]},
-              "statement": {"$ref": "#/$defs/statement"},
-              "source": {"$ref": "#/$defs/evidenceFile"},
-              "location": {"type": "string", "minLength": 1, "maxLength": 300},
-              "scope_bundle_sha256": {"$ref": "#/$defs/sha256"}
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "kind": {
+                "enum": [
+                  "review_acceptance",
+                  "promotion_authorization"
+                ]
+              },
+              "statement": {
+                "$ref": "#/$defs/statement"
+              },
+              "source": {
+                "$ref": "#/$defs/evidenceFile"
+              },
+              "location": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "scope_bundle_sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "scope_contract_sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "promotion_scope": {
+                "$ref": "#/$defs/promotionScope"
+              }
             }
           }
         }
@@ -400,66 +618,172 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
     "promotion": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["requested_state", "target", "authorization_evidence_ids"],
+      "required": [
+        "requested_state",
+        "target",
+        "authorization_evidence_ids"
+      ],
       "properties": {
-        "requested_state": {"enum": ["draft", "review_requested", "promotion_requested", "withdrawn"]},
-        "target": {"enum": ["local-skill", "bundled-plugin", "external-bundle"]},
+        "requested_state": {
+          "enum": [
+            "draft",
+            "review_requested",
+            "promotion_requested",
+            "withdrawn"
+          ]
+        },
+        "target": {
+          "enum": [
+            "local-skill",
+            "bundled-plugin",
+            "external-bundle"
+          ]
+        },
         "authorization_evidence_ids": {
           "type": "array",
-          "items": {"$ref": "#/$defs/id"},
+          "items": {
+            "$ref": "#/$defs/id"
+          },
           "uniqueItems": true
         }
       }
     }
   },
   "$defs": {
-    "skillName": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 64},
-    "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_-]{1,63}$"},
-    "statement": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "skillName": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{1,63}$"
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
     "relativePath": {
       "type": "string",
       "minLength": 1,
       "maxLength": 500,
       "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*//)(?!\\.verification(?:/|$)).+$"
     },
-    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
     "file": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "sha256", "size_bytes"],
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes"
+      ],
       "properties": {
-        "path": {"$ref": "#/$defs/relativePath"},
-        "sha256": {"$ref": "#/$defs/sha256"},
-        "size_bytes": {"type": "integer", "minimum": 0, "maximum": 10485760}
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10485760
+        }
       }
     },
     "files": {
       "type": "array",
-      "items": {"$ref": "#/$defs/file"}
+      "items": {
+        "$ref": "#/$defs/file"
+      }
     },
     "evidenceFile": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "sha256", "size_bytes"],
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes"
+      ],
       "properties": {
-        "path": {"type": "string", "pattern": "^\\.verification/evidence/(?!.*(?:^|/)\\.\\.(?:/|$)).+$", "maxLength": 500},
-        "sha256": {"$ref": "#/$defs/sha256"},
-        "size_bytes": {"type": "integer", "minimum": 1, "maximum": 10485760}
+        "path": {
+          "type": "string",
+          "pattern": "^\\.verification/evidence/(?!.*(?:^|/)\\.\\.(?:/|$)).+$",
+          "maxLength": 500
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10485760
+        }
       }
     },
     "contractItem": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "statement"],
+      "required": [
+        "id",
+        "statement"
+      ],
       "properties": {
-        "id": {"$ref": "#/$defs/id"},
-        "statement": {"$ref": "#/$defs/statement"}
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "statement": {
+          "$ref": "#/$defs/statement"
+        }
       }
     },
     "contractItems": {
       "type": "array",
-      "minItems": 1,
-      "items": {"$ref": "#/$defs/contractItem"}
+      "items": {
+        "$ref": "#/$defs/contractItem"
+      }
+    },
+    "promotionScope": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "target",
+            "repository",
+            "intended_version",
+            "revision"
+          ],
+          "properties": {
+            "target": {
+              "const": "bundled-plugin"
+            },
+            "repository": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            "intended_version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$",
+              "maxLength": 100
+            },
+            "revision": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          }
+        }
+      ]
     }
   }
 }
@@ -473,28 +797,30 @@ JSON Schema cannot express all repository relationships. The verifier SHALL enfo
 2. The manifest's parent directory is the bundle root and `skill.bundle_root == "."`.
 3. `skill.name` equals the directory name and the parsed frontmatter `name`.
 4. IDs are unique globally within their kind; every reference resolves exactly once.
-5. `provenance.conversion_manifest` appears in `bundle.provenance` with the same digest.
-6. `skill.bundle_sha256` equals SHA-256 over UTF-8 bytes from `json.dumps(records, ensure_ascii=False, sort_keys=True, separators=(",", ":"))`, where `records` is the list of `{path, sha256, size_bytes}` records for every inventoried bundle file sorted by Unicode code-point order of `path`. The manifest and `.verification/**` are excluded. This digest scopes every human review and observation.
-7. Every regular file except the manifest and `.verification/**` appears exactly once in the bundle inventory; no listed path is absent.
-8. Bundle category matches path: `references/**`, `scripts/**`, `tests/**`, `fixtures/**`, and `provenance/**`.
-9. Every `source` requirement has one or more `basis_source_unit_ids` present in the conversion manifest.
-10. Every `derived` requirement has one or more resolvable `basis_source_unit_ids` or `basis_derived_insight_ids` from the conversion manifest. Every `source` requirement has an empty derived-insight basis; every `proposal` requirement has empty source and derived-insight bases unless the proposal explicitly names what it extends.
-11. Every `proposal` has no normative promotion effect. A proposal cannot be the sole basis of a completion criterion.
-12. Every behavioral requirement has a traceability row with the same ID.
-13. `verification=observed` requires at least one referenced fixture. `verification=human` requires accepted human-review evidence. `verification=static` requires one or more implemented verifier check IDs.
-14. Every `skill_sections` anchor resolves to a unique heading in `SKILL.md`.
-15. Every fixture ID exists, and every required fixture is referenced by at least one requirement.
-16. Required tools and related skills must resolve. Optional unresolved capabilities produce warnings.
-17. `human_review.status=accepted` requires a reviewer, a hashed source under `.verification/evidence/`, and at least one `review_acceptance` evidence item whose `scope_bundle_sha256` exactly matches `skill.bundle_sha256`. Evidence is deliberately outside the bundle inventory to avoid a self-referential digest cycle. Any bundle change reopens review. The verifier checks presence, digest, scope, and location only; it reports `evidence_present`, not authenticity.
-18. `promotion_requested` requires accepted review and at least one referenced `promotion_authorization` item scoped to the same bundle digest.
-19. Human X, Z, value, or return claims remain solely in the referenced conversion manifest and its attestations. skill-v1 human-review evidence cannot create those statuses.
-20. `S → G → Q → P → V` order is checked from the conversion manifest. Optional phase logs cannot repair a missing or invalid conversion trace.
-21. A candidate V requires a non-empty question-bearing return and a concrete removal test in the conversion manifest. The skill requirement trace must identify which behavior or gate the removal test says is lost.
-22. For `bundled-plugin`, public evidence may contain a review or promotion statement scoped to the bundle digest, but SHALL NOT contain private attestation wording, raw conversation/session/wiki material, personal identifiers not already intentionally public, or hashes of short/guessable private wording. Public conversion provenance must remain open or use a deliberately sanitized public record when private H evidence cannot be published.
+5. `provenance.conversion_manifest` equals exactly one complete `{path, sha256, size_bytes}` record in `bundle.provenance`; path, digest, and size must all agree.
+6. `skill.bundle_sha256` equals SHA-256 over UTF-8 bytes from `json.dumps(records, ensure_ascii=False, sort_keys=True, separators=(",", ":"))`, where `records` is the list of `{path, sha256, size_bytes}` records for every inventoried bundle file sorted by Unicode code-point order of `path`. The manifest and `.verification/**` are excluded. Observations bind this digest.
+7. `skill.contract_sha256` equals SHA-256 over the same canonical JSON serialization of the immutable manifest projection containing exactly `skill` without `contract_sha256`, `provenance`, `bundle`, `contract`, `requirement_traceability`, and `behavioral_fixtures`. `human_review` and `promotion` are excluded to avoid self-reference. Human review binds both the bundle and contract digests.
+8. Every regular file except the manifest and `.verification/**` appears exactly once in the bundle inventory; no listed path is absent.
+9. Bundle category matches path: `references/**`, `scripts/**`, `tests/**`, `fixtures/**`, and `provenance/**`.
+10. Every `source` requirement has one or more `basis_source_unit_ids` present in the conversion manifest.
+11. Every `derived` requirement has one or more resolvable `basis_source_unit_ids` or `basis_derived_insight_ids` from the conversion manifest. Every `source` requirement has an empty derived-insight basis; every `proposal` requirement has empty source and derived-insight bases unless the proposal explicitly names what it extends.
+12. Every `proposal` has no normative promotion effect. A proposal cannot be the sole basis of a completion criterion.
+13. Every behavioral requirement has a traceability row with the same ID.
+14. `verification=observed` requires at least one referenced fixture. `verification=human` requires accepted human-review evidence. `verification=static` requires one or more implemented verifier check IDs.
+15. Every `skill_sections` anchor resolves to a unique heading in `SKILL.md`.
+16. Every fixture ID exists, and every required fixture is referenced by at least one requirement.
+17. Required tools and related skills must resolve. Optional unresolved capabilities produce warnings.
+18. `human_review.status=accepted` requires a reviewer, a hashed source under `.verification/evidence/`, and at least one `review_acceptance` evidence item whose bundle and contract scopes exactly match `skill.bundle_sha256` and `skill.contract_sha256`; `promotion_scope` must be null. Evidence is deliberately outside the bundle inventory to avoid a self-referential digest cycle. Any bundle or contract change reopens review. The verifier checks presence, digest, scope, and location only; it reports `evidence_present`, not authenticity.
+19. `promotion_requested` is the sole authority that activates promotion checks. It is valid only for `bundled-plugin` and requires accepted review plus a referenced `promotion_authorization` item scoped to the same bundle and contract digests and to the exact repository identity, intended version, and revision or PR identity. Invocation flags cannot elevate the requested state.
+20. Human X, Z, value, or return claims remain solely in the referenced conversion manifest and its attestations. skill-v1 human-review evidence cannot create those statuses.
+21. `S → G → Q → P → V` order is checked from the conversion manifest. Optional phase logs cannot repair a missing or invalid conversion trace.
+22. A candidate V requires a non-empty question-bearing return and a concrete removal test in the conversion manifest. The skill requirement trace must identify which behavior or gate the removal test says is lost.
+23. For `bundled-plugin`, public evidence may contain a review or promotion statement scoped to the bundle and contract digests, but SHALL NOT contain private attestation wording, raw conversation/session/wiki material, personal identifiers not already intentionally public, or hashes of short/guessable private wording. Public conversion provenance must remain open or use a deliberately sanitized public record when private H evidence cannot be published.
+24. Draft scaffolds may leave triggers, non-triggers, behavioral requirements, completion criteria, and requirement traceability empty. Empty semantic arrays never receive `structural_status=passed`; completeness is a deterministic conformance gate for every checked candidate. The scaffolder must not invent placeholder semantics.
 
 ## 6. SKILL.md contract
 
-The verifier SHALL parse frontmatter as YAML, not with regex pretending to be YAML. It SHALL use `yaml.safe_load` through a small isolated adapter. In Hermes this dependency already exists; standalone CLI use SHALL fail visibly with `DEPENDENCY_MISSING` if a conforming YAML parser is unavailable. It must not silently accept a reduced YAML subset.
+The verifier SHALL parse frontmatter as YAML, not with regex pretending to be YAML. It SHALL use a `yaml.SafeLoader` adapter whose mapping constructor rejects duplicate keys before applying safe-load semantics. In Hermes this dependency already exists; standalone CLI use SHALL fail visibly with `DEPENDENCY_MISSING` if a conforming YAML parser is unavailable. It must not silently accept a reduced YAML subset or PyYAML's default last-key-wins behavior.
 
 Required checks:
 
@@ -518,7 +844,7 @@ Resolution has three deterministic sources:
 
 1. **Repository surface:** `plugin.yaml`, actual tool registration in `__init__.py`, bundled skill directories, and the exact registration test.
 2. **Bundle surface:** files and entry points inside the candidate bundle.
-3. **Capability snapshot:** an optional, hash-addressed JSON inventory supplied by a trusted test harness for Hermes or external capabilities.
+3. **Capability snapshot:** an optional JSON inventory supplied by a trusted test harness as a complete expected file record `{path, sha256, size_bytes}` for Hermes or external capabilities. The verifier rejects any digest or size mismatch before parsing it.
 
 The verifier SHALL NOT claim that a Hermes or external capability resolves merely because its name looks plausible. If no snapshot is supplied:
 
@@ -586,7 +912,6 @@ Allowed deterministic assertion kinds:
 |---|---|---|
 | `output_contains` | string | Literal UTF-8 substring exists. |
 | `output_not_contains` | string | Literal substring is absent. |
-| `output_regex` | string | Python regular expression matches; regex length is capped and invalid expressions fail fixture validation. |
 | `output_last_line_question` | null | Last nonblank output line ends in `?`. |
 | `tool_called` | tool name string | Tool trace contains the name. |
 | `tool_not_called` | tool name string | Tool trace omits the name. |
@@ -617,7 +942,8 @@ An external harness SHALL produce:
 ```json
 {
   "format_version": "observed-run-v1",
-  "fixture_id": "FIX_POSITIVE",
+  "fixture_id": "FIX_POSITIVE_TRIGGER",
+  "fixture_sha256": "64 lowercase hex",
   "run_id": "RUN_001",
   "producer": "named external harness",
   "bundle_sha256": "64 lowercase hex",
@@ -635,14 +961,16 @@ An external harness SHALL produce:
 }
 ```
 
-The verifier recomputes fixture assertions from these files. It does not trust harness-supplied pass/fail labels. A run whose `bundle_sha256` differs from the candidate is inapplicable, not evidence for the changed bundle.
+`fixture_sha256` is the SHA-256 of the exact fixture JSON bytes. `input_sha256` is the SHA-256 of UTF-8 bytes from the fixture's `scenario.user_input` exactly as stored, with no normalization. Output and tool-trace paths resolve relative to the observed-run record's parent directory. The verifier rejects absolute paths, traversal, symlinks, non-regular files, and case-fold collisions, then reads each artifact once under the global bounds.
+
+The verifier recomputes fixture assertions from these files. It does not trust harness-supplied pass/fail labels. A run whose bundle or fixture digest differs is inapplicable, not evidence for changed bytes.
 
 Observed status vocabulary:
 
 - `not_declared`: no fixtures declared;
 - `not_observed`: fixtures exist but no qualifying run evidence was supplied;
-- `observed_failed`: one or more required fixture assertions failed;
-- `observed_mixed`: runs disagree or minimum-run requirements are incomplete;
+- `observed_failed`: any qualifying completed required fixture assertion failed;
+- `observed_mixed`: repeated qualifying runs contradict one another or minimum-run requirements are incomplete;
 - `observed_passed`: all required fixtures meet their observation policy in the supplied evidence.
 
 Even `observed_passed` means only “the declared assertions passed in these runs.”
@@ -714,7 +1042,7 @@ Findings use stable artifact-specific codes. Existing converter findings are nes
 | `PATH_CASE_COLLISION` | error | Distinct paths collide under Unicode case-folding. |
 | `FILE_CATEGORY` | error | Path does not match its bundle category. |
 | `HASH_MISMATCH` | error | SHA-256 differs. |
-| `SIZE_LIMIT` | error | Manifest, skill, fixture, regex, or run evidence exceeds its defined bound. |
+| `SIZE_LIMIT` | error | Manifest, skill, fixture, observed-run, or report evidence exceeds its defined bound. |
 
 ### 10.3 Skill contract
 
@@ -790,6 +1118,7 @@ The generated report SHALL have this shape and reject ambiguous `valid` or `cert
   "behavioral_status": "not_observed",
   "attestation_status": "open",
   "human_review_status": "open",
+  "requested_state": "draft",
   "promotion_state": "structurally_conformant",
   "promotion_ready": false,
   "counts": {"errors": 0, "warnings": 0, "observations": 0},
@@ -838,16 +1167,15 @@ Canonical reports SHALL omit timestamps, stable-sort checks and findings, and us
 
 Derived `promotion_state`:
 
-1. `draft` — requested state is draft or structural checking has not run.
-2. `blocked` — structural errors, failed required observations, changes requested, or promotion synchronization errors exist.
-3. `structurally_conformant` — structure passed; required behavior not yet fully observed.
-4. `behaviorally_observed` — required observations passed; human review remains open.
-5. `human_reviewed` — accepted human review evidence is present; promotion not requested or not synchronized.
-6. `promotion_ready` — structure passed, required observations passed, human review accepted, promotion authorized, and repository promotion checks pass.
-7. `promoted` — all `promotion_ready` conditions hold and the current repository already registers and documents the skill at the target version.
-8. `withdrawn` — manifest explicitly requests withdrawal; no readiness claim is emitted.
+1. `withdrawn` — manifest explicitly requests withdrawal; this overrides every other state.
+2. `draft` — structural checking has not completed.
+3. `blocked` — structural errors, failed required observations, changes requested, or requested-promotion synchronization errors exist.
+4. `structurally_conformant` — structure passed; required behavior not yet fully observed.
+5. `behaviorally_observed` — required observations passed; human review remains open.
+6. `human_reviewed` — accepted exact-digest review evidence is present; promotion not requested or not synchronized.
+7. `promotion_ready` — structure passed, required observations passed, exact-digest human review accepted, target-scoped promotion authorized, and repository promotion checks pass.
 
-A transition to `promoted` is repository state plus human authorization, not proof of living 5QLN formation.
+`promotion_ready` is the terminal verifier state. Merge, release, installation, and public deployment remain external evidence and are not self-awarded by this verifier.
 
 ## 12. CLI and Hermes tool surface
 
@@ -871,13 +1199,14 @@ It orchestrates converter provenance, skill authoring, verification, observation
 ```bash
 python3 skills/5qln-skill-formation/scripts/new_skill_manifest.py \
   skills/<name> \
-  --conversion-manifest skills/<name>/provenance/conversion-manifest.json \
-  --out skills/<name>/skill-formation-manifest.json
+  --conversion-manifest skills/<name>/provenance/conversion-manifest.json
 
 python3 skills/5qln-skill-formation/scripts/verify_skill.py \
   skills/<name>/skill-formation-manifest.json \
   --repository-root . \
   --capability-snapshot path/to/capabilities.json \
+  --capability-snapshot-sha256 64-lowercase-hex \
+  --capability-snapshot-size 1234 \
   --observed-run path/to/run.json \
   --report skills/<name>/.verification/skill-report.json
 ```
@@ -889,7 +1218,7 @@ CLI behavior:
 - no LLM invocation;
 - non-overwrite by default;
 - `--overwrite` required to replace a report or scaffold;
-- observation and capability arguments repeatable;
+- observation arguments are repeatable; the capability snapshot is one complete expected file record;
 - exit `0` when execution completed and structural checks passed;
 - exit `1` when execution completed with structural errors, or when `promotion_requested` gates are blocked;
 - exit `2` on operational failure;
@@ -900,13 +1229,14 @@ CLI behavior:
 Add exactly two tools because their behavior is deterministic:
 
 1. `fiveqln_create_skill_manifest`
-   - inputs: `bundle_path`, `conversion_manifest_path`, `output_path`, optional `title`, `overwrite`;
+   - inputs: `bundle_path`, `conversion_manifest_path`, optional `title`, `overwrite`;
    - scans and hashes an existing candidate bundle;
+   - writes exactly `<bundle_path>/skill-formation-manifest.json`; alternate names and outside-root outputs are rejected to prevent inventory and self-hash cycles;
    - creates open human-review and draft promotion fields;
    - never writes SKILL.md or semantic content.
 
 2. `fiveqln_verify_skill`
-   - inputs: `manifest_path`, optional `repository_root`, `capability_snapshot_path`, `observed_run_paths`, `report_path`, `overwrite`;
+   - inputs: `manifest_path`, optional `repository_root`, hash-addressed `capability_snapshot` record `{path, sha256, size_bytes}`, `observed_run_paths`, `report_path`, `overwrite`;
    - performs the checks in this specification;
    - returns `execution_success` plus the independent report dimensions;
    - never executes candidate code or an agent.
@@ -980,7 +1310,7 @@ Update README, Architecture, Integrity Model, Usage, Development, Provenance whe
 | Existing conversion manifests | No schema change. Continue compiling format `1.0` unchanged. |
 | Existing ten bundled skills lack skill-v1 manifests | Grandfather them as legacy bundles in `0.6.0`; do not retroactively call them verified. Require skill-v1 for newly promoted skills. Migrate existing bundles separately if desired. |
 | New strict frontmatter requirements differ from general Agent Skills | Apply peer metadata requirements only to `bundled-plugin`; basic name/description/body checks apply elsewhere. Document PyYAML requirement for standalone verification. |
-| Hash churn after edits | Any changed bundle file requires scaffold refresh or explicit manifest digest update, followed by re-verification. This is intended. |
+| Hash churn after edits | Any changed bundle file requires scaffold refresh or explicit manifest digest update, followed by re-verification. Any immutable contract-projection change also changes `contract_sha256` and reopens human review. This is intended. |
 | Self-referential manifest hash | Exclude only `skill-formation-manifest.json` and fixed `.verification/**`; no arbitrary exclusion list. |
 | Capability resolution differs by environment | Require a hashed capability snapshot for non-repository capabilities; never infer resolution. |
 | Arbitrary code execution | Registered verifier never runs candidate scripts/tests. Trusted CI owns execution evidence. |
@@ -1071,7 +1401,7 @@ Tests:
 - missing tool in plugin.yaml/schemas/tools/registration;
 - missing version/changelog entry;
 - missing human review or promotion authorization;
-- complete synchronized repository reaches `promotion_ready` or `promoted` according to actual state.
+- complete synchronized repository reaches `promotion_ready`; merge and release state remain external evidence.
 
 Acceptance criteria: no machine-only evidence can cross the human review or promotion authorization gate.
 

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://5qln.com/schemas/observed-run-v1.schema.json",
+  "title": "5QLN observed behavioral run v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "fixture_id",
+    "fixture_sha256",
+    "run_id",
+    "producer",
+    "bundle_sha256",
+    "environment",
+    "input_sha256",
+    "output",
+    "tool_trace",
+    "exit_status"
+  ],
+  "properties": {
+    "format_version": {
+      "const": "observed-run-v1"
+    },
+    "fixture_id": {
+      "$ref": "#/$defs/id"
+    },
+    "run_id": {
+      "$ref": "#/$defs/id"
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "bundle_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent",
+        "provider",
+        "model",
+        "configuration_sha256",
+        "fresh_session"
+      ],
+      "properties": {
+        "agent": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "configuration_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "fresh_session": {
+          "type": "boolean"
+        }
+      }
+    },
+    "input_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "output": {
+      "$ref": "#/$defs/runFile"
+    },
+    "tool_trace": {
+      "$ref": "#/$defs/runFile"
+    },
+    "exit_status": {
+      "type": "integer"
+    },
+    "fixture_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{1,63}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "runFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "^runs/(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10485760
+        }
+      }
+    }
+  }
+}

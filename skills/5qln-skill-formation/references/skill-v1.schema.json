@@ -1,0 +1,589 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://5qln.com/schemas/skill-v1.schema.json",
+  "title": "5QLN skill formation manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "title",
+    "skill",
+    "provenance",
+    "bundle",
+    "contract",
+    "requirement_traceability",
+    "behavioral_fixtures",
+    "human_review",
+    "promotion"
+  ],
+  "properties": {
+    "format_version": {
+      "const": "skill-v1"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "bundle_root",
+        "bundle_sha256",
+        "contract_sha256"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/skillName"
+        },
+        "bundle_root": {
+          "const": "."
+        },
+        "bundle_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "contract_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conversion_manifest",
+        "formation_evidence"
+      ],
+      "properties": {
+        "conversion_manifest": {
+          "$ref": "#/$defs/file"
+        },
+        "formation_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "file",
+              "authority"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "kind": {
+                "enum": [
+                  "phase_log",
+                  "human_record",
+                  "prior_report",
+                  "other"
+                ]
+              },
+              "file": {
+                "$ref": "#/$defs/file"
+              },
+              "authority": {
+                "const": "evidence-only"
+              }
+            }
+          }
+        }
+      }
+    },
+    "bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_md",
+        "references",
+        "scripts",
+        "tests",
+        "fixtures",
+        "provenance"
+      ],
+      "properties": {
+        "skill_md": {
+          "$ref": "#/$defs/file"
+        },
+        "references": {
+          "$ref": "#/$defs/files"
+        },
+        "scripts": {
+          "$ref": "#/$defs/files"
+        },
+        "tests": {
+          "$ref": "#/$defs/files"
+        },
+        "fixtures": {
+          "$ref": "#/$defs/files"
+        },
+        "provenance": {
+          "$ref": "#/$defs/files"
+        }
+      }
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "triggers",
+        "non_triggers",
+        "behavioral_requirements",
+        "completion_criteria",
+        "claimed_tools",
+        "related_skills"
+      ],
+      "properties": {
+        "triggers": {
+          "$ref": "#/$defs/contractItems"
+        },
+        "non_triggers": {
+          "$ref": "#/$defs/contractItems"
+        },
+        "behavioral_requirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "statement",
+              "verification"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "statement": {
+                "$ref": "#/$defs/statement"
+              },
+              "verification": {
+                "enum": [
+                  "static",
+                  "observed",
+                  "human"
+                ]
+              }
+            }
+          }
+        },
+        "completion_criteria": {
+          "$ref": "#/$defs/contractItems"
+        },
+        "claimed_tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "provider",
+              "required"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+              },
+              "provider": {
+                "enum": [
+                  "5qln-plugin",
+                  "hermes",
+                  "bundle",
+                  "external"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "related_skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "provider",
+              "required"
+            ],
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/skillName"
+              },
+              "provider": {
+                "enum": [
+                  "5qln-plugin",
+                  "hermes",
+                  "external"
+                ]
+              },
+              "required": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "requirement_traceability": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requirement_id",
+          "class",
+          "statement",
+          "basis_source_unit_ids",
+          "basis_derived_insight_ids",
+          "skill_sections",
+          "verifier_checks",
+          "fixture_ids"
+        ],
+        "properties": {
+          "requirement_id": {
+            "$ref": "#/$defs/id"
+          },
+          "class": {
+            "enum": [
+              "source",
+              "derived",
+              "proposal"
+            ]
+          },
+          "statement": {
+            "$ref": "#/$defs/statement"
+          },
+          "basis_source_unit_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "uniqueItems": true
+          },
+          "basis_derived_insight_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "uniqueItems": true
+          },
+          "skill_sections": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^#[A-Za-z0-9._~-]+$"
+            },
+            "uniqueItems": true
+          },
+          "verifier_checks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_-]{2,63}$"
+            },
+            "uniqueItems": true
+          },
+          "fixture_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/id"
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "behavioral_fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "class",
+          "spec",
+          "required"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "class": {
+            "enum": [
+              "positive_trigger",
+              "near_miss_non_trigger",
+              "human_attestation_boundary",
+              "q_phase_skip_resistance",
+              "missing_context_open_behavior",
+              "removal_test",
+              "mutation"
+            ]
+          },
+          "spec": {
+            "$ref": "#/$defs/file"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "human_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewer",
+        "evidence"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "open",
+            "changes_requested",
+            "accepted"
+          ]
+        },
+        "reviewer": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 200
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "statement",
+              "source",
+              "location",
+              "scope_bundle_sha256",
+              "scope_contract_sha256",
+              "promotion_scope"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "kind": {
+                "enum": [
+                  "review_acceptance",
+                  "promotion_authorization"
+                ]
+              },
+              "statement": {
+                "$ref": "#/$defs/statement"
+              },
+              "source": {
+                "$ref": "#/$defs/evidenceFile"
+              },
+              "location": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "scope_bundle_sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "scope_contract_sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "promotion_scope": {
+                "$ref": "#/$defs/promotionScope"
+              }
+            }
+          }
+        }
+      }
+    },
+    "promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requested_state",
+        "target",
+        "authorization_evidence_ids"
+      ],
+      "properties": {
+        "requested_state": {
+          "enum": [
+            "draft",
+            "review_requested",
+            "promotion_requested",
+            "withdrawn"
+          ]
+        },
+        "target": {
+          "enum": [
+            "local-skill",
+            "bundled-plugin",
+            "external-bundle"
+          ]
+        },
+        "authorization_evidence_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "$defs": {
+    "skillName": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{1,63}$"
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*//)(?!\\.verification(?:/|$)).+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10485760
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    },
+    "evidenceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "size_bytes"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^\\.verification/evidence/(?!.*(?:^|/)\\.\\.(?:/|$)).+$",
+          "maxLength": 500
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10485760
+        }
+      }
+    },
+    "contractItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "statement"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "statement": {
+          "$ref": "#/$defs/statement"
+        }
+      }
+    },
+    "contractItems": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/contractItem"
+      }
+    },
+    "promotionScope": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "target",
+            "repository",
+            "intended_version",
+            "revision"
+          ],
+          "properties": {
+            "target": {
+              "const": "bundled-plugin"
+            },
+            "repository": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            "intended_version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$",
+              "maxLength": 100
+            },
+            "revision": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          }
+        }
+      ]
+    }
+  }
+}

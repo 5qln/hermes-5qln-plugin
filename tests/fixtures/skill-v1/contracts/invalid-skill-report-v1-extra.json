@@ -1,0 +1,34 @@
+{
+  "format_version": "skill-report-v1",
+  "execution_success": true,
+  "manifest": {
+    "path": "skill-formation-manifest.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "skill": {
+    "name": "golden-skill",
+    "bundle_root": ".",
+    "bundle_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "structural_status": "passed",
+  "behavioral_status": "not_observed",
+  "attestation_status": "open",
+  "human_review_status": "open",
+  "promotion_state": "structurally_conformant",
+  "promotion_ready": false,
+  "counts": {
+    "errors": 0,
+    "warnings": 0,
+    "observations": 0
+  },
+  "checks": [],
+  "errors": [],
+  "warnings": [],
+  "observations": [],
+  "conversion_report": {},
+  "limitations": [
+    "Structural conformance is not proof of living 5QLN."
+  ],
+  "unexpected": "SCHEMA_EXTRA",
+  "requested_state": "draft"
+}

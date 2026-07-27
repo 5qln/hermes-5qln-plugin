@@ -257,3 +257,398 @@ def atomic_write_json(
     finally:
         os.close(fd)
     os.replace(tmp, str(path))
+
+
+# ---------------------------------------------------------------------------
+# Strict manifest validation
+# ---------------------------------------------------------------------------
+
+def _require_type(value: object, expected: type, pointer: str) -> None:
+    if not isinstance(value, expected):
+        raise SkillContractError(
+            "SCHEMA_TYPE",
+            f"expected {expected.__name__} at {pointer}, got {type(value).__name__}",
+            pointer,
+        )
+
+
+def _require_object(value: object, pointer: str) -> dict:
+    _require_type(value, dict, pointer)
+    return value  # type: ignore[return-value]
+
+
+def _require_string(value: object, pointer: str, *, pattern: str | None = None,
+                    min_len: int = 0, max_len: int | None = None) -> str:
+    _require_type(value, str, pointer)
+    s: str = value  # type: ignore[assignment]
+    if min_len and len(s) < min_len:
+        raise SkillContractError("SCHEMA_TYPE", f"string too short at {pointer}", pointer)
+    if max_len is not None and len(s) > max_len:
+        raise SkillContractError("SCHEMA_TYPE", f"string too long at {pointer}", pointer)
+    if pattern:
+        import re
+        if not re.fullmatch(pattern, s):
+            raise SkillContractError("SCHEMA_TYPE", f"string does not match pattern at {pointer}", pointer)
+    return s
+
+
+def _require_array(value: object, pointer: str, *, min_items: int = 0) -> list:
+    _require_type(value, list, pointer)
+    lst: list = value  # type: ignore[assignment]
+    if len(lst) < min_items:
+        raise SkillContractError("SCHEMA_MISSING", f"array has fewer than {min_items} items at {pointer}", pointer)
+    return lst
+
+
+def _require_exact_keys(value: object, required: set[str], optional: set[str],
+                        pointer: str) -> dict:
+    obj = _require_object(value, pointer)
+    allowed = required | optional
+    actual = set(obj.keys())
+    missing = required - actual
+    if missing:
+        raise SkillContractError(
+            "SCHEMA_MISSING",
+            f"missing required keys {sorted(missing)} at {pointer}",
+            pointer,
+        )
+    extra = actual - allowed
+    if extra:
+        raise SkillContractError(
+            "SCHEMA_EXTRA",
+            f"unknown keys {sorted(extra)} at {pointer}",
+            pointer,
+        )
+    return obj
+
+
+_ID_PATTERN = r"^[A-Z][A-Z0-9_-]{1,63}$"
+_SHA256_PATTERN = r"^[0-9a-f]{64}$"
+_SKILL_NAME_PATTERN = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
+_STATEMENT_MAX = 2000
+
+
+def _check_id(value: object, pointer: str) -> str:
+    return _require_string(value, pointer, pattern=_ID_PATTERN)
+
+
+def _check_sha256(value: object, pointer: str) -> str:
+    return _require_string(value, pointer, pattern=_SHA256_PATTERN)
+
+
+def _check_skill_name(value: object, pointer: str) -> str:
+    s = _require_string(value, pointer, max_len=64)
+    import re
+    if not re.fullmatch(_SKILL_NAME_PATTERN, s):
+        raise SkillContractError("SCHEMA_TYPE", f"invalid skill name at {pointer}", pointer)
+    return s
+
+
+def _check_statement(value: object, pointer: str) -> str:
+    return _require_string(value, pointer, min_len=1, max_len=_STATEMENT_MAX)
+
+
+def _check_relative_path(value: object, pointer: str) -> str:
+    s = _require_string(value, pointer, min_len=1, max_len=500)
+    try:
+        return normalize_relative_path(s)
+    except SkillContractError:
+        raise SkillContractError("PATH_INVALID", f"invalid relative path at {pointer}", pointer)
+
+
+def _check_file(value: object, pointer: str) -> dict:
+    obj = _require_exact_keys(value, {"path", "sha256", "size_bytes"}, set(), pointer)
+    _check_relative_path(obj["path"], f"{pointer}/path")
+    _check_sha256(obj["sha256"], f"{pointer}/sha256")
+    _require_type(obj["size_bytes"], int, f"{pointer}/size_bytes")
+    if not (0 <= obj["size_bytes"] <= MAX_FILE_BYTES):
+        raise SkillContractError("SIZE_LIMIT", f"size_bytes out of range at {pointer}", pointer)
+    return obj
+
+
+def _check_files(value: object, pointer: str) -> list:
+    arr = _require_array(value, pointer)
+    for i, item in enumerate(arr):
+        _check_file(item, f"{pointer}/{i}")
+    return arr
+
+
+def _check_evidence_file(value: object, pointer: str) -> dict:
+    obj = _require_exact_keys(value, {"path", "sha256", "size_bytes"}, set(), pointer)
+    s = _require_string(obj["path"], f"{pointer}/path", min_len=1, max_len=500)
+    if not s.startswith(".verification/evidence/"):
+        raise SkillContractError("PATH_INVALID", f"evidence path must start with .verification/evidence/ at {pointer}", pointer)
+    _check_sha256(obj["sha256"], f"{pointer}/sha256")
+    return obj
+
+
+def _check_contract_items(value: object, pointer: str) -> list:
+    arr = _require_array(value, pointer)
+    for i, item in enumerate(arr):
+        obj = _require_exact_keys(item, {"id", "statement"}, set(), f"{pointer}/{i}")
+        _check_id(obj["id"], f"{pointer}/{i}/id")
+        _check_statement(obj["statement"], f"{pointer}/{i}/statement")
+    return arr
+
+
+def validate_skill_manifest(payload: object) -> list[dict[str, object]]:
+    """Validate a skill-v1 manifest against the published contract.
+
+    Returns a list of finding dicts, stable-sorted by (code, path, message).
+    An empty list means structural conformance per the published schema.
+    """
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, message: str, pointer: str = "$") -> None:
+        findings.append({
+            "severity": "error",
+            "dimension": "structure",
+            "code": code,
+            "location": {"kind": "json_pointer", "value": pointer},
+            "message": message,
+            "evidence": [],
+        })
+
+    try:
+        obj = _require_object(payload, "$")
+    except SkillContractError as e:
+        err(e.code, e.message, "$")
+        return findings
+
+    # Top-level keys
+    try:
+        root = _require_exact_keys(
+            obj,
+            {"format_version", "title", "skill", "provenance", "bundle",
+             "contract", "requirement_traceability", "behavioral_fixtures",
+             "human_review", "promotion"},
+            set(),
+            "$",
+        )
+    except SkillContractError as e:
+        err(e.code, e.message, "$")
+        return findings
+
+    # format_version
+    if root.get("format_version") != "skill-v1":
+        err("SCHEMA_VERSION", "format_version must be 'skill-v1'", "$/format_version")
+
+    # title
+    try:
+        _require_string(root.get("title"), "$/title", min_len=1, max_len=200)
+    except SkillContractError as e:
+        err(e.code, e.message, e.path or "$/title")
+
+    # skill
+    try:
+        skill = _require_exact_keys(
+            root.get("skill"),
+            {"name", "bundle_root", "bundle_sha256", "contract_sha256"},
+            set(),
+            "$/skill",
+        )
+        _check_skill_name(skill.get("name"), "$/skill/name")
+        if skill.get("bundle_root") != ".":
+            err("SCHEMA_ENUM", "bundle_root must be '.'", "$/skill/bundle_root")
+        _check_sha256(skill.get("bundle_sha256"), "$/skill/bundle_sha256")
+        _check_sha256(skill.get("contract_sha256"), "$/skill/contract_sha256")
+    except SkillContractError as e:
+        err(e.code, e.message, e.path or "$/skill")
+
+    # provenance
+    try:
+        prov = _require_exact_keys(
+            root.get("provenance"),
+            {"conversion_manifest", "formation_evidence"},
+            set(),
+            "$/provenance",
+        )
+        _check_file(prov.get("conversion_manifest"), "$/provenance/conversion_manifest")
+        evidence = _require_array(prov.get("formation_evidence"), "$/provenance/formation_evidence")
+        for i, item in enumerate(evidence):
+            ev = _require_exact_keys(
+                item, {"id", "kind", "file", "authority"}, set(),
+                f"$/provenance/formation_evidence/{i}",
+            )
+            _check_id(ev.get("id"), f"$/provenance/formation_evidence/{i}/id")
+            if ev.get("kind") not in ("phase_log", "human_record", "prior_report", "other"):
+                err("SCHEMA_ENUM", f"invalid kind at $/provenance/formation_evidence/{i}/kind")
+            _check_file(ev.get("file"), f"$/provenance/formation_evidence/{i}/file")
+            if ev.get("authority") != "evidence-only":
+                err("SCHEMA_ENUM", f"authority must be 'evidence-only' at $/provenance/formation_evidence/{i}/authority")
+    except SkillContractError as e:
+        err(e.code, e.message, e.path or "$/provenance")
+
+    # bundle
+    try:
+        bundle = _require_exact_keys(
+            root.get("bundle"),
+            {"skill_md", "references", "scripts", "tests", "fixtures", "provenance"},
+            set(),
+            "$/bundle",
+        )
+        _check_file(bundle.get("skill_md"), "$/bundle/skill_md")
+        for cat in ("references", "scripts", "tests", "fixtures", "provenance"):
+            _check_files(bundle.get(cat), f"$/bundle/{cat}")
+        if bundle.get("skill_md", {}).get("path") != "SKILL.md":
+            err("FILE_CATEGORY", "skill_md.path must be 'SKILL.md'", "$/bundle/skill_md/path")
+    except SkillContractError as e:
+        err(e.code, e.message, e.path or "$/bundle")
+
+    # contract
+    try:
+        contract = _require_exact_keys(
+            root.get("contract"),
+            {"triggers", "non_triggers", "behavioral_requirements",
+             "completion_criteria", "claimed_tools", "related_skills"},
+            set(),
+            "$/contract",
+        )
+        _check_contract_items(contract.get("triggers"), "$/contract/triggers")
+        _check_contract_items(contract.get("non_triggers"), "$/contract/non_triggers")
+        _check_contract_items(contract.get("completion_criteria"), "$/contract/completion_criteria")
+
+        breqs = _require_array(contract.get("behavioral_requirements"), "$/contract/behavioral_requirements")
+        for i, br in enumerate(breqs):
+            bro = _require_exact_keys(
+                br, {"id", "statement", "verification"}, set(),
+                f"$/contract/behavioral_requirements/{i}",
+            )
+            _check_id(bro.get("id"), f"$/contract/behavioral_requirements/{i}/id")
+            _check_statement(bro.get("statement"), f"$/contract/behavioral_requirements/{i}/statement")
+            if bro.get("verification") not in ("static", "observed", "human"):
+                err("SCHEMA_ENUM", f"invalid verification at $/contract/behavioral_requirements/{i}/verification")
+
+        tools = _require_array(contract.get("claimed_tools"), "$/contract/claimed_tools")
+        for i, t in enumerate(tools):
+            to = _require_exact_keys(
+                t, {"name", "provider", "required"}, set(),
+                f"$/contract/claimed_tools/{i}",
+            )
+            _require_string(to.get("name"), f"$/contract/claimed_tools/{i}/name", max_len=128)
+            if to.get("provider") not in ("5qln-plugin", "hermes", "bundle", "external"):
+                err("SCHEMA_ENUM", f"invalid provider at $/contract/claimed_tools/{i}/provider")
+            _require_type(to.get("required"), bool, f"$/contract/claimed_tools/{i}/required")
+
+        skills = _require_array(contract.get("related_skills"), "$/contract/related_skills")
+        for i, s in enumerate(skills):
+            so = _require_exact_keys(
+                s, {"name", "provider", "required"}, set(),
+                f"$/contract/related_skills/{i}",
+            )
+            _check_skill_name(so.get("name"), f"$/contract/related_skills/{i}/name")
+            if so.get("provider") not in ("5qln-plugin", "hermes", "external"):
+                err("SCHEMA_ENUM", f"invalid provider at $/contract/related_skills/{i}/provider")
+            _require_type(so.get("required"), bool, f"$/contract/related_skills/{i}/required")
+    except SkillContractError as e:
+        err(e.code, e.message, e.path or "$/contract")
+
+    # requirement_traceability
+    try:
+        traces = _require_array(root.get("requirement_traceability"), "$/requirement_traceability")
+        for i, tr in enumerate(traces):
+            tro = _require_exact_keys(
+                tr,
+                {"requirement_id", "class", "statement", "basis_source_unit_ids",
+                 "basis_derived_insight_ids", "skill_sections", "verifier_checks", "fixture_ids"},
+                set(),
+                f"$/requirement_traceability/{i}",
+            )
+            _check_id(tro.get("requirement_id"), f"$/requirement_traceability/{i}/requirement_id")
+            if tro.get("class") not in ("source", "derived", "proposal"):
+                err("SCHEMA_ENUM", f"invalid class at $/requirement_traceability/{i}/class")
+            _check_statement(tro.get("statement"), f"$/requirement_traceability/{i}/statement")
+            for field in ("basis_source_unit_ids", "basis_derived_insight_ids"):
+                arr = _require_array(tro.get(field), f"$/requirement_traceability/{i}/{field}")
+                for j, sid in enumerate(arr):
+                    _require_string(sid, f"$/requirement_traceability/{i}/{field}/{j}", min_len=1, max_len=128)
+            sects = _require_array(tro.get("skill_sections"), f"$/requirement_traceability/{i}/skill_sections", min_items=1)
+            for j, sec in enumerate(sects):
+                _require_string(sec, f"$/requirement_traceability/{i}/skill_sections/{j}",
+                                pattern=r"^#[A-Za-z0-9._~-]+$")
+            checks = _require_array(tro.get("verifier_checks"), f"$/requirement_traceability/{i}/verifier_checks", min_items=1)
+            for j, chk in enumerate(checks):
+                _require_string(chk, f"$/requirement_traceability/{i}/verifier_checks/{j}",
+                                pattern=r"^[A-Z][A-Z0-9_-]{2,63}$")
+            fids = _require_array(tro.get("fixture_ids"), f"$/requirement_traceability/{i}/fixture_ids")
+            for j, fid in enumerate(fids):
+                _check_id(fid, f"$/requirement_traceability/{i}/fixture_ids/{j}")
+    except SkillContractError as e:
+        err(e.code, e.message, e.path or "$/requirement_traceability")
+
+    # behavioral_fixtures
+    try:
+        fixs = _require_array(root.get("behavioral_fixtures"), "$/behavioral_fixtures")
+        for i, fix in enumerate(fixs):
+            fo = _require_exact_keys(
+                fix, {"id", "class", "spec", "required"}, set(),
+                f"$/behavioral_fixtures/{i}",
+            )
+            _check_id(fo.get("id"), f"$/behavioral_fixtures/{i}/id")
+            allowed_classes = {
+                "positive_trigger", "near_miss_non_trigger",
+                "human_attestation_boundary", "q_phase_skip_resistance",
+                "missing_context_open_behavior", "removal_test", "mutation",
+            }
+            if fo.get("class") not in allowed_classes:
+                err("SCHEMA_ENUM", f"invalid fixture class at $/behavioral_fixtures/{i}/class")
+            _check_file(fo.get("spec"), f"$/behavioral_fixtures/{i}/spec")
+            _require_type(fo.get("required"), bool, f"$/behavioral_fixtures/{i}/required")
+    except SkillContractError as e:
+        err(e.code, e.message, e.path or "$/behavioral_fixtures")
+
+    # human_review
+    try:
+        hr = _require_exact_keys(
+            root.get("human_review"),
+            {"status", "reviewer", "evidence"},
+            set(),
+            "$/human_review",
+        )
+        if hr.get("status") not in ("open", "changes_requested", "accepted"):
+            err("SCHEMA_ENUM", "invalid human_review status", "$/human_review/status")
+        rev = hr.get("reviewer")
+        if rev is not None:
+            _require_string(rev, "$/human_review/reviewer", max_len=200)
+        ev = _require_array(hr.get("evidence"), "$/human_review/evidence")
+        for i, eitem in enumerate(ev):
+            eo = _require_exact_keys(
+                eitem,
+                {"id", "kind", "statement", "source", "location",
+                 "scope_bundle_sha256", "scope_contract_sha256", "promotion_scope"},
+                set(),
+                f"$/human_review/evidence/{i}",
+            )
+            _check_id(eo.get("id"), f"$/human_review/evidence/{i}/id")
+            if eo.get("kind") not in ("review_acceptance", "promotion_authorization"):
+                err("SCHEMA_ENUM", f"invalid evidence kind at $/human_review/evidence/{i}/kind")
+            _check_statement(eo.get("statement"), f"$/human_review/evidence/{i}/statement")
+            _check_evidence_file(eo.get("source"), f"$/human_review/evidence/{i}/source")
+            _require_string(eo.get("location"), f"$/human_review/evidence/{i}/location", min_len=1, max_len=300)
+            _check_sha256(eo.get("scope_bundle_sha256"), f"$/human_review/evidence/{i}/scope_bundle_sha256")
+            _check_sha256(eo.get("scope_contract_sha256"), f"$/human_review/evidence/{i}/scope_contract_sha256")
+            if eo.get("promotion_scope") not in ("local", "bundled", "external"):
+                err("SCHEMA_ENUM", f"invalid promotion_scope at $/human_review/evidence/{i}/promotion_scope")
+    except SkillContractError as e:
+        err(e.code, e.message, e.path or "$/human_review")
+
+    # promotion
+    try:
+        promo = _require_exact_keys(
+            root.get("promotion"),
+            {"requested_state", "target", "authorization_evidence_ids"},
+            set(),
+            "$/promotion",
+        )
+        if promo.get("requested_state") not in ("draft", "review_requested", "promotion_requested", "withdrawn"):
+            err("SCHEMA_ENUM", "invalid requested_state", "$/promotion/requested_state")
+        if promo.get("target") not in ("local-skill", "bundled-plugin", "external-bundle"):
+            err("SCHEMA_ENUM", "invalid promotion target", "$/promotion/target")
+        auth_ids = _require_array(promo.get("authorization_evidence_ids"), "$/promotion/authorization_evidence_ids")
+        for i, aid in enumerate(auth_ids):
+            _check_id(aid, f"$/promotion/authorization_evidence_ids/{i}")
+    except SkillContractError as e:
+        err(e.code, e.message, e.path or "$/promotion")
+
+    findings.sort(key=lambda f: (str(f["code"]), str(f.get("location", {}).get("value", "")), str(f["message"])))
+    return findings

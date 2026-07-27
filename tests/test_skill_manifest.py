@@ -814,3 +814,79 @@ class SkillScaffoldTests(unittest.TestCase):
         ])
         self.assertEqual(exit_code3, 0)
 
+
+
+class SkillManifestValidationTests(unittest.TestCase):
+    """Tests for validate_skill_manifest against the published contract."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        sys.path.insert(0, str(ROOT / "skills" / "5qln-skill-formation" / "scripts"))
+        global skill_common
+        import skill_common
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        sys.path.remove(str(ROOT / "skills" / "5qln-skill-formation" / "scripts"))
+
+    def _load_fixture(self, name: str) -> dict:
+        return json.loads(
+            (ROOT / "tests" / "fixtures" / "skill-v1" / "contracts" / name).read_text()
+        )
+
+    def test_valid_manifest_passes(self) -> None:
+        payload = self._load_fixture("valid-skill-v1.json")
+        findings = skill_common.validate_skill_manifest(payload)
+        self.assertEqual(findings, [], f"Unexpected findings: {findings}")
+
+    def test_invalid_extra_field_fails(self) -> None:
+        payload = self._load_fixture("invalid-skill-v1-extra.json")
+        findings = skill_common.validate_skill_manifest(payload)
+        self.assertTrue(any("SCHEMA_EXTRA" in (f["code"]) for f in findings))
+
+    def test_wrong_format_version_fails(self) -> None:
+        payload = self._load_fixture("valid-skill-v1.json")
+        payload = json.loads(json.dumps(payload))
+        payload["format_version"] = "wrong"
+        findings = skill_common.validate_skill_manifest(payload)
+        self.assertTrue(any("SCHEMA_VERSION" in (f["code"]) for f in findings))
+
+    def test_missing_title_fails(self) -> None:
+        payload = self._load_fixture("valid-skill-v1.json")
+        payload = json.loads(json.dumps(payload))
+        del payload["title"]
+        findings = skill_common.validate_skill_manifest(payload)
+        self.assertTrue(any("SCHEMA_MISSING" in (f["code"]) for f in findings))
+
+    def test_malformed_sha256_fails(self) -> None:
+        payload = self._load_fixture("valid-skill-v1.json")
+        payload = json.loads(json.dumps(payload))
+        payload["skill"]["bundle_sha256"] = "too-short"
+        findings = skill_common.validate_skill_manifest(payload)
+        self.assertTrue(any(f["code"] == "SCHEMA_TYPE" and "bundle_sha256" in f.get("message", "")
+                          for f in findings))
+
+    def test_non_object_top_level_fails(self) -> None:
+        findings = skill_common.validate_skill_manifest("not an object")
+        self.assertTrue(len(findings) > 0)
+
+    def test_wrong_enum_fails(self) -> None:
+        payload = self._load_fixture("valid-skill-v1.json")
+        payload = json.loads(json.dumps(payload))
+        payload["human_review"]["status"] = "bogus"
+        findings = skill_common.validate_skill_manifest(payload)
+        self.assertTrue(any("SCHEMA_ENUM" in (f["code"]) for f in findings))
+
+    def test_empty_findings_for_valid_has_empty_list(self) -> None:
+        payload = self._load_fixture("valid-skill-v1.json")
+        self.assertEqual(skill_common.validate_skill_manifest(payload), [])
+
+    def test_findings_are_stable_sorted(self) -> None:
+        payload = self._load_fixture("valid-skill-v1.json")
+        payload = json.loads(json.dumps(payload))
+        payload["format_version"] = "wrong"
+        payload["skill"]["bundle_sha256"] = "bad"
+        a = skill_common.validate_skill_manifest(payload)
+        b = skill_common.validate_skill_manifest(payload)
+        self.assertEqual(a, b)
+

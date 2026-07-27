@@ -160,3 +160,90 @@ FIVEQLN_VALIDATE_RESEARCH_PROMPT = {
         "additionalProperties": False,
     },
 }
+
+
+# ---- skill-v1 formation tools (0.6.0) ----
+
+FIVEQLN_CREATE_SKILL_MANIFEST = {
+    "name": "fiveqln_create_skill_manifest",
+    "description": (
+        "Create a skill-v1 formation manifest scaffold from a candidate skill bundle directory. "
+        "The scaffold inventories every regular file, computes bundle and contract digests, and "
+        "leaves all human-dependent fields (triggers, requirements, behavioral fixtures, review, "
+        "promotion) open. This tool does not claim the bundle is verified, certified, or living."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "bundle_root": {
+                "type": "string",
+                "description": "Path to the candidate skill bundle directory.",
+            },
+            "output_path": {
+                "type": "string",
+                "description": "Path for the skill-formation-manifest.json scaffold.",
+            },
+            "conversion_manifest": {
+                "type": "string",
+                "description": "Optional bundle-relative path to a conversion manifest (default: provenance/conversion-manifest.json).",
+            },
+            "compact": {
+                "type": "boolean",
+                "default": False,
+                "description": "Write compact JSON instead of indented JSON.",
+            },
+            "overwrite": {
+                "type": "boolean",
+                "default": False,
+                "description": "Permit replacing an existing output file.",
+            },
+        },
+        "required": ["bundle_root", "output_path"],
+        "additionalProperties": False,
+    },
+}
+
+FIVEQLN_VERIFY_SKILL = {
+    "name": "fiveqln_verify_skill",
+    "description": (
+        "Verify a skill-v1 formation manifest against the published contract. Runs deterministic "
+        "structural checks (schema, bundle integrity, SKILL.md frontmatter, script syntax, "
+        "conversion provenance), plus optional behavioral observations, human review scoping, "
+        "and promotion inspection. Returns a skill-report-v1 with independent evidence dimensions. "
+        "A machine pass is structural conformance — it is never certification of living 5QLN."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "manifest_path": {
+                "type": "string",
+                "description": "Path to the skill-formation-manifest.json to verify.",
+            },
+            "report_path": {
+                "type": "string",
+                "description": "Optional path at which to persist the full skill-report-v1 JSON.",
+            },
+            "observation_paths": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Optional paths to observed-run-v1 JSON files for behavioral evidence.",
+            },
+            "capability_snapshot_path": {
+                "type": "string",
+                "description": "Optional path to a JSON capability snapshot for tool/skill resolution.",
+            },
+            "promotion_mode": {
+                "type": "boolean",
+                "default": False,
+                "description": "When true, also inspect promotion readiness for bundled-plugin targets.",
+            },
+            "overwrite": {
+                "type": "boolean",
+                "default": False,
+                "description": "Permit replacing an existing report file.",
+            },
+        },
+        "required": ["manifest_path"],
+        "additionalProperties": False,
+    },
+}

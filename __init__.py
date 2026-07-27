@@ -87,6 +87,22 @@ def register(ctx):
 
     ctx.register_hook("pre_llm_call", fractal_memory.pre_llm_context)
 
+    # ---- skill-v1 formation tools (0.6.0) ----
+    ctx.register_tool(
+        name="fiveqln_create_skill_manifest",
+        toolset="5qln",
+        schema=schemas.FIVEQLN_CREATE_SKILL_MANIFEST,
+        handler=tools.create_skill_manifest,
+        description="Scaffold a skill-v1 formation manifest from a bundle directory.",
+    )
+    ctx.register_tool(
+        name="fiveqln_verify_skill",
+        toolset="5qln",
+        schema=schemas.FIVEQLN_VERIFY_SKILL,
+        handler=tools.verify_skill,
+        description="Verify a skill-v1 manifest structurally; returns a report with no valid/certified/living claim.",
+    )
+
     skill_root = Path(__file__).resolve().parent / "skills"
     for skill_name in (
         # Base 5QLN — language runtime
@@ -101,6 +117,8 @@ def register(ctx):
         "5qln-deep-research",
         "5qln-centrifuge",
         "5qln-signature-engine",
+        # Skill formation (0.6.0)
+        "5qln-skill-formation",
     ):
         skill_md = skill_root / skill_name / "SKILL.md"
         if not skill_md.is_file():

@@ -48,6 +48,8 @@ class RepositoryPolicyTests(unittest.TestCase):
             "fiveqln_compile_manifest",
             "fiveqln_validate_research_prompt",
             "fiveqln_fractal_memory",
+            "fiveqln_create_skill_manifest",
+            "fiveqln_verify_skill",
         ):
             self.assertIn(f"  - {tool}", manifest)
 

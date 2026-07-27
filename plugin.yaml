@@ -7,5 +7,7 @@ provides_tools:
   - fiveqln_compile_manifest
   - fiveqln_validate_research_prompt
   - fiveqln_fractal_memory
+  - fiveqln_create_skill_manifest
+  - fiveqln_verify_skill
 provides_hooks:
   - pre_llm_call

@@ -102,6 +102,8 @@ class PluginRegistrationTests(unittest.TestCase):
                 "fiveqln_compile_manifest",
                 "fiveqln_validate_research_prompt",
                 "fiveqln_fractal_memory",
+                "fiveqln_create_skill_manifest",
+                "fiveqln_verify_skill",
             },
         )
         self.assertEqual(
@@ -117,6 +119,7 @@ class PluginRegistrationTests(unittest.TestCase):
                 "5qln-deep-research",
                 "5qln-centrifuge",
                 "5qln-signature-engine",
+                "5qln-skill-formation",
             },
         )
         for skill_path in ctx.skills.values():

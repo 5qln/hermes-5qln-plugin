@@ -5,14 +5,14 @@ Each code has one stable meaning. Existing conversion-compiler findings remain n
 ## Execution and schema
 
 ### `READ_FAILED`
-- Severity: execution error
+- Severity: error
 - Condition: a required input cannot be read.
 - Path: affected invocation field or relative file.
 - Repair: restore access or supply the correct file.
 - Boundary: no conformance result is issued.
 
 ### `JSON_INVALID`
-- Severity: execution error
+- Severity: error
 - Condition: required JSON bytes cannot be parsed.
 - Path: affected JSON file.
 - Repair: provide valid UTF-8 JSON.
@@ -54,7 +54,7 @@ Each code has one stable meaning. Existing conversion-compiler findings remain n
 - Boundary: author fields cannot smuggle machine status.
 
 ### `DEPENDENCY_MISSING`
-- Severity: execution error
+- Severity: error
 - Condition: an exact parser required for verification is unavailable.
 - Path: dependency name.
 - Repair: install the documented dependency in an isolated environment.
@@ -398,7 +398,7 @@ Each code has one stable meaning. Existing conversion-compiler findings remain n
 - Boundary: absence remains open.
 
 ### `OBSERVATION_FAILED`
-- Severity: behavioral finding
+- Severity: warning
 - Condition: a deterministic assertion fails against supplied run bytes.
 - Path: fixture assertion and run.
 - Repair: inspect the candidate or revise an unjustified assertion through review.

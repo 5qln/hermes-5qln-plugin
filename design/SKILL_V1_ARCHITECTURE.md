@@ -668,7 +668,7 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
       "type": "string",
       "minLength": 1,
       "maxLength": 500,
-      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*//)(?!\\.verification(?:/|$)).+$"
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*\\u0000)(?!\\.verification(?:/|$))(?:(?!\\.{1,2}(?:/|$))[^/]+)(?:/(?:(?!\\.{1,2}(?:/|$))[^/]+))*$"
     },
     "sha256": {
       "type": "string",
@@ -712,9 +712,7 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
       ],
       "properties": {
         "path": {
-          "type": "string",
-          "pattern": "^\\.verification/evidence/(?!.*(?:^|/)\\.\\.(?:/|$)).+$",
-          "maxLength": 500
+          "$ref": "#/$defs/evidencePath"
         },
         "sha256": {
           "$ref": "#/$defs/sha256"
@@ -784,6 +782,12 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
           }
         }
       ]
+    },
+    "evidencePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^\\.verification/evidence/(?:(?!\\.{1,2}(?:/|$))[^/\\\\\\u0000]+)(?:/(?:(?!\\.{1,2}(?:/|$))[^/\\\\\\u0000]+))*$"
     }
   }
 }
@@ -898,7 +902,7 @@ Every fixture spec SHALL be a JSON file with this exact root:
 }
 ```
 
-Allowed `class` values exactly match the manifest fixture enum.
+Allowed `class` values exactly match the manifest fixture enum. Every `scenario.context_files` entry is a portable bundle-relative path, resolves beneath the candidate bundle root, and must match an inventoried regular file; absolute paths, `.`, `..`, backslashes, NUL, symlinks, and `.verification/**` are rejected. The harness supplies those exact bytes without ambient profile context.
 
 Allowed `trigger` values:
 
@@ -961,7 +965,20 @@ An external harness SHALL produce:
 }
 ```
 
-`fixture_sha256` is the SHA-256 of the exact fixture JSON bytes. `input_sha256` is the SHA-256 of UTF-8 bytes from the fixture's `scenario.user_input` exactly as stored, with no normalization. Output and tool-trace paths resolve relative to the observed-run record's parent directory. The verifier rejects absolute paths, traversal, symlinks, non-regular files, and case-fold collisions, then reads each artifact once under the global bounds.
+`fixture_sha256` is the SHA-256 of the exact fixture JSON bytes. `input_sha256` is the SHA-256 of UTF-8 bytes from the fixture's `scenario.user_input` exactly as stored, with no normalization. Output and tool-trace paths resolve relative to the observed-run record's parent directory. The verifier rejects absolute paths, traversal, symlinks, non-regular files, and case-fold collisions, then reads each artifact once under the global bounds. Output bytes must decode as strict UTF-8 without replacement or normalization; malformed bytes yield `OBSERVATION_FAILED` and cannot satisfy assertions.
+
+Tool-trace files conform to the published `tool-trace-v1.schema.json` contract:
+
+```json
+{
+  "format_version": "tool-trace-v1",
+  "events": [
+    {"sequence": 0, "tool": "tool_name", "arguments_sha256": null}
+  ]
+}
+```
+
+The harness emits one event per invocation in observed order. `sequence` values must be strictly increasing and unique. When arguments are captured, `arguments_sha256` hashes canonical JSON bytes using sorted keys, no insignificant whitespace, and UTF-8; `null` means argument bytes were intentionally not captured and makes only name/order assertions available. The verifier parses tool traces as strict UTF-8 JSON with duplicate-key rejection and validates the published schema before evaluating `tool_called`, `tool_not_called`, or `tool_order`.
 
 The verifier recomputes fixture assertions from these files. It does not trust harness-supplied pass/fail labels. A run whose bundle or fixture digest differs is inapplicable, not evidence for changed bytes.
 
@@ -1026,7 +1043,7 @@ Findings use stable artifact-specific codes. Existing converter findings are nes
 | `SCHEMA_MISSING` | error | Required field absent. |
 | `SCHEMA_ENUM` | error | Value outside fixed vocabulary. |
 | `SCHEMA_EXTRA` | error | Unknown field present. |
-| `DEPENDENCY_MISSING` | execution error | Exact validation dependency unavailable; no conformance result is issued. |
+| `DEPENDENCY_MISSING` | error | Exact validation dependency unavailable; no conformance result is issued; report dimension is `execution`. |
 
 ### 10.2 Filesystem and bundle
 
@@ -1096,7 +1113,7 @@ Constitutional drift and corruption retain canonical codes through nested conver
 | `OBSERVATION_HASH` | error | Run artifact digest mismatch. |
 | `OBSERVATION_INPUT` | error | Run input does not match fixture input. |
 | `OBSERVATION_INSUFFICIENT` | warning or promotion blocker | Minimum run policy not met. |
-| `OBSERVATION_FAILED` | behavioral finding | Deterministic assertion failed in supplied run. |
+| `OBSERVATION_FAILED` | warning | Deterministic assertion failed in supplied run; report dimension is `behavior`. |
 | `REGISTRATION_DRIFT` | error when promotion requested | Skill absent or inconsistent across registration surfaces. |
 | `DOCS_DRIFT` | error when promotion requested | Counts/lists/usage docs not synchronized. |
 | `VERSION_DRIFT` | error when promotion requested | Version and changelog not synchronized. |
@@ -1115,7 +1132,7 @@ The generated report SHALL have this shape and reject ambiguous `valid` or `cert
   "manifest": {"path": "...", "sha256": "..."},
   "skill": {"name": "...", "bundle_root": ".", "bundle_sha256": "..."},
   "structural_status": "passed",
-  "behavioral_status": "not_observed",
+  "behavioral_status": "not_declared",
   "attestation_status": "open",
   "human_review_status": "open",
   "requested_state": "draft",
@@ -1138,7 +1155,7 @@ Finding objects:
   "severity": "error",
   "dimension": "structure | behavior | attestation | promotion | execution",
   "code": "STABLE_CODE",
-  "path": "JSON pointer or relative file path",
+  "location": {"kind": "json_pointer | relative_path | invocation_field", "value": "typed value"},
   "message": "Human-readable explanation",
   "evidence": ["stable IDs, digests, or paths"]
 }
@@ -1154,7 +1171,9 @@ Check objects:
 }
 ```
 
-Canonical reports SHALL omit timestamps, stable-sort checks and findings, and use only bundle-relative persisted paths. Identical inputs and capability/observation evidence must produce byte-stable canonical JSON.
+Canonical reports SHALL omit timestamps, stable-sort checks and findings, and use explicit typed locations. Relative-path locations and subject files must be portable bundle-relative paths; evidence tokens reject absolute POSIX paths, Windows drive paths, backslashes, and NUL. Identical inputs and capability/observation evidence must produce byte-stable canonical JSON.
+
+The verifier additionally enforces relationships not expressible in JSON Schema: each count equals its corresponding array length; `errors` contain only error findings and `warnings` only warning findings; generated status combinations follow §11.2; and no persisted value contains an absolute host/profile/repository path. `conversion_report` is the sole intentionally open nested object because it preserves the existing compiler's versioned report without redefining it; upstream findings are namespaced as `CONVERSION/<code>`, including exact `CONVERSION/V∅`.
 
 ### 11.2 Status vocabularies
 

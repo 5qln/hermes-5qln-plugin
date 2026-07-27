@@ -131,13 +131,35 @@
     "errors": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/finding"
+        "allOf": [
+          {
+            "$ref": "#/$defs/finding"
+          },
+          {
+            "properties": {
+              "severity": {
+                "const": "error"
+              }
+            }
+          }
+        ]
       }
     },
     "warnings": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/finding"
+        "allOf": [
+          {
+            "$ref": "#/$defs/finding"
+          },
+          {
+            "properties": {
+              "severity": {
+                "const": "warning"
+              }
+            }
+          }
+        ]
       }
     },
     "observations": {
@@ -180,9 +202,7 @@
       ],
       "properties": {
         "path": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 500
+          "$ref": "#/$defs/relativePath"
         },
         "sha256": {
           "$ref": "#/$defs/sha256"
@@ -213,8 +233,7 @@
         "evidence": {
           "type": "array",
           "items": {
-            "type": "string",
-            "maxLength": 1000
+            "$ref": "#/$defs/evidenceToken"
           }
         }
       }
@@ -226,7 +245,7 @@
         "severity",
         "dimension",
         "code",
-        "path",
+        "location",
         "message",
         "evidence"
       ],
@@ -248,11 +267,7 @@
         },
         "code": {
           "type": "string",
-          "pattern": "^[A-Z][A-Z0-9_/-]{2,127}$"
-        },
-        "path": {
-          "type": "string",
-          "maxLength": 1000
+          "pattern": "^(?:[A-Z][A-Z0-9_/-]{2,127}|CONVERSION/V∅)$"
         },
         "message": {
           "type": "string",
@@ -262,9 +277,11 @@
         "evidence": {
           "type": "array",
           "items": {
-            "type": "string",
-            "maxLength": 1000
+            "$ref": "#/$defs/evidenceToken"
           }
+        },
+        "location": {
+          "$ref": "#/$defs/location"
         }
       }
     },
@@ -296,11 +313,145 @@
         "evidence": {
           "type": "array",
           "items": {
-            "type": "string",
-            "maxLength": 1000
+            "$ref": "#/$defs/evidenceToken"
+          }
+        }
+      }
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*\\u0000)(?:(?!\\.{1,2}(?:/|$))[^/]+)(?:/(?:(?!\\.{1,2}(?:/|$))[^/]+))*$"
+    },
+    "evidenceToken": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*\\u0000).+$"
+    },
+    "location": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "json_pointer"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^(?:/(?:[^~/]|~[01])*)*$",
+              "maxLength": 1000
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "relative_path"
+            },
+            "value": {
+              "$ref": "#/$defs/relativePath"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "invocation_field"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,63}$"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "execution_success": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "structural_status": {
+            "const": "not_run"
+          },
+          "promotion_state": {
+            "const": "draft"
+          },
+          "promotion_ready": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "promotion_ready": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "structural_status": {
+            "const": "passed"
+          },
+          "behavioral_status": {
+            "const": "observed_passed"
+          },
+          "human_review_status": {
+            "const": "accepted"
+          },
+          "requested_state": {
+            "const": "promotion_requested"
+          },
+          "promotion_state": {
+            "const": "promotion_ready"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "promotion_state": {
+            "const": "promotion_ready"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "promotion_ready": {
+            "const": true
           }
         }
       }
     }
-  }
+  ]
 }

@@ -468,7 +468,7 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 500,
-      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*//)(?!\\.verification(?:/|$)).+$"
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*\\u0000)(?!\\.verification(?:/|$))(?:(?!\\.{1,2}(?:/|$))[^/]+)(?:/(?:(?!\\.{1,2}(?:/|$))[^/]+))*$"
     },
     "sha256": {
       "type": "string",
@@ -512,9 +512,7 @@
       ],
       "properties": {
         "path": {
-          "type": "string",
-          "pattern": "^\\.verification/evidence/(?!.*(?:^|/)\\.\\.(?:/|$)).+$",
-          "maxLength": 500
+          "$ref": "#/$defs/evidencePath"
         },
         "sha256": {
           "$ref": "#/$defs/sha256"
@@ -584,6 +582,12 @@
           }
         }
       ]
+    },
+    "evidencePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^\\.verification/evidence/(?:(?!\\.{1,2}(?:/|$))[^/\\\\\\u0000]+)(?:/(?:(?!\\.{1,2}(?:/|$))[^/\\\\\\u0000]+))*$"
     }
   }
 }

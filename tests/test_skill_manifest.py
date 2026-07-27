@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import re
 import unittest
 from pathlib import Path
+
+HAS_JSONSCHEMA = importlib.util.find_spec("jsonschema") is not None
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,6 +17,7 @@ SCHEMA_FILES = {
     "skill-v1.schema.json": "skill-v1",
     "behavior-fixture-v1.schema.json": "behavior-fixture-v1",
     "observed-run-v1.schema.json": "observed-run-v1",
+    "tool-trace-v1.schema.json": "tool-trace-v1",
     "skill-report-v1.schema.json": "skill-report-v1",
 }
 STATUS_VOCABULARY = {
@@ -104,7 +108,7 @@ EXPECTED_ERROR_CODES = {
 
 def iter_object_schemas(value: object, pointer: str = "$"):
     if isinstance(value, dict):
-        if "properties" in value:
+        if value.get("type") == "object" and "properties" in value:
             yield pointer, value
         for key, child in value.items():
             yield from iter_object_schemas(child, f"{pointer}/{key}")
@@ -126,11 +130,16 @@ class SkillSchemaContractTests(unittest.TestCase):
                     "https://json-schema.org/draft/2020-12/schema",
                 )
                 self.assertEqual(payload["type"], "object")
-                self.assertFalse(payload["additionalProperties"])
-                self.assertEqual(
-                    payload["properties"]["format_version"]["const"],
-                    format_version,
-                )
+                self.assertIs(payload["additionalProperties"], False)
+                self.assertEqual(payload["properties"]["format_version"]["const"], format_version)
+
+    def test_architecture_embeds_the_exact_published_skill_schema(self) -> None:
+        architecture = (ROOT / "design" / "SKILL_V1_ARCHITECTURE.md").read_text(encoding="utf-8")
+        section = architecture.split("### 5.2 Formal JSON Schema", 1)[1].split(
+            "### 5.3 Cross-field invariants", 1
+        )[0]
+        embedded = json.loads(section.split("```json", 1)[1].split("```", 1)[0])
+        self.assertEqual(embedded, self.load_schema("skill-v1.schema.json"))
 
     def test_every_declared_object_with_properties_rejects_unknown_fields(self) -> None:
         for filename in SCHEMA_FILES:
@@ -140,8 +149,30 @@ class SkillSchemaContractTests(unittest.TestCase):
                     self.assertIs(
                         schema.get("additionalProperties"),
                         False,
-                        f"open object schema at {pointer}",
+                        f"{filename} leaves {pointer} open",
                     )
+
+    def test_conversion_report_is_the_only_intentionally_open_object(self) -> None:
+        open_objects: list[tuple[str, str]] = []
+        for filename in SCHEMA_FILES:
+            payload = self.load_schema(filename)
+
+            def visit(value: object, pointer: str = "$") -> None:
+                if isinstance(value, dict):
+                    if value.get("type") == "object" and "additionalProperties" not in value:
+                        open_objects.append((filename, pointer))
+                    for key, child in value.items():
+                        visit(child, f"{pointer}/{key}")
+                elif isinstance(value, list):
+                    for index, child in enumerate(value):
+                        visit(child, f"{pointer}/{index}")
+
+            visit(payload)
+
+        self.assertEqual(
+            open_objects,
+            [("skill-report-v1.schema.json", "$/properties/conversion_report")],
+        )
 
     def test_skill_manifest_has_no_author_supplied_machine_status(self) -> None:
         payload = self.load_schema("skill-v1.schema.json")
@@ -203,7 +234,10 @@ class SkillSchemaContractTests(unittest.TestCase):
 
     def test_fixture_contract_excludes_backtracking_regex(self) -> None:
         payload = self.load_schema("behavior-fixture-v1.schema.json")
-        kinds = payload["$defs"]["assertion"]["properties"]["kind"]["enum"]
+        kinds = {
+            branch["properties"]["kind"]["const"]
+            for branch in payload["$defs"]["assertion"]["oneOf"]
+        }
         self.assertNotIn("output_regex", kinds)
 
     def test_report_state_is_stateless_and_ends_at_promotion_ready(self) -> None:
@@ -224,6 +258,122 @@ class SkillSchemaContractTests(unittest.TestCase):
                 self.assertNotIn("unexpected", valid)
                 self.assertEqual(invalid["format_version"], format_version)
                 self.assertEqual(invalid["unexpected"], "SCHEMA_EXTRA")
+
+
+@unittest.skipUnless(HAS_JSONSCHEMA, "install dev dependency: jsonschema")
+class SkillSchemaInstanceTests(unittest.TestCase):
+    def load_schema(self, filename: str) -> dict:
+        return json.loads((REFERENCE_ROOT / filename).read_text(encoding="utf-8"))
+
+    def test_golden_instances_validate_and_extra_fields_fail(self) -> None:
+        import jsonschema
+
+        fixture_root = ROOT / "tests" / "fixtures" / "skill-v1" / "contracts"
+        for filename in SCHEMA_FILES:
+            stem = filename.removesuffix(".schema.json")
+            schema = self.load_schema(filename)
+            with self.subTest(stem=stem, validity="valid"):
+                jsonschema.Draft202012Validator(schema).validate(
+                    json.loads((fixture_root / f"valid-{stem}.json").read_text())
+                )
+            with self.subTest(stem=stem, validity="invalid-extra"):
+                with self.assertRaises(jsonschema.ValidationError):
+                    jsonschema.Draft202012Validator(schema).validate(
+                        json.loads((fixture_root / f"invalid-{stem}-extra.json").read_text())
+                    )
+
+    def test_adversarial_paths_are_schema_invalid(self) -> None:
+        import jsonschema
+
+        skill_schema = self.load_schema("skill-v1.schema.json")
+        relative_path = skill_schema["$defs"]["relativePath"]
+        evidence_path = skill_schema["$defs"]["evidencePath"]
+        run_schema = self.load_schema("observed-run-v1.schema.json")
+        run_path = run_schema["$defs"]["runPath"]
+        for schema, values in (
+            (relative_path, [".", "./foo", "a/../b", "a/./b", "../secret", ".verification/private", "C:\\secret", "a\\b", "nul\x00x"]),
+            (evidence_path, [".verification/evidence/../secret", ".verification/evidence/./x"]),
+            (run_path, ["runs/../secret", "runs/./x", "runs/a\\b"]),
+        ):
+            for value in values:
+                with self.subTest(value=value):
+                    self.assertFalse(jsonschema.Draft202012Validator(schema).is_valid(value))
+
+    def test_assertion_types_and_mutation_class_are_schema_bound(self) -> None:
+        import jsonschema
+
+        fixture_root = ROOT / "tests" / "fixtures" / "skill-v1" / "contracts"
+        base = json.loads((fixture_root / "valid-behavior-fixture-v1.json").read_text())
+        schema = self.load_schema("behavior-fixture-v1.schema.json")
+        validator = jsonschema.Draft202012Validator(schema)
+
+        wrong_type = json.loads(json.dumps(base))
+        wrong_type["expected"]["assertions"][0] = {
+            "id": "ASSERT_1",
+            "kind": "output_last_line_question",
+            "value": "not-null",
+        }
+        self.assertFalse(validator.is_valid(wrong_type))
+
+        unsafe_mutation = json.loads(json.dumps(base))
+        unsafe_mutation["mutation"] = {
+            "target": "../../outside",
+            "operation": "delete_file",
+            "selector": "file",
+            "replacement": None,
+            "expected_error_codes": ["FILE_MISSING"],
+        }
+        self.assertFalse(validator.is_valid(unsafe_mutation))
+
+        missing_mutation = json.loads(json.dumps(base))
+        missing_mutation["class"] = "mutation"
+        self.assertFalse(validator.is_valid(missing_mutation))
+
+    def test_report_rejects_contradictory_status_and_absolute_locations(self) -> None:
+        import jsonschema
+
+        fixture_root = ROOT / "tests" / "fixtures" / "skill-v1" / "contracts"
+        base = json.loads((fixture_root / "valid-skill-report-v1.json").read_text())
+        schema = self.load_schema("skill-report-v1.schema.json")
+        validator = jsonschema.Draft202012Validator(schema)
+
+        impossible = json.loads(json.dumps(base))
+        impossible["promotion_ready"] = True
+        self.assertFalse(validator.is_valid(impossible))
+
+        failed_execution = json.loads(json.dumps(base))
+        failed_execution["execution_success"] = False
+        self.assertFalse(validator.is_valid(failed_execution))
+
+        absolute_manifest = json.loads(json.dumps(base))
+        absolute_manifest["manifest"]["path"] = "/opt/private/manifest.json"
+        self.assertFalse(validator.is_valid(absolute_manifest))
+
+    def test_report_finding_locations_are_typed_and_converter_v_empty_is_allowed(self) -> None:
+        import jsonschema
+
+        schema = self.load_schema("skill-report-v1.schema.json")
+        finding_schema = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$defs": schema["$defs"],
+            "$ref": "#/$defs/finding",
+        }
+        validator = jsonschema.Draft202012Validator(finding_schema)
+        valid = {
+            "severity": "error",
+            "dimension": "structure",
+            "code": "CONVERSION/V∅",
+            "location": {"kind": "relative_path", "value": "provenance/conversion.json"},
+            "message": "Nested conversion corruption finding.",
+            "evidence": ["CONVERSION/V∅"],
+        }
+        self.assertTrue(validator.is_valid(valid))
+        leaked = json.loads(json.dumps(valid))
+        leaked["location"] = {"kind": "relative_path", "value": "/opt/private"}
+        self.assertFalse(validator.is_valid(leaked))
+        leaked = json.loads(json.dumps(valid))
+        leaked["evidence"] = ["/opt/private/session.db"]
+        self.assertFalse(validator.is_valid(leaked))
 
 
 class SkillRegistryContractTests(unittest.TestCase):

@@ -7,6 +7,11 @@ import importlib.util
 import re
 import unittest
 from pathlib import Path
+import os
+import sys
+import tempfile
+import unittest
+from unittest import mock
 
 HAS_JSONSCHEMA = importlib.util.find_spec("jsonschema") is not None
 
@@ -400,3 +405,266 @@ class SkillRegistryContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SkillCommonContractTests(unittest.TestCase):
+    """Tests for skills/5qln-skill-formation/scripts/skill_common.py."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        sys.path.insert(0, str(ROOT / "skills" / "5qln-skill-formation" / "scripts"))
+        global skill_common
+        import skill_common
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        sys.path.remove(str(ROOT / "skills" / "5qln-skill-formation" / "scripts"))
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    # --- constants ---
+    def test_constants_are_reasonable(self) -> None:
+        self.assertEqual(skill_common.MAX_FILES, 512)
+        self.assertEqual(skill_common.MAX_FILE_BYTES, 10 * 1024 * 1024)
+        self.assertEqual(skill_common.MAX_TOTAL_BYTES, 50 * 1024 * 1024)
+        self.assertEqual(skill_common.MAX_DEPTH, 32)
+
+    # --- canonical_json_bytes ---
+    def test_canonical_json_is_stable_int(self) -> None:
+        a = skill_common.canonical_json_bytes({"b": 1, "a": 2})
+        b = skill_common.canonical_json_bytes({"a": 2, "b": 1})
+        self.assertEqual(a, b)
+        self.assertEqual(a, b'{"a":2,"b":1}')
+
+    def test_canonical_json_is_stable_str(self) -> None:
+        a = skill_common.canonical_json_bytes({"z": "hello", "a": "world"})
+        self.assertEqual(a, b'{"a":"world","z":"hello"}')
+
+    def test_canonical_json_survives_roundtrip(self) -> None:
+        payload = {"key": "val", "nested": {"b": 1, "a": [3, 2, 1]}}
+        self.assertEqual(payload, json.loads(skill_common.canonical_json_bytes(payload)))
+
+    # --- sha256_bytes ---
+    def test_sha256_of_empty(self) -> None:
+        self.assertEqual(
+            skill_common.sha256_bytes(b""),
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        )
+
+    def test_sha256_of_known(self) -> None:
+        self.assertEqual(
+            skill_common.sha256_bytes(b"hello world"),
+            "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
+        )
+
+    def test_sha256_is_stable(self) -> None:
+        self.assertEqual(skill_common.sha256_bytes(b"a"), skill_common.sha256_bytes(b"a"))
+
+    # --- normalize_relative_path ---
+    def test_normalize_passes_clean_path(self) -> None:
+        self.assertEqual(skill_common.normalize_relative_path("a/b/c"), "a/b/c")
+
+    def test_normalize_rejects_absolute(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.normalize_relative_path("/etc/passwd")
+        self.assertEqual(ctx.exception.code, "PATH_ESCAPE")
+
+    def test_normalize_rejects_dotdot(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.normalize_relative_path("a/../b")
+        self.assertEqual(ctx.exception.code, "PATH_ESCAPE")
+
+    def test_normalize_rejects_dot_segment(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError):
+            skill_common.normalize_relative_path("./foo")
+
+    def test_normalize_rejects_backslash(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError):
+            skill_common.normalize_relative_path("a\\b")
+
+    def test_normalize_rejects_null(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError):
+            skill_common.normalize_relative_path("a\x00b")
+
+    def test_normalize_rejects_empty(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError):
+            skill_common.normalize_relative_path("")
+
+    def test_normalize_rejects_dot(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError):
+            skill_common.normalize_relative_path(".")
+
+    def test_normalize_rejects_verification(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.normalize_relative_path(".verification/evidence/x")
+        self.assertEqual(ctx.exception.code, "PATH_INVALID")
+
+    def test_normalize_rejects_trailing_slash(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError):
+            skill_common.normalize_relative_path("a/b/")
+
+    def test_normalize_rejects_trailing_dotdot(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError):
+            skill_common.normalize_relative_path("a/..")
+
+    def test_normalize_rejects_dot_as_standalone(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError):
+            skill_common.normalize_relative_path(".")
+
+    # --- inspect_regular_file ---
+    def test_inspect_regular_file_basic(self) -> None:
+        f = self.tmp / "hello.txt"
+        f.write_text("hello", encoding="utf-8")
+        info = skill_common.inspect_regular_file(self.tmp, "hello.txt")
+        self.assertEqual(info["path"], "hello.txt")
+        self.assertEqual(info["size_bytes"], 5)
+        self.assertEqual(len(info["sha256"]), 64)
+
+    def test_inspect_rejects_symlink(self) -> None:
+        target = self.tmp / "real.txt"
+        target.write_text("real")
+        link = self.tmp / "link.txt"
+        os.symlink(str(target), str(link))
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.inspect_regular_file(self.tmp, "link.txt")
+        self.assertIn(ctx.exception.code, ("SYMLINK_FORBIDDEN", "FILE_TYPE_FORBIDDEN"))
+
+    def test_inspect_rejects_missing(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.inspect_regular_file(self.tmp, "nope.txt")
+        self.assertEqual(ctx.exception.code, "FILE_MISSING")
+
+    def test_inspect_rejects_oversized(self) -> None:
+        f = self.tmp / "big.txt"
+        f.write_bytes(b"x" * (skill_common.MAX_FILE_BYTES + 1))
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.inspect_regular_file(self.tmp, "big.txt")
+        self.assertEqual(ctx.exception.code, "SIZE_LIMIT")
+
+    def test_inspect_read_once_produces_consistent_hash(self) -> None:
+        f = self.tmp / "data.bin"
+        f.write_bytes(b"\x00\x01\x02\x03\x04")
+        a = skill_common.inspect_regular_file(self.tmp, "data.bin")
+        b = skill_common.inspect_regular_file(self.tmp, "data.bin")
+        self.assertEqual(a["sha256"], b["sha256"])
+        self.assertEqual(a["size_bytes"], b["size_bytes"])
+
+    # --- inventory_bundle ---
+    def test_inventory_excludes_manifest_and_verification(self) -> None:
+        (self.tmp / "SKILL.md").write_text("# Test")
+        (self.tmp / "ref.md").write_text("ref")
+        (self.tmp / "skill-formation-manifest.json").write_text("{}")
+        (self.tmp / ".verification").mkdir()
+        (self.tmp / ".verification" / "run.json").write_text("{}")
+        inv = skill_common.inventory_bundle(self.tmp)
+        paths = {r["path"] for r in inv}
+        self.assertIn("SKILL.md", paths)
+        self.assertIn("ref.md", paths)
+        self.assertNotIn("skill-formation-manifest.json", paths)
+        self.assertNotIn(".verification/run.json", paths)
+
+    def test_inventory_returns_sorted(self) -> None:
+        (self.tmp / "c.txt").write_text("c")
+        (self.tmp / "a.txt").write_text("a")
+        (self.tmp / "b.txt").write_text("b")
+        inv = skill_common.inventory_bundle(self.tmp)
+        paths = [r["path"] for r in inv]
+        self.assertEqual(paths, ["a.txt", "b.txt", "c.txt"])
+
+    def test_inventory_rejects_symlinks(self) -> None:
+        (self.tmp / "real.txt").write_text("real")
+        os.symlink(str(self.tmp / "real.txt"), str(self.tmp / "link.txt"))
+        with self.assertRaises(skill_common.SkillContractError):
+            skill_common.inventory_bundle(self.tmp)
+
+    def test_inventory_rejects_excess_files(self) -> None:
+        for i in range(skill_common.MAX_FILES + 1):
+            (self.tmp / f"f{i:04d}.txt").write_text("x")
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.inventory_bundle(self.tmp)
+        self.assertEqual(ctx.exception.code, "SIZE_LIMIT")
+
+    def test_inventory_rejects_excess_depth(self) -> None:
+        d = self.tmp
+        for _ in range(skill_common.MAX_DEPTH + 1):
+            d = d / "sub"
+        d.mkdir(parents=True)
+        (d / "deep.txt").write_text("deep")
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.inventory_bundle(self.tmp)
+        self.assertEqual(ctx.exception.code, "SIZE_LIMIT")
+
+    def test_inventory_rejects_excess_total_bytes(self) -> None:
+        (self.tmp / "big.txt").write_bytes(b"x" * (skill_common.MAX_TOTAL_BYTES + 1))
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.inventory_bundle(self.tmp)
+        self.assertEqual(ctx.exception.code, "SIZE_LIMIT")
+
+    def test_inventory_handles_case_collision(self) -> None:
+        (self.tmp / "File.txt").write_text("a")
+        (self.tmp / "file.txt").write_text("b")
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.inventory_bundle(self.tmp)
+        self.assertEqual(ctx.exception.code, "PATH_CASE_COLLISION")
+
+    # --- compute_bundle_sha256 ---
+    def test_bundle_sha256_is_deterministic(self) -> None:
+        files = [
+            {"path": "a.txt", "sha256": skill_common.sha256_bytes(b"a"), "size_bytes": 1},
+            {"path": "b.txt", "sha256": skill_common.sha256_bytes(b"b"), "size_bytes": 1},
+        ]
+        self.assertEqual(
+            skill_common.compute_bundle_sha256(files),
+            skill_common.compute_bundle_sha256(files),
+        )
+
+    def test_bundle_sha256_changes_with_content(self) -> None:
+        a = [{"path": "x.txt", "sha256": skill_common.sha256_bytes(b"a"), "size_bytes": 1}]
+        b = [{"path": "x.txt", "sha256": skill_common.sha256_bytes(b"b"), "size_bytes": 1}]
+        self.assertNotEqual(skill_common.compute_bundle_sha256(a), skill_common.compute_bundle_sha256(b))
+
+    # --- SkillContractError ---
+    def test_error_repr_includes_code_and_message(self) -> None:
+        err = skill_common.SkillContractError("TEST_CODE", "test message", "a/b")
+        s = str(err)
+        self.assertIn("TEST_CODE", s)
+        self.assertIn("test message", s)
+        self.assertIn("a/b", s)
+
+    def test_error_path_is_optional(self) -> None:
+        err = skill_common.SkillContractError("NO_PATH", "no path")
+        self.assertIsNone(err.path)
+
+    # --- atomic_write_json ---
+    def test_atomic_write_creates_file(self) -> None:
+        path = self.tmp / "out.json"
+        skill_common.atomic_write_json(path, {"a": 1}, overwrite=False)
+        self.assertTrue(path.exists())
+        self.assertEqual(json.loads(path.read_text()), {"a": 1})
+
+    def test_atomic_write_refuses_overwrite_by_default(self) -> None:
+        path = self.tmp / "out.json"
+        path.write_text("existing")
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            skill_common.atomic_write_json(path, {"a": 1}, overwrite=False)
+        self.assertEqual(ctx.exception.code, "FILE_DUPLICATE")
+
+    def test_atomic_write_overwrite_ok(self) -> None:
+        path = self.tmp / "out.json"
+        path.write_text("existing")
+        skill_common.atomic_write_json(path, {"a": 1}, overwrite=True)
+        self.assertEqual(json.loads(path.read_text()), {"a": 1})
+
+    def test_atomic_write_is_deterministic(self) -> None:
+        p1 = self.tmp / "a.json"
+        p2 = self.tmp / "b.json"
+        payload = {"key": "value", "list": [1, 2, 3]}
+        skill_common.atomic_write_json(p1, payload, overwrite=False)
+        skill_common.atomic_write_json(p2, payload, overwrite=False)
+        self.assertEqual(p1.read_bytes(), p2.read_bytes())
+

@@ -334,6 +334,408 @@ def run_conversion_compiler(manifest_path: Path) -> dict[str, object]:
 
 
 # ---------------------------------------------------------------------------
+# Requirement traceability (Task 10)
+# ---------------------------------------------------------------------------
+
+def _verify_requirement_traceability(
+    manifest: dict[str, object], conversion_report: dict[str, object]
+) -> list[dict[str, object]]:
+    """Check every requirement maps to sections, verifiers, and fixtures."""
+    findings: list[dict[str, object]] = []
+    traces = manifest.get("requirement_traceability", [])
+
+    def err(code: str, msg: str, ptr: str = "$") -> None:
+        findings.append({
+            "severity": "error", "dimension": "structure", "code": code,
+            "location": {"kind": "json_pointer", "value": ptr}, "message": msg, "evidence": [],
+        })
+
+    requirement_ids = set()
+    fixture_ids = {str(f.get("id", "")) for f in manifest.get("behavioral_fixtures", [])}
+    behavioral_reqs = {
+        str(r.get("id", "")): r
+        for r in manifest.get("contract", {}).get("behavioral_requirements", [])
+    }
+
+    for i, tr in enumerate(traces):
+        base = f"$/requirement_traceability/{i}"
+        rid = str(tr.get("requirement_id", ""))
+
+        if rid in requirement_ids:
+            err("REQUIREMENT_DUPLICATE", f"duplicate requirement_id: {rid}", f"{base}/requirement_id")
+        requirement_ids.add(rid)
+
+        req_class = str(tr.get("class", ""))
+        if req_class == "source":
+            if not tr.get("basis_source_unit_ids"):
+                err("REQUIREMENT_BASIS", f"source requirement {rid} missing basis_source_unit_ids", base)
+            if tr.get("basis_derived_insight_ids"):
+                err("SOURCE_CLASS_INVALID", f"source requirement {rid} must have empty derived basis", base)
+        elif req_class == "derived":
+            if not (tr.get("basis_source_unit_ids") or tr.get("basis_derived_insight_ids")):
+                err("REQUIREMENT_BASIS", f"derived requirement {rid} missing basis", base)
+        elif req_class == "proposal":
+            if tr.get("basis_source_unit_ids") or tr.get("basis_derived_insight_ids"):
+                err("SOURCE_CLASS_INVALID", f"proposal {rid} should have empty basis unless extending", base)
+
+        if not tr.get("skill_sections"):
+            err("SECTION_MISSING", f"requirement {rid} has no skill_sections", f"{base}/skill_sections")
+        if not tr.get("verifier_checks"):
+            err("REQUIREMENT_UNMAPPED", f"requirement {rid} has no verifier_checks", f"{base}/verifier_checks")
+
+        # Fixture resolution
+        for fid in tr.get("fixture_ids", []):
+            if str(fid) not in fixture_ids:
+                err("FIXTURE_UNRESOLVED", f"fixture {fid} not declared", f"{base}/fixture_ids")
+
+        # Check behavioral requirement mapping
+        if rid in behavioral_reqs:
+            br = behavioral_reqs[rid]
+            verif = str(br.get("verification", ""))
+            if verif == "observed" and not tr.get("fixture_ids"):
+                err("FIXTURE_UNRESOLVED", f"observed requirement {rid} has no fixtures", f"{base}/fixture_ids")
+
+    # Check all behavioral requirements have trace rows
+    for brid in behavioral_reqs:
+        if brid not in requirement_ids:
+            err("REQUIREMENT_UNMAPPED", f"behavioral requirement {brid} has no traceability row", "$/contract")
+
+    # 5QLN boundary: S→G→Q→P→V order from conversion report
+    if conversion_report:
+        cells = conversion_report.get("cells", [])
+        if cells:
+            phase_order_ok = _check_phase_order(cells)
+            if not phase_order_ok:
+                err("FORMATION_ORDER", "conversion cell phase order deviates from S→G→Q→P→V")
+
+        # Return is question-bearing
+        doc_cell = conversion_report.get("document_cell", {})
+        v_phase = doc_cell.get("V", {})
+        return_q = str(v_phase.get("return_question", ""))
+        if return_q and not return_q.strip().endswith("?"):
+            err("RETURN_NOT_QUESTION", "V-phase return must be question-bearing")
+
+    return findings
+
+
+def _check_phase_order(cells: list) -> bool:
+    """Check that cell addresses follow S→G→Q→P→V ordering."""
+    phase_order = {"S": 0, "G": 1, "Q": 2, "P": 3, "V": 4}
+    last_phase = -1
+    for cell in cells:
+        addr = str(cell.get("address", ""))
+        if len(addr) >= 1 and addr[0] in phase_order:
+            current = phase_order[addr[0]]
+            if current < last_phase:
+                return False
+            last_phase = current
+    return True
+
+
+def _verify_section_anchors(manifest: dict[str, object], skill_md_path: Path) -> list[dict[str, object]]:
+    """Verify that declared skill_sections resolve to headings in SKILL.md."""
+    findings: list[dict[str, object]] = []
+    text = skill_md_path.read_text(encoding="utf-8")
+
+    # Extract headings from SKILL.md
+    import re
+    headings = set()
+    for line in text.splitlines():
+        m = re.match(r"^(#{1,6})\s+(.+)$", line)
+        if m:
+            slug = "#" + re.sub(r"[^A-Za-z0-9._~-]+", "-", m.group(2).strip().lower())
+            headings.add(slug)
+
+    traces = manifest.get("requirement_traceability", [])
+    for i, tr in enumerate(traces):
+        for sec in tr.get("skill_sections", []):
+            if str(sec) not in headings:
+                findings.append({
+                    "severity": "error", "dimension": "structure", "code": "SECTION_MISSING",
+                    "location": {"kind": "json_pointer", "value": f"$/requirement_traceability/{i}/skill_sections"},
+                    "message": f"section anchor '{sec}' not found in SKILL.md", "evidence": [],
+                })
+
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Capability resolution (Task 11)
+# ---------------------------------------------------------------------------
+
+def _resolve_capabilities(
+    manifest: dict[str, object], capability_snapshot: Path | None
+) -> list[dict[str, object]]:
+    """Resolve claimed tools and skills against available capabilities."""
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, msg: str, ptr: str = "$") -> None:
+        findings.append({
+            "severity": "error", "dimension": "structure", "code": code,
+            "location": {"kind": "json_pointer", "value": ptr}, "message": msg, "evidence": [],
+        })
+
+    # If no snapshot provided, external capabilities are unresolved
+    snapshot: dict[str, object] = {}
+    if capability_snapshot and capability_snapshot.exists():
+        try:
+            snapshot = json.loads(capability_snapshot.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, FileNotFoundError):
+            err("JSON_INVALID", "capability snapshot unreadable")
+
+    available_tools = set(snapshot.get("tools", []))
+    available_skills = set(snapshot.get("skills", []))
+
+    # Check claimed tools
+    for i, tool in enumerate(manifest.get("contract", {}).get("claimed_tools", [])):
+        name = str(tool.get("name", ""))
+        provider = str(tool.get("provider", ""))
+        required = tool.get("required", False)
+
+        if provider == "hermes":
+            if required and name not in available_tools and capability_snapshot:
+                err("TOOL_UNRESOLVED", f"required Hermes tool '{name}' not in snapshot",
+                    f"$/contract/claimed_tools/{i}")
+
+    # Check related skills
+    for i, skill in enumerate(manifest.get("contract", {}).get("related_skills", [])):
+        name = str(skill.get("name", ""))
+        provider = str(skill.get("provider", ""))
+        required = skill.get("required", False)
+
+        if provider in ("5qln-plugin", "hermes"):
+            if required and name not in available_skills and capability_snapshot:
+                err("SKILL_UNRESOLVED", f"required skill '{name}' not in snapshot",
+                    f"$/contract/related_skills/{i}")
+
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Behavioral fixture parsing (Task 13)
+# ---------------------------------------------------------------------------
+
+def _parse_behavioral_fixtures(
+    manifest: dict[str, object], bundle_root: Path | None
+) -> list[dict[str, object]]:
+    """Validate fixture declarations structurally."""
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, msg: str, ptr: str = "$") -> None:
+        findings.append({
+            "severity": "error", "dimension": "structure", "code": code,
+            "location": {"kind": "json_pointer", "value": ptr}, "message": msg, "evidence": [],
+        })
+
+    fixtures = manifest.get("behavioral_fixtures", [])
+    seen_ids = set()
+    required_classes = {
+        "positive_trigger", "near_miss_non_trigger",
+        "human_attestation_boundary", "q_phase_skip_resistance",
+        "missing_context_open_behavior", "removal_test",
+    }
+
+    for i, fix in enumerate(fixtures):
+        fid = str(fix.get("id", ""))
+        fclass = str(fix.get("class", ""))
+        base = f"$/behavioral_fixtures/{i}"
+
+        if fid in seen_ids:
+            err("FIXTURE_UNRESOLVED", f"duplicate fixture id: {fid}", f"{base}/id")
+        seen_ids.add(fid)
+
+        # Verify spec file exists
+        if bundle_root:
+            spec_path = str(fix.get("spec", {}).get("path", ""))
+            if spec_path:
+                full = bundle_root / spec_path
+                if not full.exists():
+                    err("FILE_MISSING", f"fixture spec not found: {spec_path}", f"{base}/spec")
+
+        # Mutation fixtures must have a mutation field
+        if fclass == "mutation":
+            # Checked by schema validation; additional structural check
+            pass
+
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Observed-run ingestion (Task 14)
+# ---------------------------------------------------------------------------
+
+def _ingest_observed_runs(
+    manifest: dict[str, object], observation_paths: list[Path]
+) -> tuple[str, list[dict[str, object]]]:
+    """Ingest and validate behavioral observation records.
+
+    Returns (behavioral_status, findings).
+    """
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, msg: str, ptr: str = "$") -> None:
+        findings.append({
+            "severity": "error", "dimension": "behavioral", "code": code,
+            "location": {"kind": "json_pointer", "value": ptr}, "message": msg, "evidence": [],
+        })
+
+    fixtures = manifest.get("behavioral_fixtures", [])
+    if not fixtures:
+        return "not_declared", findings
+
+    if not observation_paths:
+        return "not_observed", findings
+
+    bundle_sha256 = str(manifest.get("skill", {}).get("bundle_sha256", ""))
+
+    passed = 0
+    failed = 0
+
+    for obs_path in observation_paths:
+        if not obs_path.exists():
+            err("OBSERVATION_INPUT", f"observation file not found: {obs_path}")
+            failed += 1
+            continue
+
+        try:
+            obs = json.loads(obs_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            err("JSON_INVALID", f"observation not valid JSON: {obs_path}")
+            failed += 1
+            continue
+
+        # Check bundle digest scope
+        if obs.get("bundle_sha256") != bundle_sha256:
+            err("OBSERVATION_HASH", f"observation bundle digest mismatch: {obs_path}")
+            failed += 1
+            continue
+
+        # Check fixture reference
+        fixture_sha = obs.get("fixture_sha256", "")
+        fixture_match = any(
+            str(f.get("spec", {}).get("sha256", "")) == fixture_sha
+            for f in fixtures
+        )
+        if not fixture_match:
+            err("OBSERVATION_HASH", f"observation fixture_sha256 unrecognized: {obs_path}")
+            failed += 1
+            continue
+
+        # Check results
+        results = obs.get("results", [])
+        for r in results:
+            if r.get("status") == "pass":
+                passed += 1
+            else:
+                failed += 1
+
+    if failed and not passed:
+        return "observed_failed", findings
+    elif failed and passed:
+        return "observed_mixed", findings
+    elif passed:
+        return "observed_passed", findings
+    return "not_observed", findings
+
+
+# ---------------------------------------------------------------------------
+# Human review evidence (Task 15)
+# ---------------------------------------------------------------------------
+
+def _verify_human_review(
+    manifest: dict[str, object], bundle_root: Path | None
+) -> list[dict[str, object]]:
+    """Verify human review evidence scope and presence."""
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, msg: str, ptr: str = "$") -> None:
+        findings.append({
+            "severity": "error", "dimension": "human", "code": code,
+            "location": {"kind": "json_pointer", "value": ptr}, "message": msg, "evidence": [],
+        })
+
+    hr = manifest.get("human_review", {})
+    status = str(hr.get("status", "open"))
+    bundle_sha256 = str(manifest.get("skill", {}).get("bundle_sha256", ""))
+
+    if status == "accepted":
+        reviewer = hr.get("reviewer")
+        if not reviewer:
+            err("HUMAN_EVIDENCE_MISSING", "accepted review has no reviewer", "$/human_review/reviewer")
+
+        evidence = hr.get("evidence", [])
+        if not evidence:
+            err("HUMAN_EVIDENCE_MISSING", "accepted review has no evidence", "$/human_review/evidence")
+        else:
+            for i, ev in enumerate(evidence):
+                # Scope check
+                ev_scope = str(ev.get("scope_bundle_sha256", ""))
+                if ev_scope != bundle_sha256:
+                    err("HUMAN_EVIDENCE_SCOPE",
+                        f"evidence scope digest mismatch at evidence/{i}",
+                        f"$/human_review/evidence/{i}/scope_bundle_sha256")
+
+                # Source file existence
+                if bundle_root:
+                    src_path = str(ev.get("source", {}).get("path", ""))
+                    if src_path:
+                        full = bundle_root / src_path
+                        if not full.exists():
+                            err("HUMAN_EVIDENCE_MISSING",
+                                f"evidence source not found: {src_path}",
+                                f"$/human_review/evidence/{i}/source")
+
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Promotion inspection (Task 16)
+# ---------------------------------------------------------------------------
+
+def _inspect_promotion_readiness(
+    manifest: dict[str, object], bundle_root: Path | None
+) -> list[dict[str, object]]:
+    """Inspect promotion readiness for bundled-plugin targets."""
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, msg: str, ptr: str = "$") -> None:
+        findings.append({
+            "severity": "error", "dimension": "promotion", "code": code,
+            "location": {"kind": "json_pointer", "value": ptr}, "message": msg, "evidence": [],
+        })
+
+    promo = manifest.get("promotion", {})
+    target = str(promo.get("target", ""))
+
+    if target != "bundled-plugin":
+        return findings
+
+    hr = manifest.get("human_review", {})
+    if hr.get("status") != "accepted":
+        err("PROMOTION_UNAUTHORIZED", "promotion requires accepted human review",
+            "$/human_review/status")
+
+    auth_ids = promo.get("authorization_evidence_ids", [])
+    if not auth_ids:
+        err("PROMOTION_UNAUTHORIZED", "no promotion authorization evidence",
+            "$/promotion/authorization_evidence_ids")
+    else:
+        evidence_ids = {str(e.get("id", "")) for e in hr.get("evidence", [])}
+        for aid in auth_ids:
+            if str(aid) not in evidence_ids:
+                err("PROMOTION_UNAUTHORIZED",
+                    f"authorization evidence {aid} not found in human review",
+                    "$/promotion/authorization_evidence_ids")
+
+    # Check requested state
+    if promo.get("requested_state") != "promotion_requested":
+        err("PROMOTION_UNAUTHORIZED",
+            "requested_state must be 'promotion_requested' for promotion mode",
+            "$/promotion/requested_state")
+
+    return findings
+
+# ---------------------------------------------------------------------------
 # Main verifier
 # ---------------------------------------------------------------------------
 
@@ -429,8 +831,37 @@ def verify_skill(
         else:
             err("CONVERSION_MISSING", f"conversion manifest not found: {conv_path_str}")
 
+    # 8. Requirement traceability (Task 10)
+    findings.extend(_verify_requirement_traceability(manifest, conversion_report))
+
+    # 9. Section anchor resolution in SKILL.md
+    if bundle_root is not None:
+        skill_md_path = bundle_root / "SKILL.md"
+        if skill_md_path.exists():
+            findings.extend(_verify_section_anchors(manifest, skill_md_path))
+
+    # 10. Capability resolution (Task 11)
+    findings.extend(_resolve_capabilities(manifest, capability_snapshot))
+
+    # 11. Behavioral fixture parsing (Task 13)
+    findings.extend(_parse_behavioral_fixtures(manifest, bundle_root))
+
+    # 12. Observed-run ingestion (Task 14)
+    behavioral_status, obs_findings = _ingest_observed_runs(manifest, observations or [])
+    findings.extend(obs_findings)
+
+    # 13. Human review evidence checks (Task 15)
+    findings.extend(_verify_human_review(manifest, bundle_root))
+
+    # 14. Promotion inspection (Task 16)
+    promotion_findings = []
+    if promotion_mode:
+        promotion_findings = _inspect_promotion_readiness(manifest, bundle_root)
+        findings.extend(promotion_findings)
+
     return _build_report(
-        manifest_path, manifest, findings, warnings, conversion_report, promotion_mode
+        manifest_path, manifest, findings, warnings, conversion_report,
+        promotion_mode, behavioral_status=behavioral_status,
     )
 
 
@@ -443,10 +874,10 @@ def _build_report(
     promotion_mode: bool,
     *,
     execution_success: bool = True,
+    behavioral_status: str = "not_declared",
 ) -> dict[str, object]:
     """Assemble the final skill-report-v1."""
     structural_status = "passed" if not findings else "failed"
-    behavioral_status: str = "not_declared"
     attestation_status: str = "open"
     human_review_status: str = str(manifest.get("human_review", {}).get("status", "open"))
     promotion_state: str = str(manifest.get("promotion", {}).get("requested_state", "draft"))

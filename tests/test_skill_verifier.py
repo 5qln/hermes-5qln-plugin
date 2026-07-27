@@ -178,3 +178,178 @@ class SkillVerifierCoreTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
+class SkillTraceabilityTests(unittest.TestCase):
+    """Tests for requirement traceability (Task 10)."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def test_empty_traces_passes_boundary_checks(self) -> None:
+        findings = verify_skill._verify_requirement_traceability(
+            {"requirement_traceability": [], "contract": {"behavioral_requirements": []},
+             "behavioral_fixtures": []}, {}
+        )
+        self.assertEqual(findings, [])
+
+    def test_source_requirement_needs_basis(self) -> None:
+        manifest = {
+            "requirement_traceability": [{
+                "requirement_id": "REQ_TEST",
+                "class": "source",
+                "statement": "test",
+                "basis_source_unit_ids": [],
+                "basis_derived_insight_ids": [],
+                "skill_sections": ["#overview"],
+                "verifier_checks": ["CHECK_TEST"],
+                "fixture_ids": [],
+            }],
+            "behavioral_fixtures": [],
+            "contract": {"behavioral_requirements": []},
+        }
+        findings = verify_skill._verify_requirement_traceability(manifest, {})
+        self.assertTrue(any("REQUIREMENT_BASIS" in (f.get("code") or "") for f in findings))
+
+    def test_proposal_with_basis_is_invalid(self) -> None:
+        manifest = {
+            "requirement_traceability": [{
+                "requirement_id": "REQ_PROP",
+                "class": "proposal",
+                "statement": "test",
+                "basis_source_unit_ids": ["SRC-1"],
+                "basis_derived_insight_ids": [],
+                "skill_sections": ["#overview"],
+                "verifier_checks": ["CHECK_TEST"],
+                "fixture_ids": [],
+            }],
+            "behavioral_fixtures": [],
+            "contract": {"behavioral_requirements": []},
+        }
+        findings = verify_skill._verify_requirement_traceability(manifest, {})
+        self.assertTrue(any("SOURCE_CLASS_INVALID" in (f.get("code") or "") for f in findings))
+
+    def test_section_anchor_not_found(self) -> None:
+        md = self.tmp / "SKILL.md"
+        md.write_text("# Real Heading\n\ncontent\n")
+        manifest = {
+            "requirement_traceability": [{
+                "requirement_id": "REQ_X",
+                "class": "source",
+                "statement": "test",
+                "basis_source_unit_ids": ["SRC-1"],
+                "basis_derived_insight_ids": [],
+                "skill_sections": ["#nonexistent-heading"],
+                "verifier_checks": ["CHECK_TEST"],
+                "fixture_ids": [],
+            }],
+        }
+        findings = verify_skill._verify_section_anchors(manifest, md)
+        self.assertTrue(any("SECTION_MISSING" in (f.get("code") or "") for f in findings))
+
+    def test_return_not_question(self) -> None:
+        manifest = {"requirement_traceability": []}
+        conv = {
+            "document_cell": {
+                "V": {"return_question": "this is not a question", "return_status": "open"}
+            },
+            "cells": [],
+        }
+        findings = verify_skill._verify_requirement_traceability(manifest, conv)
+        self.assertTrue(any("RETURN_NOT_QUESTION" in (f.get("code") or "") for f in findings))
+
+
+class SkillHumanReviewTests(unittest.TestCase):
+    """Tests for human review evidence (Task 15)."""
+
+    def test_accepted_without_reviewer(self) -> None:
+        manifest = {
+            "human_review": {"status": "accepted", "reviewer": None, "evidence": []},
+            "skill": {"bundle_sha256": "a" * 64},
+        }
+        findings = verify_skill._verify_human_review(manifest, None)
+        self.assertTrue(any("HUMAN_EVIDENCE_MISSING" in (f.get("code") or "") for f in findings))
+
+    def test_evidence_scope_mismatch(self) -> None:
+        manifest = {
+            "human_review": {
+                "status": "accepted",
+                "reviewer": "tester",
+                "evidence": [{
+                    "id": "EV_TEST",
+                    "kind": "review_acceptance",
+                    "statement": "approved",
+                    "source": {"path": ".verification/evidence/ok.txt", "sha256": "b" * 64, "size_bytes": 1},
+                    "location": "inline",
+                    "scope_bundle_sha256": "0" * 64,
+                    "scope_contract_sha256": "c" * 64,
+                    "promotion_scope": "local",
+                }],
+            },
+            "skill": {"bundle_sha256": "a" * 64},
+        }
+        findings = verify_skill._verify_human_review(manifest, None)
+        self.assertTrue(any("HUMAN_EVIDENCE_SCOPE" in (f.get("code") or "") for f in findings))
+
+
+class SkillPromotionTests(unittest.TestCase):
+    """Tests for promotion inspection (Task 16)."""
+
+    def test_promotion_without_accepted_review(self) -> None:
+        manifest = {
+            "promotion": {"target": "bundled-plugin", "requested_state": "promotion_requested", "authorization_evidence_ids": []},
+            "human_review": {"status": "open", "reviewer": None, "evidence": []},
+        }
+        findings = verify_skill._inspect_promotion_readiness(manifest, None)
+        self.assertTrue(any("PROMOTION_UNAUTHORIZED" in (f.get("code") or "") for f in findings))
+
+    def test_local_skill_no_promotion_checks(self) -> None:
+        manifest = {
+            "promotion": {"target": "local-skill", "requested_state": "draft", "authorization_evidence_ids": []},
+            "human_review": {"status": "open", "reviewer": None, "evidence": []},
+        }
+        findings = verify_skill._inspect_promotion_readiness(manifest, None)
+        self.assertEqual(findings, [])
+
+
+class SkillObservedRunTests(unittest.TestCase):
+    """Tests for observed-run ingestion (Task 14)."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def test_no_fixtures_returns_not_declared(self) -> None:
+        manifest = {"behavioral_fixtures": []}
+        status, findings = verify_skill._ingest_observed_runs(manifest, [])
+        self.assertEqual(status, "not_declared")
+
+    def test_fixtures_without_runs_returns_not_observed(self) -> None:
+        manifest = {
+            "behavioral_fixtures": [{"id": "FIX_1", "class": "positive_trigger", "spec": {"sha256": "a"*64}, "required": True}],
+        }
+        status, findings = verify_skill._ingest_observed_runs(manifest, [])
+        self.assertEqual(status, "not_observed")
+
+    def test_bundle_digest_mismatch(self) -> None:
+        obs = self.tmp / "obs.json"
+        obs.write_text(json.dumps({
+            "bundle_sha256": "0" * 64,
+            "fixture_sha256": "a" * 64,
+            "results": [{"status": "pass"}],
+        }))
+        manifest = {
+            "behavioral_fixtures": [{"id": "FIX_1", "class": "positive_trigger", "spec": {"sha256": "a"*64}, "required": True}],
+            "skill": {"bundle_sha256": "f" * 64},
+        }
+        status, findings = verify_skill._ingest_observed_runs(manifest, [obs])
+        self.assertTrue(any("OBSERVATION_HASH" in (f.get("code") or "") for f in findings))
+

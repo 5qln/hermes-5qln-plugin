@@ -1,0 +1,56 @@
+{
+  "format_version": "1.0",
+  "title": "test conversion",
+  "constitution": {
+    "kernel": "A = K"
+  },
+  "source_inventory": {
+    "sources": [
+      {
+        "path": "test.md",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size_bytes": 1
+      }
+    ],
+    "total_units": 1
+  },
+  "document_cell": {
+    "S": {
+      "authority": "test",
+      "question": "test?",
+      "x_status": "open",
+      "X": ""
+    },
+    "G": {
+      "alpha": "test",
+      "expressions": [],
+      "Y": "",
+      "y_status": "open"
+    },
+    "Q": {
+      "phi": "",
+      "omega": "",
+      "Z": "",
+      "z_status": "open"
+    },
+    "P": {
+      "energy_map": [],
+      "value_map": [],
+      "gradient": "",
+      "A": ""
+    },
+    "V": {
+      "local": "",
+      "global": "",
+      "benefit": "",
+      "artifact": "",
+      "return_question": "",
+      "return_status": "open"
+    }
+  },
+  "attestations": [],
+  "lens_audit": [],
+  "traceability": [],
+  "cells": [],
+  "corruption_guards": []
+}

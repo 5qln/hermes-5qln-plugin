@@ -668,3 +668,149 @@ class SkillCommonContractTests(unittest.TestCase):
         skill_common.atomic_write_json(p2, payload, overwrite=False)
         self.assertEqual(p1.read_bytes(), p2.read_bytes())
 
+
+class SkillScaffoldTests(unittest.TestCase):
+    """Tests for skills/5qln-skill-formation/scripts/new_skill_manifest.py."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        sys.path.insert(0, str(ROOT / "skills" / "5qln-skill-formation" / "scripts"))
+        global new_skill_manifest, skill_common
+        import new_skill_manifest, skill_common
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        sys.path.remove(str(ROOT / "skills" / "5qln-skill-formation" / "scripts"))
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    @property
+    def minimal_fixture(self) -> Path:
+        return ROOT / "tests" / "fixtures" / "skill-v1" / "valid-minimal"
+
+    def test_scaffold_has_format_version(self) -> None:
+        manifest = new_skill_manifest.build_manifest(
+            self.minimal_fixture, "provenance/conversion-manifest.json"
+        )
+        self.assertEqual(manifest["format_version"], "skill-v1")
+        self.assertEqual(manifest["skill"]["bundle_root"], ".")
+
+    def test_scaffold_inventories_bundle(self) -> None:
+        manifest = new_skill_manifest.build_manifest(
+            self.minimal_fixture, "provenance/conversion-manifest.json"
+        )
+        bundle = manifest["bundle"]
+        self.assertEqual(bundle["skill_md"]["path"], "SKILL.md")
+        self.assertTrue(len(bundle["skill_md"]["sha256"]) == 64)
+
+        # Check categorization
+        ref_paths = {r["path"] for r in bundle["references"]}
+        self.assertIn("references/guide.md", ref_paths)
+
+        script_paths = {r["path"] for r in bundle["scripts"]}
+        self.assertIn("scripts/helper.py", script_paths)
+
+    def test_scaffold_excludes_manifest_and_verification(self) -> None:
+        manifest = new_skill_manifest.build_manifest(
+            self.minimal_fixture, "provenance/conversion-manifest.json"
+        )
+        all_paths = []
+        for cat in ("references", "scripts", "tests", "fixtures", "provenance"):
+            all_paths.extend(r["path"] for r in manifest["bundle"][cat])
+        all_paths.append(manifest["bundle"]["skill_md"]["path"])
+        self.assertNotIn("skill-formation-manifest.json", all_paths)
+
+    def test_scaffold_has_bundle_digest(self) -> None:
+        manifest = new_skill_manifest.build_manifest(
+            self.minimal_fixture, "provenance/conversion-manifest.json"
+        )
+        self.assertEqual(len(manifest["skill"]["bundle_sha256"]), 64)
+
+    def test_scaffold_leaves_human_review_open(self) -> None:
+        manifest = new_skill_manifest.build_manifest(
+            self.minimal_fixture, "provenance/conversion-manifest.json"
+        )
+        self.assertEqual(manifest["human_review"]["status"], "open")
+        self.assertIsNone(manifest["human_review"]["reviewer"])
+        self.assertEqual(manifest["human_review"]["evidence"], [])
+
+    def test_scaffold_promotion_starts_draft(self) -> None:
+        manifest = new_skill_manifest.build_manifest(
+            self.minimal_fixture, "provenance/conversion-manifest.json"
+        )
+        self.assertEqual(manifest["promotion"]["requested_state"], "draft")
+
+    def test_scaffold_is_deterministic(self) -> None:
+        a = new_skill_manifest.build_manifest(
+            self.minimal_fixture, "provenance/conversion-manifest.json"
+        )
+        b = new_skill_manifest.build_manifest(
+            self.minimal_fixture, "provenance/conversion-manifest.json"
+        )
+        self.assertEqual(
+            skill_common.canonical_json_bytes(a),
+            skill_common.canonical_json_bytes(b),
+        )
+
+    def test_scaffold_rejects_missing_skill_md(self) -> None:
+        empty = self.tmp
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            new_skill_manifest.build_manifest(empty, "provenance/conversion-manifest.json")
+        self.assertEqual(ctx.exception.code, "FILE_MISSING")
+
+    def test_scaffold_rejects_missing_conversion_manifest(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            new_skill_manifest.build_manifest(
+                self.minimal_fixture, "nonexistent/manifest.json"
+            )
+        self.assertEqual(ctx.exception.code, "FILE_MISSING")
+
+    def test_scaffold_rejects_conversion_outside_root(self) -> None:
+        with self.assertRaises(skill_common.SkillContractError) as ctx:
+            new_skill_manifest.build_manifest(
+                self.minimal_fixture, "../outside/manifest.json"
+            )
+        self.assertEqual(ctx.exception.code, "PATH_ESCAPE")
+
+    def test_scaffold_contract_sha256_matches(self) -> None:
+        manifest = new_skill_manifest.build_manifest(
+            self.minimal_fixture, "provenance/conversion-manifest.json"
+        )
+        self.assertIn("contract_sha256", manifest["skill"])
+        self.assertEqual(len(manifest["skill"]["contract_sha256"]), 64)
+
+    def test_cli_scaffold_and_overwrite_protection(self) -> None:
+        out = self.tmp / "manifest.json"
+        exit_code = new_skill_manifest.main([
+            "new_skill_manifest.py",
+            str(self.minimal_fixture),
+            "--out", str(out),
+            "--conversion-manifest", "provenance/conversion-manifest.json",
+        ])
+        self.assertEqual(exit_code, 0)
+        self.assertTrue(out.exists())
+
+        # Overwrite refusal
+        exit_code2 = new_skill_manifest.main([
+            "new_skill_manifest.py",
+            str(self.minimal_fixture),
+            "--out", str(out),
+            "--conversion-manifest", "provenance/conversion-manifest.json",
+        ])
+        self.assertEqual(exit_code2, 2)
+
+        # Overwrite allowed
+        exit_code3 = new_skill_manifest.main([
+            "new_skill_manifest.py",
+            str(self.minimal_fixture),
+            "--out", str(out),
+            "--conversion-manifest", "provenance/conversion-manifest.json",
+            "--overwrite",
+        ])
+        self.assertEqual(exit_code3, 0)
+

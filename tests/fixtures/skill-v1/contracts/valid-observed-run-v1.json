@@ -1,0 +1,27 @@
+{
+  "format_version": "observed-run-v1",
+  "fixture_id": "FIX_POSITIVE",
+  "run_id": "RUN_001",
+  "producer": "golden test harness",
+  "bundle_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "environment": {
+    "agent": "test-agent",
+    "provider": "test-provider",
+    "model": "test-model",
+    "configuration_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "fresh_session": true
+  },
+  "input_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "output": {
+    "path": "runs/RUN_001/output.txt",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "size_bytes": 0
+  },
+  "tool_trace": {
+    "path": "runs/RUN_001/tools.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "size_bytes": 0
+  },
+  "exit_status": 0,
+  "fixture_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+}

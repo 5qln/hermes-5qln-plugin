@@ -1,0 +1,94 @@
+{
+  "format_version": "skill-v1",
+  "title": "Golden minimal candidate",
+  "skill": {
+    "name": "golden-skill",
+    "bundle_root": ".",
+    "bundle_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "contract_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "provenance": {
+    "conversion_manifest": {
+      "path": "provenance/conversion-manifest.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "size_bytes": 1
+    },
+    "formation_evidence": []
+  },
+  "bundle": {
+    "skill_md": {
+      "path": "SKILL.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "size_bytes": 1
+    },
+    "references": [],
+    "scripts": [],
+    "tests": [],
+    "fixtures": [],
+    "provenance": [
+      {
+        "path": "provenance/conversion-manifest.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "size_bytes": 1
+      }
+    ]
+  },
+  "contract": {
+    "triggers": [
+      {
+        "id": "TRIGGER_1",
+        "statement": "Use for a declared skill-formation request."
+      }
+    ],
+    "non_triggers": [
+      {
+        "id": "NON_TRIGGER_1",
+        "statement": "Do not use for ordinary text editing."
+      }
+    ],
+    "behavioral_requirements": [
+      {
+        "id": "REQ_1",
+        "statement": "Keep human claims open.",
+        "verification": "static"
+      }
+    ],
+    "completion_criteria": [
+      {
+        "id": "DONE_1",
+        "statement": "Structural report is generated."
+      }
+    ],
+    "claimed_tools": [],
+    "related_skills": []
+  },
+  "requirement_traceability": [
+    {
+      "requirement_id": "REQ_1",
+      "class": "source",
+      "statement": "Keep human claims open.",
+      "basis_source_unit_ids": [
+        "SRC-0001"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#authority-boundary"
+      ],
+      "verifier_checks": [
+        "HUMAN_BOUNDARY"
+      ],
+      "fixture_ids": []
+    }
+  ],
+  "behavioral_fixtures": [],
+  "human_review": {
+    "status": "open",
+    "reviewer": null,
+    "evidence": []
+  },
+  "promotion": {
+    "requested_state": "draft",
+    "target": "bundled-plugin",
+    "authorization_evidence_ids": []
+  }
+}

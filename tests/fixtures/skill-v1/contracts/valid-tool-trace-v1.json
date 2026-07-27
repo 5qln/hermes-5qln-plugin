@@ -1,0 +1,10 @@
+{
+  "format_version": "tool-trace-v1",
+  "events": [
+    {
+      "sequence": 0,
+      "tool": "fiveqln_verify_skill",
+      "arguments_sha256": null
+    }
+  ]
+}

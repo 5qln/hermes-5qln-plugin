@@ -20,6 +20,7 @@ from . import fractal_memory as fractal_runtime
 _PLUGIN_DIR = Path(__file__).resolve().parent
 _CONVERTER_SCRIPT_DIR = _PLUGIN_DIR / "skills" / "5qln-converter" / "scripts"
 _RESEARCH_SCRIPT_DIR = _PLUGIN_DIR / "skills" / "5qln-deep-research" / "scripts"
+_SKILL_FORMATION_SCRIPT_DIR = _PLUGIN_DIR / "skills" / "5qln-skill-formation" / "scripts"
 _TIMEOUT_SECONDS = 300
 
 
@@ -297,5 +298,97 @@ def validate_research_prompt(args: dict[str, Any], **kwargs: Any) -> str:
                 "stderr": completed.stderr.strip(),
             }
         )
+    except Exception as exc:
+        return _failure(operation, exc)
+
+
+def create_skill_manifest(args: dict[str, Any], **kwargs: Any) -> str:
+    """Create a skill-v1 formation manifest scaffold."""
+    del kwargs
+    operation = "create_skill_manifest"
+    try:
+        bundle_root = _path(args.get("bundle_root"), "bundle_root")
+        if not bundle_root.is_dir():
+            raise ValueError("bundle_root must be a directory")
+        overwrite = bool(args.get("overwrite", False))
+        output = _output_path(args.get("output_path"), "output_path", overwrite)
+        conversion = args.get("conversion_manifest", "provenance/conversion-manifest.json")
+        if not isinstance(conversion, str) or not conversion.strip():
+            raise ValueError("conversion_manifest must be a non-empty relative path")
+
+        completed = _run(
+            _SKILL_FORMATION_SCRIPT_DIR,
+            "new_skill_manifest.py",
+            [str(bundle_root), "--out", str(output), "--conversion-manifest", conversion.strip()],
+        )
+        if completed.returncode != 0:
+            return _json({
+                "success": False, "operation": operation,
+                "exit_code": completed.returncode,
+                "stdout": completed.stdout.strip(), "stderr": completed.stderr.strip(),
+            })
+        payload = json.loads(output.read_text(encoding="utf-8"))
+        return _json({
+            "success": True, "operation": operation, "output_path": str(output),
+            "skill_name": payload.get("skill", {}).get("name"),
+            "bundle_sha256": payload.get("skill", {}).get("bundle_sha256"),
+            "human_review_status": payload.get("human_review", {}).get("status", "open"),
+            "promotion_state": payload.get("promotion", {}).get("requested_state", "draft"),
+            "stdout": completed.stdout.strip(),
+        })
+    except Exception as exc:
+        return _failure(operation, exc)
+
+
+def verify_skill(args: dict[str, Any], **kwargs: Any) -> str:
+    """Verify a skill-v1 formation manifest."""
+    del kwargs
+    operation = "verify_skill"
+    try:
+        manifest = _input_path(args.get("manifest_path"), "manifest_path")
+        overwrite = bool(args.get("overwrite", False))
+        promotion_mode = bool(args.get("promotion_mode", False))
+
+        report_value = args.get("report_path")
+        report_path: Path | None = None
+        if report_value is not None:
+            report_path = _output_path(report_value, "report_path", overwrite)
+
+        command = [str(manifest)]
+        if report_path is not None:
+            command += ["--report", str(report_path)]
+        if promotion_mode:
+            command.append("--promotion-mode")
+
+        completed = _run(_SKILL_FORMATION_SCRIPT_DIR, "verify_skill.py", command)
+        if completed.returncode not in {0, 1, 2}:
+            return _json({
+                "success": False, "operation": operation,
+                "exit_code": completed.returncode,
+                "stdout": completed.stdout.strip(), "stderr": completed.stderr.strip(),
+            })
+
+        report: dict[str, Any] = {}
+        if report_path is not None and report_path.is_file():
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        elif completed.stdout.strip():
+            try:
+                report = json.loads(completed.stdout)
+            except json.JSONDecodeError:
+                pass
+
+        execution_success = report.get("execution_success", completed.returncode != 2)
+        return _json({
+            "success": execution_success,
+            "operation": operation,
+            "execution_success": execution_success,
+            "structural_status": report.get("structural_status", "failed"),
+            "behavioral_status": report.get("behavioral_status", "not_declared"),
+            "human_review_status": report.get("human_review_status", "open"),
+            "promotion_ready": report.get("promotion_ready", False),
+            "report": report,
+            "stdout": completed.stdout.strip(),
+            "stderr": completed.stderr.strip(),
+        })
     except Exception as exc:
         return _failure(operation, exc)

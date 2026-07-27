@@ -2,6 +2,45 @@
 
 All notable changes are recorded here. Versions follow semantic versioning.
 
+## 0.6.0 - 2026-07-27
+
+### Added
+- Skill-v1 formation system: deterministic manifest scaffold, verifier, and promotion inspection.
+- Two new native tools: `fiveqln_create_skill_manifest` and `fiveqln_verify_skill`.
+- Five published JSON Schema 2020-12 contracts: `skill-v1`, `behavior-fixture-v1`, `observed-run-v1`, `tool-trace-v1`, `skill-report-v1`.
+- Frozen error-code registry (60 codes) and formation protocol with promotion state machine.
+- Safe deterministic bundle inventory with path, symlink, and size-limit enforcement.
+- SKILL.md strict YAML frontmatter parsing, script syntax checking, and fresh conversion-compiler re-run.
+- Requirement traceability, 5QLN boundary checks (S→G→Q→P→V order, question-bearing return).
+- Behavioral observation ingestion with fixture-scoped digest verification.
+- Exact-digest human review scoping — evidence is outside bundle inventory, any digest change reopens review.
+- Bundled-plugin promotion readiness inspection.
+- Eleventh bundled skill: `5qln-skill-formation` — governed admission through promotion guidance.
+
+### Security
+- Verifier never executes candidate code; scripts are AST/parse-checked only.
+- Symlink, path traversal, case-fold collision, NUL, and size-limit enforcement on all bundle files.
+- Read-once file inspection with TOCTOU-aware ordering (lstat before resolve).
+- Human evidence resides under `.verification/evidence/` outside bundle digest scope.
+- Report output is byte-stable, portable (bundle-relative paths), and omits absolute host paths.
+
+### Trust boundary
+- A machine pass means structural conformance per published schemas. The verifier never returns `valid`, `certified`, or `living`.
+- Human X, Z, value, and return claims remain exclusively in the referenced conversion manifest.
+- Promotion authorisation is explicit human evidence scoped to one immutable bundle digest.
+
+### Compatibility
+- Conversion-manifest format `1.0` is unchanged; all pre-existing workflows pass.
+- The ten legacy bundled skills are labelled *legacy/unverified* — they are not retroactively certified.
+- New promotion candidates use `skill-v1` and the deterministic skill verifier.
+- Old tools retain ambiguous `valid` fields for backward compatibility; new tools expose independent evidence dimensions.
+- PyYAML is required for strict standalone SKILL.md frontmatter parsing.
+
+### Migration
+- Existing installations: no action required. Legacy skills continue to work.
+- To form and verify a new skill: use `fiveqln_create_skill_manifest` → `fiveqln_verify_skill`.
+- To promote a bundled-plugin skill: complete human review, add promotion authorisation evidence, run `--promotion-mode`.
+
 ## 0.5.0 - 2026-07-26
 
 ### Added

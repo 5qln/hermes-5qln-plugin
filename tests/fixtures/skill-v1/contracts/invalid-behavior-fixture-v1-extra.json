@@ -1,0 +1,29 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_POSITIVE",
+  "class": "positive_trigger",
+  "requirement_ids": [
+    "REQ_1"
+  ],
+  "scenario": {
+    "user_input": "Create a governed skill.",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": []
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_1",
+        "kind": "output_contains",
+        "value": "candidate"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  },
+  "unexpected": "SCHEMA_EXTRA"
+}

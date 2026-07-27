@@ -1,0 +1,388 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://5qln.com/schemas/behavior-fixture-v1.schema.json",
+  "title": "5QLN skill behavioral fixture v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "id",
+    "class",
+    "requirement_ids",
+    "scenario",
+    "expected",
+    "observation_policy"
+  ],
+  "properties": {
+    "format_version": {
+      "const": "behavior-fixture-v1"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "class": {
+      "enum": [
+        "positive_trigger",
+        "near_miss_non_trigger",
+        "human_attestation_boundary",
+        "q_phase_skip_resistance",
+        "missing_context_open_behavior",
+        "removal_test",
+        "mutation"
+      ]
+    },
+    "requirement_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "user_input",
+        "context_files",
+        "enabled_tools",
+        "enabled_skills"
+      ],
+      "properties": {
+        "user_input": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "context_files": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          }
+        },
+        "enabled_tools": {
+          "$ref": "#/$defs/stringList"
+        },
+        "enabled_skills": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trigger",
+        "assertions"
+      ],
+      "properties": {
+        "trigger": {
+          "enum": [
+            "must",
+            "must_not",
+            "may"
+          ]
+        },
+        "assertions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/assertion"
+          }
+        }
+      }
+    },
+    "observation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_runs",
+        "require_fresh_session"
+      ],
+      "properties": {
+        "minimum_runs": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "require_fresh_session": {
+          "type": "boolean"
+        }
+      }
+    },
+    "mutation": {
+      "$ref": "#/$defs/mutation"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{1,63}$"
+    },
+    "stringList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      }
+    },
+    "assertion": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "const": "output_contains"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "const": "output_not_contains"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "const": "output_last_line_question"
+            },
+            "value": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "const": "tool_called"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "const": "tool_not_called"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "const": "tool_order"
+            },
+            "value": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "const": "exit_status_equals"
+            },
+            "value": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "kind": {
+              "const": "human_state_not_claimed"
+            },
+            "value": {
+              "type": "null"
+            }
+          }
+        }
+      ]
+    },
+    "mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "operation",
+        "selector",
+        "replacement",
+        "expected_error_codes"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "operation": {
+          "enum": [
+            "replace_text",
+            "delete_file",
+            "change_hash",
+            "break_trace",
+            "change_status"
+          ]
+        },
+        "selector": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "replacement": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 20000
+        },
+        "expected_error_codes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_/-]{2,127}$"
+          }
+        }
+      }
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*\\u0000)(?!\\.verification(?:/|$))(?:(?!\\.{1,2}(?:/|$))[^/]+)(?:/(?:(?!\\.{1,2}(?:/|$))[^/]+))*$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "class": {
+            "const": "mutation"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "mutation"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "mutation"
+          ]
+        }
+      }
+    }
+  ]
+}

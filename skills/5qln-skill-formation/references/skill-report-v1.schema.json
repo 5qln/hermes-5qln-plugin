@@ -1,0 +1,457 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://5qln.com/schemas/skill-report-v1.schema.json",
+  "title": "5QLN skill verification report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "execution_success",
+    "manifest",
+    "skill",
+    "structural_status",
+    "behavioral_status",
+    "attestation_status",
+    "human_review_status",
+    "requested_state",
+    "promotion_state",
+    "promotion_ready",
+    "counts",
+    "checks",
+    "errors",
+    "warnings",
+    "observations",
+    "conversion_report",
+    "limitations"
+  ],
+  "properties": {
+    "format_version": {
+      "const": "skill-report-v1"
+    },
+    "execution_success": {
+      "type": "boolean"
+    },
+    "manifest": {
+      "$ref": "#/$defs/subjectFile"
+    },
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "bundle_root",
+        "bundle_sha256"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 64
+        },
+        "bundle_root": {
+          "const": "."
+        },
+        "bundle_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "structural_status": {
+      "enum": [
+        "not_run",
+        "failed",
+        "passed"
+      ]
+    },
+    "behavioral_status": {
+      "enum": [
+        "not_declared",
+        "not_observed",
+        "observed_failed",
+        "observed_mixed",
+        "observed_passed"
+      ]
+    },
+    "attestation_status": {
+      "enum": [
+        "open",
+        "evidence_present"
+      ]
+    },
+    "human_review_status": {
+      "enum": [
+        "open",
+        "changes_requested",
+        "accepted"
+      ]
+    },
+    "promotion_state": {
+      "enum": [
+        "draft",
+        "blocked",
+        "structurally_conformant",
+        "behaviorally_observed",
+        "human_reviewed",
+        "promotion_ready",
+        "withdrawn"
+      ]
+    },
+    "promotion_ready": {
+      "type": "boolean"
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "errors",
+        "warnings",
+        "observations"
+      ],
+      "properties": {
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observations": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/check"
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/finding"
+          },
+          {
+            "properties": {
+              "severity": {
+                "const": "error"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/finding"
+          },
+          {
+            "properties": {
+              "severity": {
+                "const": "warning"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "conversion_report": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      }
+    },
+    "requested_state": {
+      "enum": [
+        "draft",
+        "review_requested",
+        "promotion_requested",
+        "withdrawn"
+      ]
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "subjectFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{2,63}$"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "unsupported"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceToken"
+          }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "severity",
+        "dimension",
+        "code",
+        "location",
+        "message",
+        "evidence"
+      ],
+      "properties": {
+        "severity": {
+          "enum": [
+            "error",
+            "warning"
+          ]
+        },
+        "dimension": {
+          "enum": [
+            "structure",
+            "behavior",
+            "attestation",
+            "promotion",
+            "execution"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^(?:[A-Z][A-Z0-9_/-]{2,127}|CONVERSION/V∅)$"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceToken"
+          }
+        },
+        "location": {
+          "$ref": "#/$defs/location"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixture_id",
+        "run_id",
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "fixture_id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,63}$"
+        },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{1,63}$"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "inapplicable"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceToken"
+          }
+        }
+      }
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*\\u0000)(?:(?!\\.{1,2}(?:/|$))[^/]+)(?:/(?:(?!\\.{1,2}(?:/|$))[^/]+))*$"
+    },
+    "evidenceToken": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*\\u0000).+$"
+    },
+    "location": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "json_pointer"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^(?:/(?:[^~/]|~[01])*)*$",
+              "maxLength": 1000
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "relative_path"
+            },
+            "value": {
+              "$ref": "#/$defs/relativePath"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "invocation_field"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,63}$"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "execution_success": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "structural_status": {
+            "const": "not_run"
+          },
+          "promotion_state": {
+            "const": "draft"
+          },
+          "promotion_ready": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "promotion_ready": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "structural_status": {
+            "const": "passed"
+          },
+          "behavioral_status": {
+            "const": "observed_passed"
+          },
+          "human_review_status": {
+            "const": "accepted"
+          },
+          "requested_state": {
+            "const": "promotion_requested"
+          },
+          "promotion_state": {
+            "const": "promotion_ready"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "promotion_state": {
+            "const": "promotion_ready"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "promotion_ready": {
+            "const": true
+          }
+        }
+      }
+    }
+  ]
+}

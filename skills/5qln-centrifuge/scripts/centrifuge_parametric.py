@@ -67,16 +67,21 @@ def save_trail(trail: dict) -> None:
 
 # ── Parametric Dimensions ──────────────────────────────────────
 
-def compute_source_purity(entries: list[dict]) -> dict[str, float]:
-    """Per-phase ratio of emergent to total tags."""
+def compute_source_purity(entries: list[dict]) -> dict[str, float | None]:
+    """Per-phase emergent ratio over classified tags; neutral tags do not vote."""
     purity = {}
     for phase in PHASE_ORDER:
-        phase_entries = [e for e in entries if e.get("phase") == phase]
-        if not phase_entries:
+        classified = [
+            e
+            for e in entries
+            if e.get("phase") == phase
+            and e.get("source") in EMERGENT_TAGS | MECHANICAL_TAGS
+        ]
+        if not classified:
             purity[phase] = None
             continue
-        emergent = sum(1 for e in phase_entries if e.get("source") in EMERGENT_TAGS)
-        purity[phase] = round(emergent / len(phase_entries), 3)
+        emergent = sum(1 for e in classified if e.get("source") in EMERGENT_TAGS)
+        purity[phase] = round(emergent / len(classified), 3)
     return purity
 
 

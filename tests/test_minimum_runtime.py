@@ -136,6 +136,8 @@ class XyzabStrictDecodingTests(unittest.TestCase):
             ("EXTRA: accepted as a question?", "unknown field EXTRA"),
             ("x: disguised lowercase footer?", "field names must be uppercase"),
             ("x∶ disguised lowercase-ratio footer?", "non-footer line"),
+            ("Χ∶ disguised Greek-X footer?", "non-footer line"),
+            ("εχτρα∶ disguised Greek footer?", "non-footer line"),
             ("X： disguised compatibility footer?", "non-footer line"),
             ("X﹕ disguised small-colon footer?", "non-footer line"),
             ("X︓ disguised vertical-colon footer?", "non-footer line"),
@@ -149,7 +151,7 @@ class XyzabStrictDecodingTests(unittest.TestCase):
             ("This is free-form prose.\nWhat is trying to emerge?", "non-footer line"),
         )
         for content, message in cases:
-            with self.subTest(message=message):
+            with self.subTest(content=content, message=message):
                 result = self.run_xyzab("open", "x", "-c", content)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn(message, result.stdout)
@@ -494,6 +496,35 @@ class XyzabStrictDecodingTests(unittest.TestCase):
                 os.environ["QLN_WIKI"] = previous_wiki
             if previous_phase_log is not None:
                 os.environ["PHASE_LOG_PATH"] = previous_phase_log
+
+
+class ParametricCentrifugeTests(unittest.TestCase):
+    def test_unclassified_sources_do_not_dilute_purity(self) -> None:
+        module = load_script(
+            "fiveqln_test_parametric_neutral_purity", PARAMETRIC_CENTRIFUGE
+        )
+
+        neutral_only = module.compute_source_purity(
+            [{"phase": "S", "source": "unclassified"}]
+        )
+        self.assertIsNone(neutral_only["S"])
+
+        mixed = module.compute_source_purity(
+            [
+                {"phase": "S", "source": "emergent"},
+                {"phase": "S", "source": "unclassified"},
+            ]
+        )
+        self.assertEqual(mixed["S"], 1.0)
+
+        classified = module.compute_source_purity(
+            [
+                {"phase": "S", "source": "emergent"},
+                {"phase": "S", "source": "mechanical"},
+                {"phase": "S", "source": "unclassified"},
+            ]
+        )
+        self.assertEqual(classified["S"], 0.5)
 
 
 class PhaseLogTests(unittest.TestCase):

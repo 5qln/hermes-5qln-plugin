@@ -17,9 +17,10 @@ explained twice: once for the human (lived meaning) and once for the agent
 Also ships:
 
 - **The Learning Aligner** (`references/learning-aligner.md`) — per-phase source discrimination and durable transition records. The bundled log tool is `skills/5qln-learning-aligner/scripts/phase_log.py`; successful `xyzab_state.py open` commands append to it automatically. Run its `tagline`, `self-check`, and `summary` commands to inspect the chain.
-- **The xyzab state machine** — a standalone Python script that tracks
-the five transition gates between SGQPV phases. Companion to any 5QLN kernel
-implementation.
+- **The xyzab state machine** — the bundled minimum-runtime component that
+tracks the five transition gates between SGQPV phases. It requires the adjacent
+`scripts/decoding.py` and the bundled
+`skills/5qln-learning-aligner/scripts/phase_log.py` companion.
 
 ## When to Use
 
@@ -154,9 +155,11 @@ Each phase receives everything prior. Nothing is lost.
 
 ## xyzab State Machine
 
-A standalone Python 3 script (stdlib only, zero dependencies) that tracks the five
-transition gates. Any 5QLN kernel tracks which PHASE you're in; xyzab tracks which
-GATE must open next.
+A bundled Python 3 runtime component that tracks the five transition gates. It
+uses only the standard library, but it fails closed unless the adjacent
+`scripts/decoding.py` and bundled
+`skills/5qln-learning-aligner/scripts/phase_log.py` modules are present. Any
+5QLN kernel tracks which PHASE you're in; xyzab tracks which GATE must open next.
 
 The script is at `scripts/xyzab_state.py`. Key commands:
 

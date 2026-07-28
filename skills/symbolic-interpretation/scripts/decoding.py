@@ -78,15 +78,22 @@ def _is_footer_separator(char: str) -> bool:
 def looks_like_footer_shape(value: str) -> bool:
     """Recognize canonical and visually confusable ``FIELD:`` prefixes."""
     normalized = unicodedata.normalize("NFKC", value).lstrip()
-    if not normalized or not normalized[0].isalpha():
+    index = 0
+    while index < len(normalized) and unicodedata.category(normalized[index])[0] in {
+        "C",
+        "M",
+    }:
+        index += 1
+    if index >= len(normalized) or not normalized[index].isalpha():
         return False
-    index = 1
+    index += 1
     while index < len(normalized) and (
         not _is_footer_separator(normalized[index])
         and (
             normalized[index].isalpha()
             or normalized[index].isdigit()
             or normalized[index] == "_"
+            or unicodedata.category(normalized[index])[0] in {"C", "M"}
         )
     ):
         index += 1

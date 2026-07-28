@@ -26,8 +26,20 @@ from typing import Any
 
 # ── Configuration ──────────────────────────────────────────────
 
+def resolve_phase_log_path() -> str:
+    """Use the same phase-log precedence as xyzab and the base centrifuge."""
+    explicit = os.environ.get("PHASE_LOG_PATH")
+    if explicit:
+        return os.path.expanduser(explicit)
+    wiki = os.environ.get("QLN_WIKI")
+    if wiki:
+        return os.path.join(os.path.expanduser(wiki), "state", "phase_log.json")
+    hermes_home = os.path.expanduser(os.environ.get("HERMES_HOME", "~/.hermes"))
+    return os.path.join(hermes_home, "5qln", "phase_log.json")
+
+
 QLN_WIKI = os.environ.get("QLN_WIKI", os.path.expanduser("~/wiki"))
-PHASE_LOG_PATH = os.path.join(QLN_WIKI, "state", "phase_log.json")
+PHASE_LOG_PATH = resolve_phase_log_path()
 TRAIL_PATH = os.path.join(QLN_WIKI, "state", "centrifuge_trail.json")
 
 PHASE_ORDER = ["S", "G", "Q", "P", "V"]

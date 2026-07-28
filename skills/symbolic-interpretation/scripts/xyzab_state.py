@@ -3,7 +3,7 @@
 xyzab_state.py — 5QLN Transition Gate State Machine
 
 Tracks the five transition gates (xyzab) between SGQPV phases.
-Portable: stdlib only, zero dependencies, configurable state directory.
+Portable: stdlib only, with its bundled decoder and phase-log companion.
 Works on any platform with Python 3.8+.
 
 Gates:
@@ -24,13 +24,16 @@ Usage:
   python3 xyzab_state.py trail             Show full gate trail (JSON)
   python3 xyzab_state.py verify            Verify state consistency
 
-Install: copy this file into any project. No pip install needed.
+Install: keep this script with its bundled plugin skill tree. No pip install is
+needed for the minimum cycle runtime.
 """
 
 import json
 import os
 import sys
 import argparse
+import tempfile
+from copy import deepcopy
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any
@@ -86,7 +89,7 @@ GATE_TRANSITIONS: Dict[str, str] = {
 #      Completion that opens. Artifact without return question = dead end.
 #      Value that doesn't return a question consumed itself.
 #
-# Full decoder: $QLN_WIKI/references/phase-essence-decoder.md
+# Full decoder: ../references/phase-essence-decoder.md
 
 GATE_ORDER: Dict[str, int] = {"x": 0, "y": 1, "z": 2, "a": 3, "b": 4}
 
@@ -94,33 +97,45 @@ GATE_PHASE: Dict[str, str] = {"x": "S", "y": "G", "z": "Q", "a": "P", "b": "V"}
 
 
 def _load_decoding():
-    """Optional: the shared canonical decoding module. The gate machine
-    degrades gracefully (warn-only) when it is absent — gates first."""
+    """Load the decoder bundled beside this script.
+
+    Structural validation is part of the minimum runtime. A missing or broken
+    decoder is therefore an installation error, not a reason to open gates in
+    warn-only mode.
+    """
     import importlib.util
-    candidates = []
-    env = os.environ.get("QLN_BOOTSTRAP")
-    if env:
-        candidates.append(Path(env) / "decoding.py")
-    here = Path(__file__).resolve().parent
-    candidates.append(here / "decoding.py")
-    pp = here
-    for _ in range(6):
-        pp = pp.parent
-        candidates.append(pp / "bootstrap" / "decoding.py")
-    candidates.append(Path(os.path.expanduser("~/.hermes/scripts/5qln/decoding.py")))
-    for c in candidates:
-        try:
-            if c.exists():
-                spec = importlib.util.spec_from_file_location("qln_decoding", c)
-                mod = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(mod)
-                return mod
-        except Exception:
-            continue
-    return None
+
+    decoder_path = Path(__file__).resolve().with_name("decoding.py")
+    if not decoder_path.is_file():
+        raise RuntimeError(f"bundled decoder is missing: {decoder_path}")
+    spec = importlib.util.spec_from_file_location("qln_decoding", decoder_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"could not load bundled decoder: {decoder_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 DECODING = _load_decoding()
+
+
+def _load_phase_log():
+    """Load the phase log bundled with the learning-aligner skill."""
+    import importlib.util
+
+    skills_dir = Path(__file__).resolve().parents[2]
+    log_path = skills_dir / "5qln-learning-aligner" / "scripts" / "phase_log.py"
+    if not log_path.is_file():
+        raise RuntimeError(f"bundled phase log is missing: {log_path}")
+    spec = importlib.util.spec_from_file_location("qln_phase_log", log_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"could not load bundled phase log: {log_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+PHASE_LOG = _load_phase_log()
 
 # ─── Terminal Colors (auto-disabled if stdout is not a TTY) ───────
 
@@ -191,8 +206,21 @@ def save(state: Dict[str, Any]) -> None:
     state["updated_at"] = datetime.now(timezone.utc).isoformat()
     sd = state_dir()
     sd.mkdir(parents=True, exist_ok=True)
-    with open(state_file(), "w") as f:
-        json.dump(state, f, indent=2, ensure_ascii=False)
+    target = state_file()
+    fd, temporary_name = tempfile.mkstemp(
+        prefix=f".{target.name}.", suffix=".tmp", dir=sd
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(state, handle, indent=2, ensure_ascii=False)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, target)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
 
 
 def next_pending(state: Dict[str, Any]) -> Optional[str]:
@@ -265,8 +293,26 @@ def cmd_gate(state: Dict[str, Any]) -> None:
 
 
 def cmd_open(state: Dict[str, Any], gate: str, content: Optional[str],
-             override: Optional[str] = None) -> None:
+             override: Optional[str] = None, source_tag: str = "unclassified",
+             signal: str = "", session_id: str = "manual",
+             _lock: bool = True) -> None:
+    if _lock:
+        with PHASE_LOG.phase_log_lock():
+            state.clear()
+            state.update(load())
+            return cmd_open(
+                state,
+                gate,
+                content,
+                override,
+                source_tag,
+                signal,
+                session_id,
+                _lock=False,
+            )
+
     pending = next_pending(state)
+    state_before = deepcopy(state)
 
     if gate not in GATES:
         print(f"ERROR: unknown gate '{gate}'. Must be one of: {', '.join(GATES)}", file=sys.stderr)
@@ -281,57 +327,104 @@ def cmd_open(state: Dict[str, Any], gate: str, content: Optional[str],
         print(f"Gates must open in sequence: {' → '.join(GATES)}", file=sys.stderr)
         sys.exit(1)
 
+    if not isinstance(content, str) or not content.strip():
+        print("ERROR: validated content is required to open a gate.", file=sys.stderr)
+        sys.exit(1)
+
     # ─── Structural invariant check (form only; emergence is human-side) ──
     check_note = None
-    if DECODING is not None and content:
-        phase = GATE_PHASE[gate]
-        seed = None
-        if gate == "b":
-            # ∞0' must not repeat the cycle's seed: take X from gate x.
-            seed = state["gates"]["x"].get("content")
-        # Gate deposits come in two shapes. A footer (KEY: lines) gets the
-        # full phase check. Bare content — the validated output value
-        # itself — is mapped to the gate's primary field and only that
-        # field is required; form rules still apply to what is present.
-        primary = {"x": "X", "y": "ALPHA", "z": "Z", "a": "A", "b": "B2"}
-        fields = DECODING.parse_footer(content)
-        if fields:
-            violations, warnings = DECODING.check_fields(phase, fields, seed)
-        else:
-            key = primary[gate]
-            fields = {key: content.strip()}
-            violations, warnings = DECODING.check_fields(
-                phase, fields, seed, required_keys=[key])
-        if violations and not override:
-            print(json.dumps({
-                "ok": False,
-                "gate": gate,
-                "phase": phase,
-                "violations": violations,
-                "warnings": warnings,
-                "hint": "Gate stays shut. Restate the content per the "
-                        "canonical decoding (footer form: see "
-                        "decoding.PHASE_FOOTER_SPEC), or pass --override "
-                        "\"reason\" to record a human decision to open "
-                        "anyway.",
-            }, indent=2, ensure_ascii=False))
-            sys.exit(1)
-        if violations and override:
-            state["gates"][gate]["override"] = {"reason": override,
-                                                "violations": violations}
-        if warnings:
-            state["gates"][gate]["warnings"] = warnings
-            check_note = warnings
-    elif DECODING is None:
-        check_note = ["decoding.py not found — gate opened without the "
-                      "structural check (warn-only mode). Set QLN_BOOTSTRAP "
-                      "or install bootstrap/decoding.py to restore it."]
+    phase = GATE_PHASE[gate]
+    seed = None
+    if gate == "b":
+        # ∞0' must not repeat the cycle's seed: extract X from a canonical
+        # S footer, while retaining support for the permitted bare question.
+        seed_content = state["gates"]["x"].get("content")
+        seed_fields = DECODING.parse_footer(seed_content) if seed_content else None
+        seed = seed_fields.get("X") if seed_fields else seed_content
+    # Gate deposits come in two shapes. A footer (KEY: lines) gets the
+    # full phase check. Bare content — the validated output value itself —
+    # is mapped to the gate's primary field. V remains exceptional: the
+    # artifact and return question must be deposited together.
+    primary = {"x": "X", "y": "ALPHA", "z": "Z", "a": "A", "b": "B2"}
+    fields, footer_violations = DECODING.parse_footer_with_violations(content)
+    if fields:
+        violations, warnings = DECODING.check_fields(phase, fields, seed)
+        violations = footer_violations + violations
+    else:
+        key = primary[gate]
+        fields = {key: content.strip()}
+        # S permits the question as a bare value. Later phases require their
+        # complete canonical footer so the structural relation is explicit.
+        required = [key] if gate == "x" else None
+        violations, warnings = DECODING.check_fields(
+            phase, fields, seed, required_keys=required)
+        bare_start = (
+            gate == "x"
+            and len([line for line in content.splitlines() if line.strip()]) == 1
+            and not DECODING.looks_like_footer_shape(content)
+        )
+        if not bare_start:
+            violations = footer_violations + violations
+    if violations:
+        print(json.dumps({
+            "ok": False,
+            "gate": gate,
+            "phase": phase,
+            "violations": violations,
+            "warnings": warnings,
+            "hint": "Gate stays shut. Restate the content per the "
+                    "canonical decoding (footer form: see "
+                    "decoding.PHASE_FOOTER_SPEC). Structural violations "
+                    "cannot be overridden.",
+        }, indent=2, ensure_ascii=False))
+        sys.exit(1)
+    if override:
+        state["gates"][gate]["override"] = {
+            "reason": override,
+            "violations": [],
+        }
+    if warnings:
+        state["gates"][gate]["warnings"] = warnings
+        check_note = warnings
+
+    # The transition and its source classification are one operational act.
+    # Write the append-only evidence record before opening the state gate, so
+    # a log failure leaves the gate shut rather than silently unaligned.
+    log_path = PHASE_LOG.phase_log_path()
+    log_existed = log_path.exists()
+    log_before = PHASE_LOG.load_log(log_path) if log_existed else None
+    PHASE_LOG.append_entry(
+        phase,
+        gate,
+        source_tag,
+        content,
+        signal=signal,
+        session_id=session_id,
+        cycle=state["cycle_count"],
+        path=log_path,
+        _lock=False,
+    )
 
     state["gates"][gate]["open"] = True
     state["gates"][gate]["content"] = content
     state["gates"][gate]["opened_at"] = datetime.now(timezone.utc).isoformat()
     state["current_gate"] = next_pending(state) or "b"
-    save(state)
+    try:
+        save(state)
+    except Exception as save_error:
+        state.clear()
+        state.update(state_before)
+        try:
+            if log_existed:
+                PHASE_LOG.save_log(log_before, log_path)
+            elif log_path.exists():
+                log_path.unlink()
+        except Exception as rollback_error:
+            raise RuntimeError(
+                "xyzab state save failed and phase-log rollback also failed: "
+                f"{rollback_error}"
+            ) from save_error
+        raise
 
     print(json.dumps({
         "ok": True,
@@ -341,11 +434,19 @@ def cmd_open(state: Dict[str, Any], gate: str, content: Optional[str],
         "cycle": state["cycle_count"],
         "next": next_pending(state),
         "content": content[:100] if content else None,
+        "source": source_tag,
+        "phase_log": str(PHASE_LOG.phase_log_path()),
         "check": check_note or "passed",
     }, indent=2, ensure_ascii=False))
 
 
-def cmd_close(state: Dict[str, Any], gate: str) -> None:
+def cmd_close(state: Dict[str, Any], gate: str, _lock: bool = True) -> None:
+    if _lock:
+        with PHASE_LOG.phase_log_lock():
+            state.clear()
+            state.update(load())
+            return cmd_close(state, gate, _lock=False)
+
     if gate not in GATES:
         print(f"ERROR: unknown gate '{gate}'", file=sys.stderr)
         sys.exit(1)
@@ -371,7 +472,13 @@ def cmd_close(state: Dict[str, Any], gate: str) -> None:
     }, indent=2))
 
 
-def cmd_reset(state: Dict[str, Any]) -> None:
+def cmd_reset(state: Dict[str, Any], _lock: bool = True) -> None:
+    if _lock:
+        with PHASE_LOG.phase_log_lock():
+            state.clear()
+            state.update(load())
+            return cmd_reset(state, _lock=False)
+
     prev_cycle = state["cycle_count"]
     prev_gates = {gate: state["gates"][gate]["open"] for gate in GATES}
     state["cycle_count"] += 1
@@ -445,7 +552,19 @@ def main() -> None:
     open_p.add_argument("gate", choices=GATES, help="Gate to open (x|y|z|a|b)")
     open_p.add_argument("-c", "--content", default=None, help="Validated content for this gate")
     open_p.add_argument("--override", default=None, metavar="REASON",
-                        help="Open despite decoding violations; reason is recorded on the gate")
+                        help="Record a human review reason; never bypasses structural violations")
+    open_p.add_argument(
+        "--source-tag",
+        choices=sorted(PHASE_LOG.KNOWN_TAGS),
+        default="unclassified",
+        help="Explicit source classification recorded in the phase log",
+    )
+    open_p.add_argument("--signal", default="", help="Observed evidence for the source tag")
+    open_p.add_argument(
+        "--session-id",
+        default=os.environ.get("HERMES_SESSION_ID", "manual"),
+        help="Session identifier recorded in the phase log",
+    )
 
     close_p = sub.add_parser("close", help="Close a gate (cascading rollback)")
     close_p.add_argument("gate", choices=GATES, help="Gate to close (x|y|z|a|b)")
@@ -463,7 +582,15 @@ def main() -> None:
         elif args.command == "gate":
             cmd_gate(state)
         elif args.command == "open":
-            cmd_open(state, args.gate, args.content, getattr(args, "override", None))
+            cmd_open(
+                state,
+                args.gate,
+                args.content,
+                getattr(args, "override", None),
+                getattr(args, "source_tag", "unclassified"),
+                getattr(args, "signal", ""),
+                getattr(args, "session_id", "manual"),
+            )
         elif args.command == "close":
             cmd_close(state, args.gate)
         elif args.command == "reset":

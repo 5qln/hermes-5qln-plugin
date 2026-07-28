@@ -33,10 +33,10 @@ The skills control interpretation and composition. The tools make repeatable fac
 
 Hermes discovers the root `plugin.yaml` and imports root `__init__.py`. `register(ctx)` wires:
 
-- five JSON-schema tools under toolset `5qln`;
-- ten namespaced skills via `ctx.register_skill()` (loadable as `5qln:skill-name`);
+- seven JSON-schema tools under toolset `5qln`;
+- eleven namespaced skills via `ctx.register_skill()` (loadable as `5qln:skill-name`);
 - one `pre_llm_call` hook that is inert unless a valid profile seed is installed;
-- the plugin's `skills/` directory is auto-seeded into `skills.external_dirs` in config.yaml so all ten skills appear in the normal skill index (`/skills`, `skills_list`, and the agent's `<available_skills>` prompt).
+- the plugin's `skills/` directory is auto-seeded into `skills.external_dirs` in config.yaml so all eleven skills appear in the normal skill index (`/skills`, `skills_list`, and the agent's `<available_skills>` prompt).
 
 The skills are read-only from Hermes' perspective. Their namespace prevents collisions with built-in or user-managed skills.
 
@@ -110,26 +110,29 @@ The research validator checks exact kernel strings, ordered phase sections, decl
 
 ## 5. Dependency model
 
-Core workflows for Markdown, plain text, RST, logs, CSV, TSV, JSON, and research-prompt validation use the Python standard library.
+The minimum cycle runtime and most deterministic workflows use the Python
+standard library. `PyYAML` is a required plugin dependency for the skill
+verifier, and `jsonschema` is declared in `requirements-dev.txt` for schema
+conformance tests.
 
 DOCX extraction imports `python-docx` only when a DOCX is inventoried. PDF extraction imports `pypdf` only when a PDF is inventoried. Missing optional packages yield a clear tool error rather than changing the workflow silently.
 
 ## 6. Portability
 
-Both bundled skills retain their source structure:
+All eleven bundled skills use the standard `SKILL.md` plus optional
+`references/` and `scripts/` structure. Two representative bundles are:
 
 ```text
 skills/
 ├── 5qln-converter/
 │   ├── SKILL.md
-│   ├── agents/openai.yaml
 │   ├── references/
 │   └── scripts/
 └── 5qln-deep-research/
     ├── SKILL.md
-    ├── agents/openai.yaml
     ├── references/research-prompt-contract.md
     └── scripts/validate_research_prompt.py
 ```
 
-Hermes uses `SKILL.md`, `references/`, and scripts exposed through registered tool wrappers. The `agents/openai.yaml` files are retained as source metadata and for cross-surface provenance; Hermes does not consume them.
+Hermes uses `SKILL.md`, `references/`, and scripts exposed through registered
+tool wrappers.

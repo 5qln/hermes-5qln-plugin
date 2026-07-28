@@ -44,7 +44,7 @@ The Holographic Law (`XY := X within Y`) operationalizes these operators as **le
 
 When a Q-phase runs with an S-lens (QS sub-phase), the question becomes: *"Apply the arrow (integrity of emergence) to the resonance equation — is this resonance real, or manufactured? What doubt tests it?"* The lens borrows the operator, not the equation. The output is still Q-phase output (φ⋂Ω + Z) — refined through the borrowed quality.
 
-**Implementation:** `sub_phase_loop.py` — see [[ARCHITECTURE#the-holographic-law-25-sub-phases]].
+**Runtime status:** the lens model is conceptual; `sub_phase_loop.py` is not shipped.
 
 ---
 
@@ -56,4 +56,4 @@ When a Q-phase runs with an S-lens (QS sub-phase), the question becomes: *"Apply
 - **P gradient restored.** Decodings had collapsed ∇ into "less energy / where force is unnecessary," yielding trivial moves. Per [5qln.com/power](https://www.5qln.com/power/), the tiniest investment yields the *greatest flourishing* — ∇ is maximum value per unit of energy, both poles held.
 - **G handoff added.** G now closes by naming what α *seeks*, so Q receives a direction to read against the field. Honest register note: the seeking language is the Conductor's 2026-06-12 refinement, supported by the /quality/ page's "begins to seek its place"; the /growth/ page itself does not use interest-language. Conductor-attested, not page-verbatim.
 
-Structural enforcement of all three lives in `decoding.py` (version 2026-06-12.1); regression fixtures in `verify_decoding.py`. The operators themselves are unchanged — these corrections restore the decoding *of* the operators, they do not amend the Codex. The nine lines remain sealed: `feaa46b4147d4e023cdd3fd59c051d063e8ec654ee7b38a481dcd5e4c781859b`.
+Structural enforcement lives in the bundled `decoding.py`; regression coverage lives in `tests/test_minimum_runtime.py`. The operators themselves are unchanged — these corrections restore the decoding *of* the operators, they do not amend the Codex. The nine lines remain sealed: `feaa46b4147d4e023cdd3fd59c051d063e8ec654ee7b38a481dcd5e4c781859b`.

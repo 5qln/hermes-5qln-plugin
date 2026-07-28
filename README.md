@@ -53,21 +53,27 @@ Full specification: [5QLN Codex](https://5qln.com/codex). Line-by-line reading i
 
 ## What's Included
 
-10 skills and 5 registered tools. The tools are deterministic and stdlib-only;
-the experimental skills also bundle stdlib-only scripts.
+11 registered skills and 7 registered tools.
 
-| Skill | Does |
-|-------|------|
-| `5qln-agent` | Agent identity and operating rules |
-| `5qln-cycle` | Phase engine — structures each exchange |
-| `5qln-initiation` | Entry point |
-| `symbolic-interpretation` | Codex decoder for human and agent |
-| `5qln-converter` | Compiles documents into verifiable surfaces |
-| `5qln-learning-aligner` | Gate enforcement — prevents the agent from fabricating attestation |
-| `5qln-manifest-compilation` | Manifest structure and compiler rules |
-| `5qln-deep-research` | Phase-gated research prompts _(experimental)_ |
-| `5qln-centrifuge` | Cross-session pattern extraction _(experimental)_ |
-| `5qln-signature-engine` | Experimental signature and continuity interpretation; the bounded native orchestrator is documented separately |
+The converter, research validator, bounded parametric memory, decoder, phase log,
+and centrifuge use the Python standard library. Skill verification requires
+PyYAML. DOCX/PDF inventory support is optional and requires `python-docx` and
+`pypdf`. See [Runtime Status](docs/RUNTIME_STATUS.md) for the exact shipped and
+experimental boundary.
+
+| Skill | Does | Status |
+|-------|------|--------|
+| `5qln-agent` | Agent identity and operating rules | Operational guidance |
+| `5qln-cycle` | Phase engine — structures each exchange | Minimum engine bundled; deepening extensions not shipped |
+| `5qln-initiation` | Entry point | Operational guidance |
+| `symbolic-interpretation` | Codex decoder and strict xyzab gate machine | Bundled |
+| `5qln-converter` | Compiles documents into verifiable surfaces | Bundled |
+| `5qln-learning-aligner` | Integrated source-tagged phase log | Bundled |
+| `5qln-manifest-compilation` | Manifest structure and compiler rules | Bundled |
+| `5qln-deep-research` | Phase-gated research prompts | Experimental, bundled |
+| `5qln-centrifuge` | Exact-pattern extraction from the phase log | Experimental, bundled |
+| `5qln-signature-engine` | Cross-session signature concept | Planned; axis engine not shipped |
+| `5qln-skill-formation` | Skill-v1 manifest creation and verification | Bundled; PyYAML required |
 
 | Tool | Does |
 |------|------|
@@ -75,13 +81,20 @@ the experimental skills also bundle stdlib-only scripts.
 | `fiveqln_create_manifest` | Integrity checklist from inventory |
 | `fiveqln_compile_manifest` | Manifest audit |
 | `fiveqln_validate_research_prompt` | Research prompt contract validation |
-| `fiveqln_fractal_memory` | Install, inspect, or export bounded session-orchestrator state; evidence-bearing calibration is CLI-only |
+| `fiveqln_fractal_memory` | Install, inspect, or export bounded orchestrator state |
+| `fiveqln_create_skill_manifest` | Create a deterministic skill-v1 manifest scaffold |
+| `fiveqln_verify_skill` | Verify a skill-v1 manifest and bundle |
 
 ## Install
 
 ```bash
 hermes plugins install 5qln/hermes-5qln-plugin --enable
 ```
+
+The minimum cycle engine is standard-library-only. Skill verification requires
+PyYAML from `requirements.txt`; optional DOCX/PDF extraction dependencies are in
+`requirements-optional.txt`. Install dependencies into the Python environment
+that runs Hermes, not an unrelated system Python.
 
 Restart Hermes fully. Skills are namespaced — load with `5qln:skill-name`.
 They also appear in the normal skill index (`/skills`, `skills_list`) after restart.
@@ -117,9 +130,9 @@ boundary and fresh-profile A/B protocol.
 
 [Usage Guide](docs/USAGE.md) — step-by-step with expected outputs.
 
-## How It Works
+## Conversion Pipeline
 
-Three operations, all deterministic:
+The converter's three operations are deterministic:
 
 1. **Inventory** — hash-addressed snapshot of every source file
 2. **Manifest** — 25-point structural checklist: source, changes, attestations
@@ -129,12 +142,16 @@ The plugin verifies structure. What it cannot verify — emergence, insight, mea
 
 ## Designed to Grow
 
-The plugin ships the runtime. Your agent produces the rest — session distillation, domain workflows, environment configuration — from your actual work. The converter verifies each new skill stays aligned with the Codex.
+The plugin ships a self-contained minimum cycle engine plus independent
+conversion, research, bounded-memory, and skill-formation capabilities. Proposed
+deepening and signature mechanisms remain explicitly unshipped until their code,
+tests, and dependency contract exist.
 
 ## Docs
 
 | Doc | Covers |
 |-----|--------|
+| [Runtime Status](docs/RUNTIME_STATUS.md) | Shipped, experimental, planned, and dependency boundaries |
 | [Usage](docs/USAGE.md) | Install, convert, validate, troubleshoot |
 | [Architecture](docs/ARCHITECTURE.md) | Design, data flows, trust boundaries |
 | [Integrity Model](docs/INTEGRITY_MODEL.md) | What the tools can and cannot certify |

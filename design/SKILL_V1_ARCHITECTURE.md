@@ -52,6 +52,14 @@ It must never be described as a certified living 5QLN skill, proof of emergence,
 
 ### 2.2 Corrections and additional constraints
 
+> **Historical baseline:** the observations in this subsection describe the
+> repository state reviewed during skill-v1 design. The `phase_log.py` findings
+> are superseded by the 0.7.0 runtime, which validates phase/gate/source
+> combinations, uses explicit session IDs, performs atomic writes, and
+> serializes cooperating writers. The documentation-count and portability drift
+> recorded below was also corrected in later releases. The trust-boundary
+> conclusion remains: structural logging is not human attestation.
+
 1. `phase_log.py` is weaker provenance than the handoff implies:
    - `candidate` is classified as an `∞0`-side tag (`phase_log.py:27`), so it cannot support a machine attestation boundary.
    - unknown source tags warn but are still appended (`phase_log.py:72-76`).

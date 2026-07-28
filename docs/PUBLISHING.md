@@ -37,9 +37,9 @@ Then verify:
 - documentation uses `5qln/hermes-5qln-plugin`;
 - the licensing map, kernel terms, Apache 2.0 text, and NOTICE exist at repository root;
 - no generated inventories, manifests, reports, credentials, or private sources are committed;
-- both full skill bundles are present;
+- all eleven skill bundles are present;
 - a clean Hermes installation succeeds with `hermes plugins install 5qln/hermes-5qln-plugin --enable`;
-- `/plugins` shows `5qln`, all five tools, the `pre_llm_call` hook, and all ten skills;
+- `/plugins` shows `5qln`, all seven tools, the `pre_llm_call` hook, and all eleven skills;
 - `5qln:5qln-converter` loads;
 - `5qln:5qln-deep-research` loads;
 - a small end-to-end conversion produces the expected pass/fail behavior.

@@ -199,7 +199,7 @@ The Holographic Law (`XY := X within Y`) means every phase contains all five pha
 
 The 25 sub-phases (SS, SG, SQ, SP, SV, GS, GG, ... VV) allow any phase to be refined through any lens quality. When a Q-phase runs with an S-lens (QS), the question becomes: *"Apply the arrow (integrity of emergence) to the resonance equation — is this resonance real, or manufactured?"*
 
-**Implementation:** `sub_phase_loop.py`
+**Proposed implementation:** `sub_phase_loop.py` is not shipped. The lens model remains conceptual.
 
 ---
 
@@ -213,7 +213,7 @@ When a phase-cell tags `mechanical` (live-but-blocked), descend — open a full 
 
 **Soft rules:** Descend while return questions get MORE alive; surface when they don't. Descent offered, never imposed. Liveness ratings are the human's attestation.
 
-**Implementation:** `fractal_loop.py`
+**Proposed implementation:** `fractal_loop.py` is not shipped. Vertical descent remains conceptual.
 
 ---
 

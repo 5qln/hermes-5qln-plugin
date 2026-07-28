@@ -258,6 +258,16 @@ class CalibrationTests(unittest.TestCase):
                     source_tag="the model thinks it resonates",
                     evidence="yes",
                 )
+            with self.assertRaisesRegex(ValueError, "source_tag"):
+                memory.calibrate_installed(
+                    home, phase="G", source_tag="logical", evidence="yes"
+                )
+
+            before = memory.load_installed_seed(home)["calibration"]["G"]
+            updated = memory.calibrate_installed(
+                home, phase="G", source_tag="imposed", evidence="yes"
+            )
+            self.assertEqual(updated["value"], round(before * 0.9, 3))
 
     def test_concurrent_calibrations_do_not_lose_updates(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

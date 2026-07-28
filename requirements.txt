@@ -1,0 +1,2 @@
+# Required by fiveqln_verify_skill at runtime.
+PyYAML>=6.0,<7

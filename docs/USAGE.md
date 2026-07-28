@@ -20,12 +20,38 @@ hermes plugins install 5qln/hermes-5qln-plugin --enable
 hermes plugins list
 ```
 
-The plugin name is `5qln`. It registers five tools in the `5qln` toolset and ten namespaced skills.
+The plugin name is `5qln`. It registers seven tools in the `5qln` toolset and eleven namespaced skills. The exact executable boundary is maintained in [Runtime Status](RUNTIME_STATUS.md).
 
 If installation used no `--enable` flag and the prompt was declined, enable it later:
 
 ```bash
 hermes plugins enable 5qln
+```
+
+The minimum cycle engine uses only the Python standard library. To use skill
+verification, install `requirements.txt` into the interpreter that runs Hermes.
+DOCX/PDF extraction is optional and declared in `requirements-optional.txt`.
+The plugin-local directory, if one exists, is not automatically the Hermes
+runtime environment.
+
+### Verify the minimum cycle engine
+
+From the installed plugin root:
+
+```bash
+python3 skills/symbolic-interpretation/scripts/xyzab_state.py gate
+python3 skills/5qln-learning-aligner/scripts/phase_log.py self-check
+```
+
+A successful gate opening validates content and writes one source-tagged log
+entry in one command:
+
+```bash
+python3 skills/symbolic-interpretation/scripts/xyzab_state.py open x \
+  -c "X: What is trying to emerge?" \
+  --source-tag emergent \
+  --signal "explicit human validation" \
+  --session-id example-session
 ```
 
 ## 2. Load a semantic skill
@@ -169,7 +195,7 @@ Canonical tags are:
 | Phase | Positive | Negative |
 |---|---|---|
 | S | `emergent` | `mechanical` |
-| G | `revealed` | `logical` |
+| G | `revealed` | `imposed` |
 | Q | `lived` | `logical` |
 | P | `felt` | `calculated` |
 | V | `opened` | `closed` |

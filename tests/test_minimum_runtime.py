@@ -146,6 +146,8 @@ class XyzabStrictDecodingTests(unittest.TestCase):
             ("\u200b X: disguised leading-control-space key?", "unknown field"),
             ("X \u200b: disguised post-space zero-width key?", "unknown field"),
             ("X \u2060 ∶ disguised spaced word-joiner ratio key?", "non-footer line"),
+            ("AL\U000e003aPHA∶ disguised tag-colon key?", "non-footer line"),
+            ("AL\u065ePHA∶ disguised combining-two-dots key?", "non-footer line"),
             ("X： disguised compatibility footer?", "non-footer line"),
             ("X﹕ disguised small-colon footer?", "non-footer line"),
             ("X︓ disguised vertical-colon footer?", "non-footer line"),
@@ -185,6 +187,11 @@ class XyzabStrictDecodingTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["check"], "passed")
         self.assertEqual(payload["next"], "y")
+
+    def test_start_accepts_non_footer_semicolon_question(self) -> None:
+        result = self.run_xyzab("open", "x", "-c", "What; is trying to emerge?")
+        self.assertEqual(result.returncode, 0, result.stdout or result.stderr)
+        self.assertEqual(json.loads(result.stdout)["next"], "y")
 
     def test_gate_requires_content(self) -> None:
         result = self.run_xyzab("open", "x")

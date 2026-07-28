@@ -66,12 +66,14 @@ def _is_single_terminal_question(value: str) -> bool:
 
 
 def _is_footer_separator(char: str) -> bool:
+    """Return true only for reviewed colon-like punctuation."""
+    if char in {":", "։", "ː", "ˑ", "˸", "⁚", "∶", "꞉"}:
+        return True
     name = unicodedata.name(char, "")
     return (
-        char in {":", "։"}
-        or "COLON" in name
-        or "RATIO" in name
-        or "TWO DOT" in name
+        unicodedata.category(char) == "Po"
+        and "SEMICOLON" not in name
+        and ("COLON" in name or "TWO DOT" in name)
     )
 
 
@@ -87,16 +89,18 @@ def looks_like_footer_shape(value: str) -> bool:
     if index >= len(normalized) or not normalized[index].isalpha():
         return False
     index += 1
-    while index < len(normalized) and (
-        not _is_footer_separator(normalized[index])
-        and (
-            normalized[index].isalpha()
-            or normalized[index].isdigit()
-            or normalized[index] == "_"
-            or unicodedata.category(normalized[index])[0] in {"C", "M"}
-        )
-    ):
-        index += 1
+    while index < len(normalized):
+        char = normalized[index]
+        category = unicodedata.category(char)[0]
+        if category in {"C", "M"}:
+            index += 1
+            continue
+        if _is_footer_separator(char):
+            break
+        if char.isalpha() or char.isdigit() or char == "_":
+            index += 1
+            continue
+        break
     while index < len(normalized) and (
         normalized[index].isspace()
         or unicodedata.category(normalized[index])[0] in {"C", "M"}

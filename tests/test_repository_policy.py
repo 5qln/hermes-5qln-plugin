@@ -90,6 +90,9 @@ class RepositoryPolicyTests(unittest.TestCase):
         aligner_reference = (
             ROOT / "skills" / "symbolic-interpretation" / "references" / "learning-aligner.md"
         ).read_text(encoding="utf-8")
+        symbolic_skill = (
+            ROOT / "skills" / "symbolic-interpretation" / "SKILL.md"
+        ).read_text(encoding="utf-8")
         centrifuge_skill = (
             ROOT / "skills" / "5qln-centrifuge" / "SKILL.md"
         ).read_text(encoding="utf-8")
@@ -123,6 +126,11 @@ class RepositoryPolicyTests(unittest.TestCase):
         )
         self.assertIn("$PHASE_LOG_PATH", centrifuge_skill)
         self.assertIn("$HERMES_HOME/5qln/phase_log.json", centrifuge_skill)
+        self.assertNotIn("zero dependencies", symbolic_skill)
+        self.assertIn("scripts/decoding.py", symbolic_skill)
+        self.assertIn(
+            "skills/5qln-learning-aligner/scripts/phase_log.py", symbolic_skill
+        )
         self.assertIn("are superseded by the 0.7.0 runtime", design_history)
 
     def test_deep_research_import_checksums_match_provenance(self) -> None:

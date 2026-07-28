@@ -56,7 +56,7 @@ python3 centrifuge_parametric.py reset --confirm  # Wipe trail (dangerous)
 
 | Dimension | Key | Values |
 |---|---|---|
-| Source purity | `source_purity.{S,G,Q,P,V}` | 0.0–1.0 (emergent ratio) |
+| Source purity | `source_purity.{S,G,Q,P,V}` | 0.0–1.0 over explicitly classified tags; `null` when only neutral/unclassified evidence exists |
 | α direction | `alpha_direction` | "inward" or "outward" |
 | ∞0' scope | `inf0p_scope` | "widening", "narrowing", "stable" |
 | Corruption | `corruption_total` | integer count |

@@ -65,33 +65,36 @@ def _is_single_terminal_question(value: str) -> bool:
     return normalized.endswith("?") and normalized.count("?") == 1
 
 
+def _is_footer_separator(char: str) -> bool:
+    name = unicodedata.name(char, "")
+    return (
+        char in {":", "։"}
+        or "COLON" in name
+        or "RATIO" in name
+        or "TWO DOT" in name
+    )
+
+
 def looks_like_footer_shape(value: str) -> bool:
     """Recognize canonical and visually confusable ``FIELD:`` prefixes."""
     normalized = unicodedata.normalize("NFKC", value).lstrip()
-    if not normalized or not (
-        "A" <= normalized[0] <= "Z" or "a" <= normalized[0] <= "z"
-    ):
+    if not normalized or not normalized[0].isalpha():
         return False
     index = 1
     while index < len(normalized) and (
-        "A" <= normalized[index] <= "Z"
-        or "a" <= normalized[index] <= "z"
-        or normalized[index].isdigit()
-        or normalized[index] == "_"
+        not _is_footer_separator(normalized[index])
+        and (
+            normalized[index].isalpha()
+            or normalized[index].isdigit()
+            or normalized[index] == "_"
+        )
     ):
         index += 1
     while index < len(normalized) and normalized[index].isspace():
         index += 1
     if index >= len(normalized):
         return False
-    separator = normalized[index]
-    name = unicodedata.name(separator, "")
-    return (
-        separator in {":", "։"}
-        or "COLON" in name
-        or "RATIO" in name
-        or "TWO DOT" in name
-    )
+    return _is_footer_separator(normalized[index])
 
 
 def parse_footer_with_violations(

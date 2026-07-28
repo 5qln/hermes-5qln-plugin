@@ -2,6 +2,13 @@
 
 All notable changes are recorded here. Versions follow semantic versioning.
 
+## Unreleased
+
+### Fixed
+- Footer-shaped bare S input now recognizes Unicode-letter field prefixes as well as ASCII ones, including Greek confusables combined with colon-like separators.
+- Parametric source purity excludes neutral/unclassified entries from its denominator and reports `null` when no classified evidence exists.
+- Symbolic runtime documentation now states that xyzab requires its bundled decoder and phase-log companions.
+
 ## 0.7.0 - 2026-07-28
 
 ### Added

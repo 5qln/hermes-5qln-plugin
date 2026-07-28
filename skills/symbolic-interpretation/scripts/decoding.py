@@ -79,10 +79,10 @@ def looks_like_footer_shape(value: str) -> bool:
     """Recognize canonical and visually confusable ``FIELD:`` prefixes."""
     normalized = unicodedata.normalize("NFKC", value).lstrip()
     index = 0
-    while index < len(normalized) and unicodedata.category(normalized[index])[0] in {
-        "C",
-        "M",
-    }:
+    while index < len(normalized) and (
+        normalized[index].isspace()
+        or unicodedata.category(normalized[index])[0] in {"C", "M"}
+    ):
         index += 1
     if index >= len(normalized) or not normalized[index].isalpha():
         return False
@@ -97,7 +97,10 @@ def looks_like_footer_shape(value: str) -> bool:
         )
     ):
         index += 1
-    while index < len(normalized) and normalized[index].isspace():
+    while index < len(normalized) and (
+        normalized[index].isspace()
+        or unicodedata.category(normalized[index])[0] in {"C", "M"}
+    ):
         index += 1
     if index >= len(normalized):
         return False

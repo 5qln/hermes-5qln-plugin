@@ -27,7 +27,9 @@ The centrifuge does not store content. It does not perform recognition. It detec
 
 ## Commands
 
-All commands read from `$QLN_WIKI/state/phase_log.json`.
+All commands resolve the shared phase log in this order: `$PHASE_LOG_PATH`,
+then `$QLN_WIKI/state/phase_log.json`, then
+`$HERMES_HOME/5qln/phase_log.json`.
 
 ### Original (snapshot)
 ```bash

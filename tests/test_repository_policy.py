@@ -87,6 +87,12 @@ class RepositoryPolicyTests(unittest.TestCase):
             / "references"
             / "genesis-pattern.md"
         ).read_text(encoding="utf-8")
+        aligner_reference = (
+            ROOT / "skills" / "symbolic-interpretation" / "references" / "learning-aligner.md"
+        ).read_text(encoding="utf-8")
+        centrifuge_skill = (
+            ROOT / "skills" / "5qln-centrifuge" / "SKILL.md"
+        ).read_text(encoding="utf-8")
         design_history = (ROOT / "design" / "SKILL_V1_ARCHITECTURE.md").read_text(
             encoding="utf-8"
         )
@@ -110,6 +116,13 @@ class RepositoryPolicyTests(unittest.TestCase):
             for row in source_rows:
                 self.assertIn(row, document)
         self.assertIn("STATUS: HISTORICAL PROPOSAL — NOT SHIPPED", genesis)
+        self.assertNotIn("python3 scripts/phase_log.py", aligner_reference)
+        self.assertNotIn("phase_log.py append", aligner_reference)
+        self.assertIn(
+            "skills/5qln-learning-aligner/scripts/phase_log.py", aligner_reference
+        )
+        self.assertIn("$PHASE_LOG_PATH", centrifuge_skill)
+        self.assertIn("$HERMES_HOME/5qln/phase_log.json", centrifuge_skill)
         self.assertIn("are superseded by the 0.7.0 runtime", design_history)
 
     def test_deep_research_import_checksums_match_provenance(self) -> None:

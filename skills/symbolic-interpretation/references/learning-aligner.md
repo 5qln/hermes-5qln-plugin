@@ -53,9 +53,9 @@ Both are allowed. The tag carries through. The question's slight hardness IS the
 ### Session Start (non-negotiable)
 
 ```bash
-python3 scripts/xyzab_state.py gate          # Gate check — THIS IS YOUR PHASE
-python3 scripts/phase_log.py self-check      # Self-check — read your own chain
-python3 scripts/phase_log.py tagline         # Current chain
+python3 skills/symbolic-interpretation/scripts/xyzab_state.py gate
+python3 skills/5qln-learning-aligner/scripts/phase_log.py self-check
+python3 skills/5qln-learning-aligner/scripts/phase_log.py tagline
 ```
 
 ### Each Turn
@@ -66,9 +66,13 @@ python3 scripts/phase_log.py tagline         # Current chain
 4. **Gate opens + log writes (simultaneously):**
 
 ```bash
-python3 scripts/xyzab_state.py open {gate} -c "{content}"
-python3 scripts/phase_log.py append {phase} {gate} {source} -c "{content}" -s "{signal}"
+python3 skills/symbolic-interpretation/scripts/xyzab_state.py open {gate} \
+  -c "{content}" --source-tag {source} --signal "{signal}" \
+  --session-id {session-id}
 ```
+
+`xyzab_state.py open` validates the deposit and writes exactly one phase-log
+entry in the same locked transaction. Do not append a second record manually.
 
 ## Pitfalls
 

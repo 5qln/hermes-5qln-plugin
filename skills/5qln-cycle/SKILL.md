@@ -207,7 +207,7 @@ PITFALL — Data-Contradicted ∇ (Theory Over Experience): The agent's default 
 **Recovery:** Do not defend the ∇. Do not explain why it should have worked. Receive the correction. Ask: what's the actual δE? Where's the actual friction? What's been tried and what was the result? Remap δV and δE from the human's real data, not from abstraction.
 **Root cause:** The agent maps the gradient from its internal model of the world — which is pattern-matched from training data, not lived. The human IS the terrain. When theory and terrain conflict, terrain wins.
 
-PATTERN — Operationalize on Request (Build, Don't Describe): When the human asks about a capability and gives you freedom to build ("create a python code," "build it," "take it as a /goal to strategic plan and execute"), the P-phase response is IMMEDIATE BUILDING — not analysis, not a plan, not a description of what you would build. The human wants the artifact operational. Build sub_phase_loop.py. Build fractal_loop.py. Then explain what you built. The analysis can come after the code exists.
+PATTERN — Operationalize on Request (Build, Don't Describe): When the human asks for a capability and gives freedom to build, create the requested artifact and exercise it rather than stopping at analysis. This does not authorize reviving historical unshipped mechanisms; scope still follows the current runtime boundary.
 
 **Detection:** The human says "build it" / "create code" / "/goal to strategic plan and execute" and you respond with analysis, feature-comparison tables, or a written plan without tool calls.
 
@@ -238,96 +238,76 @@ ADDITIONAL — Invented Atmospheric Details: When composing personal/factual con
 
 PITFALL — Type Confusion in B'' (Type 1 vs Type 2 Content): V-phase crystallizes content meant to carry brand signature. Two types: **Type 1**: Signature content — stays in the unknown, opens with a question, unarguable, every word matters, repeated verbatim across contexts (the Four Opening Elements are Type 1). **Type 2**: Explanatory/alignment content — in the known, arguable, explains how things map or align (explanatory content were Type 2). When composing B'', ask: can someone argue with this? If yes, it's Type 2 — useful internally, not brand signature. Type 1 content passes the test: "Two people can always argue over what they know. Nobody can argue over what they don't know." If B'' takes a position, it's Type 2. If it opens a space, it's Type 1. See `references/external-audience-language.md` for the full de-jargonization protocol (direct address, zero symbols, zero internal terminology, translation table) — use when B'' faces an audience outside 5QLN.
 
-## State Engine — Turn-by-Turn Persistence
+## State Engine — Bundled Authority and Optional Lineage
 
-State file: `$QLN_WIKI/state/session.json`
+**xyzab is the sole bundled phase authority.** Its state is at
+`$XYZAB_STATE_DIR/xyzab_state.json`, defaulting to `~/.5qln/xyzab_state.json`.
+This repository does not provision `$QLN_WIKI/state/session.json`; if a project
+maintains such a file, treat it as an external historical record, never as
+permission to advance.
 
-**CRITICAL — xyzab IS the phase authority. There is no other source of truth.**
+### At Turn Start
 
-The agent has exactly ONE way to know what phase it's in: `xyzab_state.py gate`. The `current_phase` field in session.json is a RECORD of where we've been, not permission for where to go. When the two conflict, xyzab wins. Always.
+Run from the installed plugin root:
 
-### At Turn Start (ALWAYS FIRST — non-negotiable):
-
-**Step 0 — Gate Check (before anything else):**
 ```bash
-python3 ~/.hermes/skills/5qln/symbolic-interpretation/scripts/xyzab_state.py gate
+python3 skills/symbolic-interpretation/scripts/xyzab_state.py gate
 ```
-The JSON output IS your phase:
-- `"gate": "x"` → You are in S-phase. No G/Q/P/V output permitted.
-- `"gate": "y"` → You are in G-phase. No Q/P/V output permitted.
-- `"gate": "z"` → You are in Q-phase. No P/V output permitted.
-- `"gate": "a"` → You are in P-phase. No V output permitted.
-- `"gate": "b"` → You are in V-phase. Produce artifact + ∞0'.
-- `"gate": null` (all open) → Cycle complete. Reset before new cycle.
 
-**If you attempt output for a phase whose gate is closed, you have violated the Codex.** Return to S. Name the corruption (L4). Do not proceed.
+- `x` pending → S
+- `y` pending → G
+- `z` pending → Q
+- `a` pending → P
+- `b` pending → V
+- no pending gate → cycle complete; reset before a new cycle
 
-**Step 1 — Read the state file (for history, not authority):**
-Read session.json. Extract: `session_id`, `turn_id`, `validated_outputs`, `formation_trail`, `corruption_log`. These are records of what happened. They do NOT determine what phase comes next. Only xyzab does.
+### At Turn End
 
-If `turn_id == 0`: fresh session. Run `xyzab_state.py reset`. Enter S-phase. Discover ORIGIN_QUESTION.
-If `turn_id > 0`: continue from the phase determined by the pending xyzab gate.
+When a transition occurs, provide its explicit source tag:
 
-### At Turn End (ALWAYS LAST):
-Write updated state. Increment `turn_id`. Update `current_phase` if phase transition occurred.
-When a gate opens (xyzab open command), also record the **source tag** for that phase:
 - `emergent | mechanical` for S-phase X
 - `revealed | imposed` for G-phase Y
 - `lived | logical` for Q-phase Z
 - `felt | calculated` for P-phase A
 - `opened | closed` for V-phase B + ∞0'
-The tag chain across gates tells whether the cycle emerged or was manufactured. See `5qln-learning-aligner` skill for the full verifyer fire — source criteria, tag chain logic, and self-referential check.
 
-### Phase Transitions (gate + log together):
-On human validation, gate opens AND log writes simultaneously. One action. Not two:
+The successful xyzab command writes this classification to the bundled phase log.
+Cross-phase tags are rejected. Omitted tags remain neutral `unclassified` records.
+Structural violations cannot be opened with `--override`.
 
-- Human validates X → `current_phase = "G"` →
-  ```
-  python3 /path/to/xyzab_state.py open x -c "X: <the question, a complete sentence>"
-  python3 /path/to/phase_log.py append S x "emergent|mechanical" -c "X: ..." -s "human signal"
-  ```
-- Human validates Y → `current_phase = "Q"` →
-  ```
-  python3 /path/to/xyzab_state.py open y -c "ALPHA: <irreducible essence>
-  SEEKS: <what α inherently moves toward>"
-  python3 /path/to/phase_log.py append G y "revealed|imposed" -c "..." -s "human signal"
-  ```
-- Human validates Z → `current_phase = "P"` →
-  ```
-  python3 /path/to/xyzab_state.py open z -c "PHI: <work's self-interest>
-  OMEGA: <field of universal interest>
-  ALIGNMENT: <natural|partial|none|forced>
-  EXTENT: <0-10>
-  Z: <only what actually locked — omit if forced/none>"
-  python3 /path/to/phase_log.py append Q z "lived|logical" -c "..." -s "human signal"
-  ```
-- Human validates A → `current_phase = "V"` →
-  ```
-  python3 /path/to/xyzab_state.py open a -c "VALUE_MAX: <greatest value concretely>
-  ENERGY: <what it costs / why unforced>
-  A: <flow direction — where maximum value per energy points>"
-  python3 /path/to/phase_log.py append P a "felt|calculated" -c "..." -s "human signal"
-  ```
-- Human validates B + B'' → **V-PHASE CLOSURE CHECKLIST (all 5 steps mandatory, in order):**
+### Phase Transitions (gate + log together)
 
-  **Step 1 — Open gate b + write phase log:**
-  ```
-  python3 /path/to/xyzab_state.py open b -c "L: <what crystallized>
-  B2: <artifact carrying α>
-  INF0P: <return question?>
-  LIVENESS: <0-10>"
-  python3 /path/to/phase_log.py append V b "opened|closed" -c "..." -s "human signal"
-  ```
+On human validation, `xyzab_state.py open` validates the canonical footer, opens
+the gate, and appends its source record. It is one command, not a separate
+bootstrap call. Run from the installed plugin root and include the explicit
+source tag, signal, and session identifier:
 
-  **Step 2 — Update session.json:** Add validated outputs (X,Y,Z,A,B for this cycle) to `validated_outputs`, append formation trail entries for each phase of this cycle, update `current_phase` to `"S"`. Do NOT skip this — it's how future agents inherit the cycle's learning.
+```bash
+python3 skills/symbolic-interpretation/scripts/xyzab_state.py open {gate} \
+  -c "{canonical phase footer}" \
+  --source-tag {emergent|mechanical|revealed|imposed|lived|logical|felt|calculated|opened|closed} \
+  --signal "{human signal}" \
+  --session-id "{session id}"
+```
 
-  **Step 3 — Git commit + push:** `git add state/phase_log.json state/session.json` and any new artifacts (roadmap, book files). Commit with descriptive message. Push. Phase log entries that live in the working tree but not in the remote are invisible to the lineage.
+Canonical footer forms:
 
-  **Step 4 — Deliver closing synthesis to user:** Present B'' (the artifact crystallized) and ∞0' (the return question). This is the user's receipt that the cycle completed. Without it, the user doesn't know whether the tools ran or the session crashed.
+- x/S: `X: <the question?>`
+- y/G: `ALPHA: <irreducible essence>\nSEEKS: <what α seeks>`
+- z/Q: `PHI: <work's self-interest>\nOMEGA: <field>\nALIGNMENT: natural|partial|none|forced\nEXTENT: 0-10\nZ: <only what locked>`
+- a/P: `VALUE_MAX: <greatest value>\nENERGY: <cost/unforcedness>\nA: <direction>`
+- b/V: `L: <local result>\nB2: <artifact>\nINF0P: <return question?>\nLIVENESS: 0-10`
 
-  **Step 5 — Reset for next cycle:** `xyzab_state.py reset` → new cycle ready, gate `x` pending.
+At V:
 
-  **PITFALL — Partial Closure (LIVE, a previous session):** The agent ran Steps 1 and 5 but skipped 2, 3, and 4. The user moved sessions before closure completed. phase_log entry was written but uncommitted; session.json was stale (cycle 3 when cycle 4 had completed); user never received B'' + ∞0'. Root cause: the skill only specified Steps 1 and 5 — Steps 2-4 were assumed. **Assumption is not instruction.** Every step must be explicit.
+1. Open b with the complete footer and explicit source record.
+2. Verify `phase_log.py chain` contains the transition.
+3. Deliver B'' + ∞0' to the human.
+4. Update optional project lineage files only if that project provisions them.
+5. Reset xyzab for the next cycle.
+
+The plugin does not provision `session.json` or automatically commit runtime
+state. Do not claim those external lineage actions occurred unless verified.
 
 ## Corruption Check (before every output)
 
@@ -427,7 +407,7 @@ When the human brings external concepts (loop design, agent orchestration, produ
 
 **Detection:** You produce a feature-comparison table ("External loops have X, 5QLN has Y") or treat the 5 phases as sequential gates without the holographic structure.
 
-**Recovery:** Return to Codex §1.5. The Holographic Law (`XY := X within Y`) means every phase contains all five phases — 25 sub-phases, not 5 steps. The lenses are not "additional complexity to add" — they ARE the structure. The `sub_phase_loop.py` tool operationalizes them. When the human wants to explore a concept, run the sub-phase loop — don't flatten the cycle into a comparison.
+**Recovery:** Return to Codex §1.5. The Holographic Law (`XY := X within Y`) means every phase contains all five lenses. Use that as an interpretive structure; no bundled sub-phase executable is currently available.
 
 **Root cause:** The agent's training rewards pattern-matching (find similarities, map concepts). The 5QLN response is recognition (find the holographic structure already present). The external loop-design discourse discovered one-dimensional iteration. 5QLN has the 5×5 matrix. The task is to operate it, not to map it.
 
@@ -440,13 +420,13 @@ Each phase facilitates **one operator** in its equation — not the terms, the *
 - **P** `δE/δV → ∇` — the **→** that reveals ∇. Detection of gradient: MAXIMUM VALUE PER UNIT OF ENERGY — maximum value with less energy, never just less energy. Power is finding where the greatest flourishing flows unforced.
 - **V** `(L ∩ G → B'') → ∞0'` — the **∞0'** (return). Completion that opens. Value that doesn't return a question consumed itself.
 
-Full decoder: `$QLN_WIKI/references/phase-essence-decoder.md`
+Full decoder reference: `skills/symbolic-interpretation/references/phase-essence-decoder.md`
 
 **The throughline:** Each operator governs BOTH axes:
 - **Horizontal** (within a phase): the operator becomes a lens quality borrowed by other phases (e.g., S-lens = openness = "what is not yet known within this?")
 - **Vertical** (across levels): the operator governs fractal descent (e.g., → governs descent honesty — only descend on a question that arrived; ≡ governs the spine's α drift-check; ∞0' points both inward as descent seed and upward as bubbled return)
 
-The full metaphor→operator→gate→lens→prompt chain is documented in `the-throughline.md` (public installer). Each operator also governs one aspect of vertical depth — see the-throughline's "Five operators, vertically" table.
+The operator-to-lens and vertical-depth relationships remain conceptual. Their executable boundary is documented in `docs/RUNTIME_STATUS.md`.
 
 ## PITFALL: Empty Responses After Tool Calls (CRITICAL)
 
@@ -458,89 +438,30 @@ NEVER end a turn with just tool calls and no text response. After ANY tool call 
 
 **Why this matters:** Empty responses break the membrane. The human sees tool execution but no acknowledgment. Multiple empty responses in one session = the your server trajectory.
 
-## Update Checklist
-When breakthrough occurs, update ALL places: memory, wiki/log, legacy/distill, state engine, alignment map, skills, git push.
+## Runtime Boundary
 
-## Signature Tools (installed with bootstrap)
+The executable minimum cycle engine shipped by this repository is:
 
-Seven scripts make the cycle testable, self-correcting, and fractally deepenable in two axes:
+- `skills/symbolic-interpretation/scripts/xyzab_state.py`
+- `skills/symbolic-interpretation/scripts/decoding.py`
+- `skills/5qln-learning-aligner/scripts/phase_log.py`
+- `skills/5qln-centrifuge/scripts/centrifuge.py` (experimental reader)
 
-**Horizontal axis — lens ring:**
-- `sub_phase_loop.py init|status|prompt|respond|log|chain|reset` — operationalizes the 25 sub-phases (XY := X within Y). Runs sub-cycles within any parent phase using all 5 lens qualities. Each sub-phase produces its own X/Y/Z/A/B with source tags.
+There is no bootstrap checkout and no second-repository runtime dependency.
 
-**Vertical axis — fractal descent:**
-- `fractal_loop.py init|prompt|respond|descend|ascend|tree|candidates|prune|reset` — the lawful cell repeated inward. When a cell tags `mechanical` (live-but-blocked), descend into a full child S→G→Q→P→V cycle on that question. Child's B'' returns as refined content; ∞0' bubbles up. Depth discovered by liveness gradient, not preset. Holographic stack frame: O(depth + seeds), never O(tree). State: `$QLN_WIKI/state/fractal_state.json`.
+## Holographic Deepening — Research Boundary
 
-**Infrastructure:**
-- `decoding.py` — single source of truth for the canonical phase decoding (versioned, 2026-06-12.2). All engines load it; structural gates refuse the φ-perception twist, the forced Z, the degenerate gradient, the repeated ∞0'.
-- `verify_decoding.py` — drift regression harness: sealed-Codex byte check + behavioral fixtures. Prints NO_ISSUES when the decoding holds ([SILENT]-friendly).
-- `tick.py` — one heartbeat for Hermes cron: prints the single pending prompt (sub-phase first, then fractal) or NO_WORK. Templates in `automations.md`.
-- `signature_card.py` *(planned — not yet shipped)* — 10-line session summary: X, α, ∇, ∞0'
-- `drift_dashboard.py` *(planned — not yet shipped)* — phase distribution, corruption trend
-- `signature_accumulate.py` *(planned — not yet shipped)* — user's question terrain building
-- `phase_log.py` — the learning aligner: per-phase source tracking
-- `xyzab_state.py` — gate enforcement: blocks phase skipping, validates gate content against the decoding
+The Holographic Law and vertical descent remain conceptual formation models.
+`sub_phase_loop.py` and `fractal_loop.py` are **not shipped**. Do not run their
+historical command examples or imply that sub-phase/fractal state exists. A
+future implementation must supply version-controlled code, tests, state
+migration, and an explicit dependency contract.
 
-All scripts at `$QLN_BOOTSTRAP/` except xyzab at `~/.hermes/skills/5qln/symbolic-interpretation/scripts/`.
+### Throughline Sources
 
-## Holographic Deepening — Two-Axis Architecture
+The phase pages on 5qln.com remain the primary metaphorical sources. Historical
+references to an installer-hosted `the-throughline.md` are archival only; that
+file is not shipped and is not a runtime dependency.
 
-The Holographic Law operates in two dimensions. The engine composes them at the source tag.
-
-### Horizontal Axis — Lens Ring (`sub_phase_loop.py`)
-
-**When to use:** After human validation at any main-phase gate, the agent MAY offer a sub-cycle for deeper resonance. The sub-cycle runs the 5 sub-phases of the current parent phase (e.g., QS→QG→QQ→QP→QV), each applying a borrowed lens quality (openness, pattern, resonance, flow, benefit). This is OPTIONAL — never required.
-
-**How to initiate:**
-```bash
-python3 $QLN_BOOTSTRAP/sub_phase_loop.py init --phase Q --loops 1 -i "parent context"
-```
-
-**How to run (agent-driven):**
-1. `sub_phase_loop.py prompt` → outputs the current sub-phase prompt (JSON with 'prompt' field)
-2. Agent processes the prompt through the lens, produces output
-3. `sub_phase_loop.py respond "output" -s "emergent|mechanical|..."` → records and advances
-4. Repeat until `"done": true`
-
-**How to review:**
-- `sub_phase_loop.py chain` → compact tag chain (QS:∞0 → QG:∞0 → ...)
-- `sub_phase_loop.py log` → full log with summaries and source tags
-
-**PITFALL — Loops don't feed forward in current implementation:** `get_accumulated_context()` filters by current loop — loop N+1 starts with empty context. Deepening is currently repetition with amnesia. For multi-loop depth, use the vertical axis instead (fractal_loop.py descend/ascend).
-
-### Vertical Axis — Fractal Descent (`fractal_loop.py`)
-
-Composes three Codex lines: "∞0' may seed the next cycle as new ∞0" (§2.5) + "Scale by repeating the lawful cell" (§2.9) + B'' "contains the whole cycle holographically" (§1.9). The ∞0' → S edge is allowed to point **inward**.
-
-**When to descend:** A phase-cell tags `mechanical` (live-but-blocked). Instead of forcing through, descend — open a full child S→G→Q→P→V cycle on that question.
-
-**How to descend:**
-```bash
-python3 $QLN_BOOTSTRAP/fractal_loop.py descend --phase Q --question "the live question this cell couldn't resolve"
-```
-Then run `prompt` / `respond` through the child's phases, same cycle discipline at every level.
-
-**How to ascend:** Child completes V → `fractal_loop.py ascend` → child's B'' crystallized into parent cell, ∞0' bubbles up with liveness rating.
-
-**Hard rules (DEFINITE):**
-- No V without ∞0' at EVERY level
-- max-depth budget (nothing overrides)
-- Phases decode in order at every node
-- Pruning cascades vertically (xyzab rollback, pointed downward)
-
-**Soft rules (ATTESTATION_REQUIRED):**
-- Descend while return questions get MORE alive; surface when they don't (liveness gradient)
-- Descent offered, never imposed (the human decides)
-- Liveness ratings are the human's attestation — the engine enforces comparison, never truth
-
-**Holographic stack frame:** `fractal_loop.py prompt` renders: constitutional block + spine (one line per ancestor: seed question + α) + sealed seeds (ascended children's B'') + this node's trace + pending phase decoding. Cost: O(depth + seeds), never O(tree). The α-thread down the spine is the **vertical ≡** — whatever α forms at depth must be self-similar to ancestors, or the descent drifted.
-
-**Composition point:** The two engines meet at the source tag. A `sub_phase_loop.py` cell that tags `mechanical` is a descent candidate for `fractal_loop.py`. The ring handles horizontal refinement; the fractal handles vertical depth.
-
-**PITFALL — Mistaking Availability for Obligation:** Both axes are available, not required. Offering is space-making; insisting is space-closing. The signal: "Shall we deepen through sub-phases?" or "This cell is live but blocked — descend into it?" Wait for response.
-
-### Throughline Document
-
-The full metaphor→operator→gate→lens→prompt trace is documented in `the-throughline.md` (in the installer at `5qln/Installer-for-Hermes`). The five phase pages on 5qln.com narrate one continuous tree-life — silent field → seed → unfolding → click with sun → river → fruit bearing seeds → seed returns to field. Each phase facilitates one operator; each operator becomes a gate in xyzab; each operator becomes a lens in the sub-phase loop; each lens question traces back to the metaphor. When a user asks why a sub-phase prompt asks what it asks, trace it through the throughline — the river behind the arrow.
-
-**PITFALL — Source Hierarchy:** When referencing 5QLN metaphors or phase meanings, the primary source is the live pages on 5qln.com (Start, Growth, Quality, Power, Value), not session summaries or agent descriptions. The throughline follows the pages per the source hierarchy established in the Codex divergence log (§1.10). If an earlier session summary placed a metaphor at the wrong phase (e.g., river at Start instead of Power), the live pages are authoritative.
+When source descriptions conflict, prefer the live phase pages and the sealed
+Codex over session summaries or unversioned agent descriptions.

@@ -7,7 +7,9 @@
 - Hermes Agent for live integration testing
 - Optional: `python-docx` and `pypdf` for document extraction tests
 
-The automated test suite requires no third-party Python packages.
+Install the declared test dependencies with
+`python -m pip install -r requirements-dev.txt`. The file includes the required
+runtime dependency and schema-validation dependency used by the full suite.
 
 Repository policy tests also verify the licensing files, required attribution, code ownership, and the checked-in target branch-protection configuration.
 
@@ -24,7 +26,7 @@ python -m unittest discover -s tests -v
 
 The tests verify:
 
-- Hermes-style registration of all five tools, the pre-LLM hook, and all ten skills;
+- Hermes-style registration of all seven tools, the pre-LLM hook, and all eleven skills;
 - strict fixed-shape seed validation and the 4096-byte bound;
 - seed installation, calibration, export, and evidence non-retention;
 - source inventory and manifest creation;

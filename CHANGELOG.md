@@ -2,6 +2,30 @@
 
 All notable changes are recorded here. Versions follow semantic versioning.
 
+## 0.7.0 - 2026-07-28
+
+### Added
+- Self-contained minimum S→G→Q→P→V runtime with bundled structural decoder.
+- Bundled phase-log implementation and one-command gate/source recording.
+- Explicit source tags, observed signals, session identifiers, and shared phase-log path resolution.
+- Runtime, development, and optional dependency declarations plus a shipped/runtime-status matrix.
+
+### Changed
+- xyzab now fails closed when decoding or canonical phase structure is unavailable.
+- S requires exactly one question and rejects ASCII, Unicode-compatibility, or visually confusable footer-shaped disguises; G/Q/P/V require canonical footers; V requires an artifact and exactly one `INF0P` return question whose case-folded letters-and-numbers identity ignores spacing, punctuation, and invisible format controls and does not repeat the opening seed.
+- xyzab state and phase-log writes are atomic per file. A failed state save restores the preceding phase log so handled write failures do not leave a logged-but-closed transition.
+- Structural violations cannot be bypassed with `--override`; canonical footers reject duplicate, unknown, and free-form lines.
+- Source tags are phase-specific across the phase log and bounded parametric calibration, omitted tags remain neutral rather than K-side, and the parametric centrifuge uses the shared phase-log path precedence.
+- Cooperating phase-log writers and xyzab state mutations are serialized so concurrent read-modify-write operations do not lose entries.
+- Current architecture, development, publishing, agent, and genesis documentation now matches the seven-tool/eleven-skill surface and labels the signature axis as an unshipped historical proposal.
+- CI installs declared development requirements and continues testing Python 3.11 and 3.12.
+- Historical bootstrap, installer, sub-phase, fractal-loop, tick, decoding-harness, and signature-axis claims are explicitly marked unshipped.
+
+### Compatibility
+- The converter and its manifest format remain unchanged.
+- The minimum cycle runtime uses only the Python standard library.
+- PyYAML remains required for skill verification; DOCX/PDF extraction dependencies remain optional.
+
 ## 0.6.0 - 2026-07-27
 
 ### Added

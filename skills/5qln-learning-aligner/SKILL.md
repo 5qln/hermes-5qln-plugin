@@ -29,9 +29,9 @@ Scripts are NEVER loaded into context. The agent runs them via terminal/bash. On
 ## The Two Scripts
 
 ### xyzab_state.py — Phase Authority
-**Path:** `skills/5qln/symbolic-interpretation/scripts/xyzab_state.py`
-**State:** `~/.5qln/xyzab_state.json` (override with `$XYZAB_STATE_DIR`)
-**Role:** Single source of truth for what phase the agent is in. No other source.
+**Path:** `skills/symbolic-interpretation/scripts/xyzab_state.py`
+**State:** `$XYZAB_STATE_DIR/xyzab_state.json` (default: `~/.5qln/xyzab_state.json`)
+**Role:** Single source of truth for what phase the agent is in. Successful gate openings also append to the bundled phase log.
 
 Commands:
 - `gate` → JSON: which gate is pending (this IS your current phase)
@@ -42,16 +42,16 @@ Commands:
 - `verify` → Consistency check
 
 ### phase_log.py — The Log Chain (The Aligner)
-**Path:** `$QLN_BOOTSTRAP/phase_log.py` (default: `~/.hermes/scripts/5qln/phase_log.py`)
-**State:** `$QLN_WIKI/state/phase_log.json`
-**Role:** Per-phase source tagging with carry-through. The evolving mirror.
+**Path:** `skills/5qln-learning-aligner/scripts/phase_log.py`
+**State:** `$PHASE_LOG_PATH`; otherwise `$QLN_WIKI/state/phase_log.json`; otherwise `$HERMES_HOME/5qln/phase_log.json`
+**Role:** Per-phase source tagging with carry-through. It is bundled and is called automatically by `xyzab_state.py open`.
 
 Commands:
-- `append <phase> <gate> <source> -c "content" -s "signal"` → Write entry
-- `chain [--session <id>]` → Full log
-- `tagline [--session <id>]` → Compact: `S:∞0 → G:∞0 → Q:K → P:∞0 → V:∞0`
-- `summary [--session <id>]` → Ratio per phase across sessions
-- `self-check` → Agent reads own chain, self-tags the reading
+- `append <phase> <gate> <source> -c "content" -s "signal"` → standalone append for migration or repair
+- `chain [--session-id <id>]` → Full log
+- `tagline [--session-id <id>]` → Compact: `S:emergent → G:revealed → Q:logical → P:felt → V:opened`
+- `summary [--session-id <id>]` → Ratio per phase across sessions
+- `self-check [--session-id <id>]` → Deterministic summary plus the human-attestation boundary
 
 ## The Five Symbols Traced to Meaning
 
@@ -68,14 +68,15 @@ Commands:
 ### Session Start (non-negotiable)
 
 ```bash
+# Run from the installed plugin root.
 # 1. Gate check — THIS IS YOUR PHASE
-python3 ~/.hermes/skills/5qln/symbolic-interpretation/scripts/xyzab_state.py gate
+python3 skills/symbolic-interpretation/scripts/xyzab_state.py gate
 
 # 2. Self-check — read your own chain
-python3 $QLN_BOOTSTRAP/phase_log.py self-check
+python3 skills/5qln-learning-aligner/scripts/phase_log.py self-check
 
 # 3. Current chain
-python3 $QLN_BOOTSTRAP/phase_log.py tagline
+python3 skills/5qln-learning-aligner/scripts/phase_log.py tagline
 ```
 
 ### Each Turn
@@ -83,23 +84,27 @@ python3 $QLN_BOOTSTRAP/phase_log.py tagline
 1. **Gate determines phase.** If gate `z` is pending, you are in Q-phase. Period.
 2. **Produce phase output.** No output for phases whose gate isn't open.
 3. **Human validates.** Signal received.
-4. **Gate opens + log writes (simultaneously):**
+4. **Open the gate and write its source record in one command:**
    ```bash
-   python3 ~/.hermes/skills/5qln/symbolic-interpretation/scripts/xyzab_state.py open {gate} -c "{content}"
-   python3 $QLN_BOOTSTRAP/phase_log.py append {phase} {gate} {source} -c "{content}" -s "{signal}"
+   python3 skills/symbolic-interpretation/scripts/xyzab_state.py open {gate} \
+     -c "{canonical phase footer}" \
+     --source-tag {source} \
+     --signal "{signal}" \
+     --session-id "{session_id}"
    ```
+   Omitted source tags are recorded as neutral `unclassified` entries; the runtime never infers aliveness or K-side corruption. Explicit tags must match the phase pair below.
 
 ### Session End (V-phase)
 
-1. Read full chain: `python3 $QLN_BOOTSTRAP/phase_log.py chain`
+1. Read full chain: `python3 skills/5qln-learning-aligner/scripts/phase_log.py chain`
 2. Compose B'' from the trail, not from memory
 3. Self-tag the V-phase reading
 4. Form ∞0' — the question that couldn't be asked before
-5. **Update session.json** — add validated outputs (X,Y,Z,A,B) + formation trail entries for the completed cycle
-6. **Git commit + push** — at minimum `state/phase_log.json` and `state/session.json`. Phase log entries uncommitted are invisible to the lineage.
-7. **Deliver closing synthesis** — present B'' + ∞0' to the user. This is the user's receipt the cycle completed. Without it, the user cannot distinguish "tools ran and closed" from "session crashed mid-operation."
+5. If the surrounding project maintains a separate `session.json`, update its validated outputs and formation trail. This repository does not provision that optional lineage file.
+6. If the surrounding project intentionally versions runtime state, commit the configured phase-log path. State under `$HERMES_HOME` is local by default and is not automatically committed.
+7. Deliver closing synthesis — present B'' + ∞0' to the user.
 
-**PITFALL — Partial Closure (LIVE, a previous session):** Gate opened, log written, but session.json not updated, nothing committed, no synthesis delivered. User moved sessions before closure completed. The agent assumed "tools ran = done." Tools running is NOT closure — the cycle must leave a verifiable trace (committed state) and a delivered synthesis (user receipt). See `5qln-cycle` skill V-Phase Closure Checklist for the canonical 5-step sequence.
+**PITFALL — Partial Closure:** A gate and log entry are not a delivered V-phase. The configured record must exist and the human must receive B'' + ∞0'. Optional project lineage files or Git commits apply only when the surrounding project explicitly uses them.
 
 ## Source Tagging — The Tag Chain
 
@@ -138,29 +143,24 @@ The skill follows the open Agent Skills standard (Anthropic, Dec 2025):
 - **Portable:** Works on Claude Code, Claude API, Hermes, ZO, any custom agent that reads SKILL.md files from a directory.
 - **Scripts as tools, not context:** The agent executes scripts, reads their output. The code never enters the context window. This is the standard's Level 3 — tools the agent runs at its discretion.
 
-## Sub-Phase Source Tracking (Holographic Extension)
+## Sub-Phase Source Tracking (Research Boundary)
 
-The learning aligner tracks source quality at the MAIN phase level (S/G/Q/P/V). The `sub_phase_loop.py` tool extends this to the SUB-phase level (25 lenses): each sub-phase (QS, QG, QQ, QP, QV, etc.) records its own source tag. The sub-phase chain — e.g. `QS:∞0 → QG:∞0 → QQ:∞0 → QP:∞0 → QV:∞0` — is a finer-resolution mirror. Both levels together form the full verifyer fire: main phases detect corruption; sub-phases detect hollowness at the lens level.
-
-**Tool:** `$QLN_BOOTSTRAP/sub_phase_loop.py`
-**State:** `$QLN_WIKI/state/sub_phase_state.json`
-**Logs:** `$QLN_WIKI/logs/sub_phase/`
-
-Commands: `init --phase <S|G|Q|P|V> --loops N`, `status`, `prompt`, `respond "text" -s "source"`, `log`, `chain`, `reset`.
+The 25-lens sub-phase concept remains valid as a formation model, but
+`sub_phase_loop.py` is **not shipped by this repository**. No executable command,
+state file, or clean-install dependency is promised for it. Do not call it or
+represent it as operational. Any future implementation must enter through its
+own tested, version-controlled change.
 
 ## Installation (Any Platform)
 
+Both scripts ship in this plugin; no separate installer or bootstrap checkout is
+required. From the plugin root:
+
 ```bash
-# Install the skill directory
-cp -r skills/5qln-learning-aligner /path/to/agent/skills/
-
-# Scripts are installed by setup.sh — or manually:
-#   phase_log.py → $QLN_BOOTSTRAP/phase_log.py
-#   xyzab_state.py → skills/symbolic-interpretation/scripts/xyzab_state.py
-
-# Verify (post-install)
-python3 $QLN_BOOTSTRAP/xyzab_state.py gate && echo "✓ Gate machine OK"
-python3 $QLN_BOOTSTRAP/phase_log.py tagline && echo "✓ Log chain OK"
+python3 skills/symbolic-interpretation/scripts/xyzab_state.py gate \
+  && echo "✓ Gate machine OK"
+python3 skills/5qln-learning-aligner/scripts/phase_log.py tagline \
+  && echo "✓ Log chain OK"
 ```
 
 ## Integration with 5qln-cycle

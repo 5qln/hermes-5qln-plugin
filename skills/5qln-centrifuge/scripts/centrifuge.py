@@ -20,7 +20,8 @@ Operations:
   compare     — compare two sessions for shared invariant
   self-check  — the centrifuge reads its own output, self-tags the reading
 
-State: reads $QLN_WIKI/state/phase_log.json
+State: reads $PHASE_LOG_PATH, $QLN_WIKI/state/phase_log.json, or
+       $HERMES_HOME/5qln/phase_log.json (first configured location wins)
 Output: stdout (deterministic, plain text or JSON)
 Dependencies: Python stdlib only
 """
@@ -34,8 +35,18 @@ from typing import Any
 
 # ── Configuration ──────────────────────────────────────────────
 
-QLN_WIKI = os.environ.get("QLN_WIKI", os.path.expanduser("~/wiki"))
-PHASE_LOG_PATH = os.path.join(QLN_WIKI, "state", "phase_log.json")
+def phase_log_path() -> str:
+    explicit = os.environ.get("PHASE_LOG_PATH")
+    if explicit:
+        return os.path.expanduser(explicit)
+    wiki = os.environ.get("QLN_WIKI")
+    if wiki:
+        return os.path.join(os.path.expanduser(wiki), "state", "phase_log.json")
+    hermes_home = os.environ.get("HERMES_HOME", "~/.hermes")
+    return os.path.join(os.path.expanduser(hermes_home), "5qln", "phase_log.json")
+
+
+PHASE_LOG_PATH = phase_log_path()
 
 SYMBOLS = {
     "S": "?", "G": "α", "Q": "φ⋂Ω", "P": "δE/δV→∇", "V": "L⋂G→∞"

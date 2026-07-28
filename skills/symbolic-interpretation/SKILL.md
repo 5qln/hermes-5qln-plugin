@@ -16,7 +16,7 @@ explained twice: once for the human (lived meaning) and once for the agent
 
 Also ships:
 
-- **The Learning Aligner** (`references/learning-aligner.md`) — per-phase source discrimination (emergent vs. mechanical), xyzab as one flow, the verifyer fire. The canonical log chain tool is `phase_log.py` (see `5qln-learning-aligner` skill and `$QLN_BOOTSTRAP/phase_log.py`). Run `python3 phase_log.py tagline` for compact chain, `python3 phase_log.py self-check` before any response, `python3 phase_log.py summary` for cross-session ratios. `phase_log.py` is the authoritative source for per-phase source tags.
+- **The Learning Aligner** (`references/learning-aligner.md`) — per-phase source discrimination and durable transition records. The bundled log tool is `skills/5qln-learning-aligner/scripts/phase_log.py`; successful `xyzab_state.py open` commands append to it automatically. Run its `tagline`, `self-check`, and `summary` commands to inspect the chain.
 - **The xyzab state machine** — a standalone Python script that tracks
 the five transition gates between SGQPV phases. Companion to any 5QLN kernel
 implementation.
@@ -84,8 +84,8 @@ Each phase facilitates **one operator** in its equation — not the terms, the *
 | **P** | `δE/δV → ∇` | The **→** that reveals ∇ | Detection of gradient: MAXIMUM VALUE PER UNIT OF ENERGY — maximum value with less energy, never just less energy. |
 | **V** | `(L∩G→B'')→∞0'` | The **∞0'** (return) | Completion that opens. Artifact without return question = dead end. Value that doesn't return a question consumed itself. |
 
-Full decoder artifact: `$QLN_WIKI/references/phase-essence-decoder.md` (installed by `setup.sh`)
-Local copy: `references/phase-essence-decoder.md` (bundled with this skill)
+Full decoder artifact: `references/phase-essence-decoder.md` (bundled with this skill)
+Executable structural rules: `scripts/decoding.py`
 
 ### Operational Register
 
@@ -161,13 +161,14 @@ GATE must open next.
 The script is at `scripts/xyzab_state.py`. Key commands:
 
 ```bash
-python3 scripts/xyzab_state.py status          # Full gate dashboard
-python3 scripts/xyzab_state.py gate            # Which gate is pending?
-python3 scripts/xyzab_state.py open x -c "..."  # Open gate x with content
-python3 scripts/xyzab_state.py close y         # Rollback (closes y and all subsequent)
-python3 scripts/xyzab_state.py trail           # Full gate trail + timestamps
-python3 scripts/xyzab_state.py reset           # New cycle
-python3 scripts/xyzab_state.py verify          # Consistency check
+python3 scripts/xyzab_state.py status
+python3 scripts/xyzab_state.py gate
+python3 scripts/xyzab_state.py open x -c "X: What opened?" \
+  --source-tag emergent --signal "human validation" --session-id example
+python3 scripts/xyzab_state.py close y
+python3 scripts/xyzab_state.py trail
+python3 scripts/xyzab_state.py reset
+python3 scripts/xyzab_state.py verify
 ```
 
 State persists to `$XYZAB_STATE_DIR/xyzab_state.json` (default: `~/.5qln/`).

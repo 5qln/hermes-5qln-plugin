@@ -38,7 +38,7 @@ MAX_SEED_BYTES = 4096
 LEARNING_RATE = 0.1
 SOURCE_SIGNALS = {
     "S": {"emergent": 1.0, "mechanical": 0.0},
-    "G": {"revealed": 1.0, "logical": 0.0},
+    "G": {"revealed": 1.0, "imposed": 0.0},
     "Q": {"lived": 1.0, "logical": 0.0},
     "P": {"felt": 1.0, "calculated": 0.0},
     "V": {"opened": 1.0, "closed": 0.0},

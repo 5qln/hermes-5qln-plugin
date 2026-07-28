@@ -1,0 +1,4 @@
+-r requirements.txt
+
+# Schema conformance and repository tests.
+jsonschema>=4.20,<5

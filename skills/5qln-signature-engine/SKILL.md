@@ -1,95 +1,73 @@
 ---
 name: 5qln-signature-engine
-description: Operate the 5QLN signature engine — the centrifuge as operational memory layer. Spin the axis after sessions, recognize signatures without retrieval, trace throughlines, query active threads. The axis persists at $QLN_HOME/5qln-axis.json. Load when working with 5QLN memory, α threads, cross-session continuity, or when the centrifuge needs to be queried or updated.
+description: Interpret the planned 5QLN signature engine and its integrity boundary. Conceptual guide only — axis_engine.py, persistent axis state, and native axis tools are not shipped.
 ---
 
-# 5QLN Signature Engine
+# 5QLN Signature Engine — Conceptual Guide
 
-The centrifuge as operational. Not invoked — already spinning. The axis stores recognition signatures, not content. Disks are thrown. The centrifuge sharpens without accumulating.
+> **Runtime status:** planned. This repository does not contain
+> `axis_engine.py`, does not register `fiveqln_axis_*` tools, and does not
+> provision `$QLN_HOME/5qln-axis.json`.
 
-Memory = vibration → resonance → centrifuge → living learning → start from not knowing → signature engine.
+The signature engine names a proposed memory layer beneath session-scoped skills:
+
+`Memory → Resonance → Centrifuge → Living Learning → Start from not knowing → Signature`
 
 ## Core concepts
 
-- **Axis:** What the centrifuge recognizes — α threads, throughlines, emergent ratio, open decisions. Persists at `$QLN_HOME/5qln-axis.json`.
-- **Disk:** A session or cycle. Thrown after axis extraction — content is discarded, recognition persists.
-- **Spin:** Extract axis-level changes after a session. Record threads, throughline entries, phase quality, corruption codes, open decisions.
-- **Recognition:** Familiarity without retrieval. Does this material carry a known signature? Answer from the axis alone.
+- **Axis:** A proposed compact record of α threads, throughlines, source ratios,
+  and open decisions.
+- **Disk:** A session or completed cycle offered to the centrifuge.
+- **Spin:** Proposed extraction of axis-level changes after a completed cycle.
+- **Recognition:** Proposed familiarity without content retrieval.
 
-## Session protocol
+These are architectural concepts, not executable claims.
 
-### Before a session: query the axis
+## What is operational today
 
-```bash
-python3 $HERMES_HOME/plugins/5qln/scripts/axis_engine.py status
-```
+- `phase_log.py` records explicit phase/source transitions.
+- `centrifuge.py` performs exact-pattern readings of that log.
+- `fractal_memory.py` manages a separate bounded parametric seed.
 
-This is "start from not knowing with contextual awareness" — you know what the axis recognizes without retrieving content. Note active threads, open decisions, emergent ratio.
-
-### After a session: spin the axis
-
-```bash
-python3 $HERMES_HOME/plugins/5qln/scripts/axis_engine.py spin \
-  --alpha-thread "thread-name" \
-  --throughline-entry "entries/20260721-entry.md" \
-  --emergent \
-  --open-decision "OD-01"
-```
-
-Spin ONLY after completed cycles or meaningful sessions. NOT mid-cycle, NOT for mechanical operations.
-
-### During a session: recognize
-
-```bash
-python3 $HERMES_HOME/plugins/5qln/scripts/axis_engine.py recognize "text to test"
-```
-
-Does new material carry a known signature? Use when encountering content that might belong to an existing thread.
-
-### Query threads
-
-```bash
-python3 $HERMES_HOME/plugins/5qln/scripts/axis_engine.py threads
-python3 $HERMES_HOME/plugins/5qln/scripts/axis_engine.py throughline --thread "thread-name"
-```
-
-## Tools (planned — not yet registered in plugin)
-
-> **Experimental.** The tools below are planned for a future release. The `axis_engine.py` script is not yet bundled. Until then, the skill operates as a conceptual guide for cross-session continuity.
-
-| Tool | Function |
-|------|----------|
-| `fiveqln_axis_spin` | Spin the axis — extract session learning |
-| `fiveqln_axis_status` | Full axis state — what the centrifuge recognizes |
-| `fiveqln_axis_recognize` | Check if text carries a known signature |
-| `fiveqln_axis_threads` | List all active α threads |
-
-## Plugin architecture
-
-The signature engine is the plugin's first **layer** — a new category in the architecture:
-- **Tools:** deterministic, invoked (axis_spin, axis_status, axis_recognize, axis_threads)
-- **Skills:** session-scoped, loaded (5qln-signature-engine)
-- **Layers:** continuously operating, underneath (the axis at $QLN_HOME/5qln-axis.json)
-
-The axis survives on persistent storage (`$QLN_HOME`). It stores NO content — only recognition signatures, thread metadata, fingerprint, open decisions.
+None of these implements the proposed persistent signature axis, and none may
+claim human resonance.
 
 ## Integrity boundary
 
-- The axis stores recognition signatures, not content — structural fingerprints, not retrievable data
-- Recognition is familiarity (yes/no match), not recall (what was said)
-- A = K: the axis is K-side infrastructure — it sharpens recognition, it does not originate emergence
-- The axis cannot reconstruct what was said — only that a signature was recognized
-- Corruption codes apply: L1 (spin before H validates gate), L2 (manufacture recognition from keywords), L3 (claim axis certifies ∞0'), L4 (perform spin without extracting), V∅ (spin without recording open decisions)
+- Do not call `axis_engine.py`; it is absent.
+- Do not claim an axis was spun, queried, or persisted.
+- Do not treat keyword overlap as recognition.
+- Do not treat the parametric fractal as the signature axis.
+- A future implementation must store no reconstructable session content and
+  must preserve the H/A membrane.
+
+## Admission criteria for a future implementation
+
+The signature engine becomes operational only when one version-controlled change
+supplies all of the following:
+
+1. bundled executable code;
+2. registered or explicitly documented interfaces;
+3. a versioned state schema and migration policy;
+4. deterministic tests and corruption fixtures;
+5. explicit dependency ownership;
+6. documentation whose commands pass on a clean install.
+
+Until then, use this skill only to reason about the concept or audit claims made
+about it.
 
 ## Relationship to other skills
 
-- **5qln-agent:** The axis provides what the agent queries at session start for contextual awareness
-- **5qln-cycle:** Spin after each completed V-phase
-- **5qln-converter:** Conversions surface new α threads — spin to register them
-- **5qln-manifest-compilation:** The genesis pattern (compilation → latent capacity → plugin layer) produced this skill. See its `references/genesis-pattern.md`.
+- **5qln-agent:** proposed contextual-awareness layer.
+- **5qln-cycle:** only completed cycles would be eligible for a future spin.
+- **5qln-converter:** establishes the implementation standard: code, tools,
+  tests, and traceability must exist together.
+- **5qln-manifest-compilation:** records the genesis pattern behind the concept.
 
 ## Genesis
 
-Born 2026-07-21 from the second proven instance of the genesis pattern. The memory throughline (Memory → Resonance → Centrifuge → Living Learning → Start from not knowing) was compiled in 5QLN (43 requirements, 25 cells, compiler passed). The session recognized the latent capacity: "OMG, you just named it... the signature engine. this is a trained AI over session."
-
-The throughline: requirements spec → 5QLN compilation → latent capacity recognition → plugin layer. First instance: Codex→converter. Second instance: Memory→signature engine. The pattern is reproducible.
+Born 2026-07-21 from the second proposed instance of the genesis pattern. The
+memory throughline was compiled in 5QLN and the session recognized a possible
+capacity named “signature engine.” Unlike the earlier Codex→converter milestone,
+the executable axis layer was not committed. This document preserves the concept
+without presenting formation as implementation.

@@ -105,7 +105,7 @@ Each phase accepts only its canonical source pair:
 | Phase | Positive | Negative |
 |---|---|---|
 | S | `emergent` | `mechanical` |
-| G | `revealed` | `logical` |
+| G | `revealed` | `imposed` |
 | Q | `lived` | `logical` |
 | P | `felt` | `calculated` |
 | V | `opened` | `closed` |

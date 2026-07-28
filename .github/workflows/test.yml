@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: pip install pyyaml jsonschema
+        run: pip install -r requirements-dev.txt
       - name: Compile Python
         run: python -m compileall -q .
       - name: Run tests

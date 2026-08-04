@@ -228,6 +228,30 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
     "format_version": {
       "const": "skill-v1"
     },
+    "axis_attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "direction",
+        "sha256",
+        "source"
+      ],
+      "properties": {
+        "direction": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    },
     "title": {
       "type": "string",
       "minLength": 1,

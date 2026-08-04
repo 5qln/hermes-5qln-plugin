@@ -453,7 +453,7 @@ def validate_skill_manifest(payload: object) -> list[dict[str, object]]:
             {"format_version", "title", "skill", "provenance", "bundle",
              "contract", "requirement_traceability", "behavioral_fixtures",
              "human_review", "promotion"},
-            set(),
+            {"axis_attestation"},
             "$",
         )
     except SkillContractError as e:
@@ -463,6 +463,19 @@ def validate_skill_manifest(payload: object) -> list[dict[str, object]]:
     # format_version
     if root.get("format_version") != "skill-v1":
         err("SCHEMA_VERSION", "format_version must be 'skill-v1'", "$/format_version")
+
+    # axis_attestation (loop mode standing direction — optional, validated when present)
+    axis = root.get("axis_attestation")
+    if axis is not None:
+        try:
+            ax = _require_exact_keys(
+                axis, {"direction", "sha256", "source"}, set(), "$/axis_attestation"
+            )
+            _require_string(ax.get("direction"), "$/axis_attestation/direction", min_len=1, max_len=2000)
+            _check_sha256(ax.get("sha256"), "$/axis_attestation/sha256")
+            _require_string(ax.get("source"), "$/axis_attestation/source", min_len=1, max_len=300)
+        except SkillContractError as e:
+            err(e.code, e.message, e.path or "$/axis_attestation")
 
     # title
     try:

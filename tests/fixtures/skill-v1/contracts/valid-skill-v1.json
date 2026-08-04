@@ -37,13 +37,15 @@
     "triggers": [
       {
         "id": "TRIGGER_1",
-        "statement": "Use for a declared skill-formation request."
+        "statement": "Use for a declared skill-formation request.",
+        "authorship": "H"
       }
     ],
     "non_triggers": [
       {
         "id": "NON_TRIGGER_1",
-        "statement": "Do not use for ordinary text editing."
+        "statement": "Do not use for ordinary text editing.",
+        "authorship": "H"
       }
     ],
     "behavioral_requirements": [

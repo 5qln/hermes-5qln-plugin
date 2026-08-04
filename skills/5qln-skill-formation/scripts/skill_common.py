@@ -397,6 +397,31 @@ def _check_contract_items(value: object, pointer: str) -> list:
     return arr
 
 
+_SEMANTIC_AUTHORSHIP_VALUES = ("H", "K", "PENDING")
+
+
+def _check_semantic_contract_items(value: object, pointer: str) -> list:
+    """Validate trigger/non-trigger items, which must declare authorship.
+
+    ASMA Pillar III: the semantic boundary (what the skill is for, what it
+    refuses) must carry an authorship declaration. The verifier enforces
+    presence and vocabulary; it cannot verify the truth of the declaration.
+    """
+    arr = _require_array(value, pointer)
+    for i, item in enumerate(arr):
+        obj = _require_exact_keys(item, {"id", "statement", "authorship"}, set(), f"{pointer}/{i}")
+        _check_id(obj["id"], f"{pointer}/{i}/id")
+        _check_statement(obj["statement"], f"{pointer}/{i}/statement")
+        authorship = obj.get("authorship")
+        if authorship not in _SEMANTIC_AUTHORSHIP_VALUES:
+            raise SkillContractError(
+                "SCHEMA_ENUM",
+                f"authorship must be one of {list(_SEMANTIC_AUTHORSHIP_VALUES)}",
+                f"{pointer}/{i}/authorship",
+            )
+    return arr
+
+
 def validate_skill_manifest(payload: object) -> list[dict[str, object]]:
     """Validate a skill-v1 manifest against the published contract.
 
@@ -510,8 +535,8 @@ def validate_skill_manifest(payload: object) -> list[dict[str, object]]:
             set(),
             "$/contract",
         )
-        _check_contract_items(contract.get("triggers"), "$/contract/triggers")
-        _check_contract_items(contract.get("non_triggers"), "$/contract/non_triggers")
+        _check_semantic_contract_items(contract.get("triggers"), "$/contract/triggers")
+        _check_semantic_contract_items(contract.get("non_triggers"), "$/contract/non_triggers")
         _check_contract_items(contract.get("completion_criteria"), "$/contract/completion_criteria")
 
         breqs = _require_array(contract.get("behavioral_requirements"), "$/contract/behavioral_requirements")

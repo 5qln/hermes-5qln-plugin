@@ -525,20 +525,29 @@
       }
     },
     "contractItem": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "statement"
-      ],
-      "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "statement": {
-          "$ref": "#/$defs/statement"
-        }
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "id",
+      "statement"
+     ],
+     "properties": {
+      "id": {
+       "$ref": "#/$defs/id"
+      },
+      "statement": {
+       "$ref": "#/$defs/statement"
+      },
+      "authorship": {
+       "type": "string",
+       "enum": [
+        "H",
+        "K",
+        "PENDING"
+       ],
+       "description": "ASMA Pillar III: who authored this semantic boundary. Required by the Python validator for triggers and non-triggers."
       }
+     }
     },
     "contractItems": {
       "type": "array",

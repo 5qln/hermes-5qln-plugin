@@ -381,3 +381,69 @@ class EvolutionGateTests(unittest.TestCase):
         self.assertTrue(real_kernel.exists(), "kernel.txt must exist at plugin root")
         findings = verify_skill._verify_kernel_seal(real_kernel)
         self.assertEqual(findings, [])
+
+    # ---- Slice 2: Pillar III — semantic authorship provenance ----
+
+    def test_semantic_authorship_required_in_schema(self) -> None:
+        """Triggers/non-triggers must declare authorship (H, K, or PENDING)."""
+        manifest = {
+            "format_version": "skill-v1", "title": "t",
+            "skill": {"name": "x", "bundle_root": ".", "bundle_sha256": "a"*64, "contract_sha256": "b"*64},
+            "provenance": {"conversion_manifest": {"path": "p.json", "sha256": "c"*64, "size_bytes": 1}, "formation_evidence": []},
+            "bundle": {"skill_md": {"path": "SKILL.md", "sha256": "d"*64, "size_bytes": 1},
+                       "references": [], "scripts": [], "tests": [], "fixtures": [], "provenance": []},
+            "contract": {"triggers": [{"id": "TR_1", "statement": "S"}], "non_triggers": [],
+                         "behavioral_requirements": [], "completion_criteria": [], "claimed_tools": [], "related_skills": []},
+            "requirement_traceability": [], "behavioral_fixtures": [],
+            "human_review": {"status": "open", "reviewer": None, "evidence": []},
+            "promotion": {"requested_state": "draft", "target": "local-skill", "authorization_evidence_ids": []},
+        }
+        findings = skill_common.validate_skill_manifest(manifest)
+        self.assertTrue(any("SCHEMA" in (f.get("code") or "") for f in findings),
+                        f"expected schema failure for missing authorship, got {findings}")
+
+    def test_k_authored_trigger_without_h_evidence_fails(self) -> None:
+        """Machine-authored semantics without H acceptance evidence = GHOST_ORIGINATION."""
+        manifest = {
+            "contract": {"triggers": [{"id": "TR_1", "statement": "S", "authorship": "K"}]},
+            "human_review": {"status": "open", "reviewer": None, "evidence": []},
+            "skill": {"bundle_sha256": "a"*64},
+        }
+        findings = verify_skill._verify_semantic_authorship(manifest)
+        self.assertTrue(any("GHOST_ORIGINATION" in (f.get("code") or "") for f in findings))
+
+    def test_h_authored_trigger_passes(self) -> None:
+        """H-authored semantics need no evidence — H is the authority."""
+        manifest = {
+            "contract": {"triggers": [{"id": "TR_1", "statement": "S", "authorship": "H"}]},
+            "human_review": {"status": "open", "reviewer": None, "evidence": []},
+            "skill": {"bundle_sha256": "a"*64},
+        }
+        findings = verify_skill._verify_semantic_authorship(manifest)
+        self.assertFalse(any("GHOST_ORIGINATION" in (f.get("code") or "") for f in findings))
+
+    def test_k_authored_trigger_with_h_acceptance_passes(self) -> None:
+        """K-authored semantics pass once H acceptance evidence is digest-scoped."""
+        manifest = {
+            "contract": {"triggers": [{"id": "TR_1", "statement": "S", "authorship": "K"}],
+                         "non_triggers": []},
+            "human_review": {"status": "accepted", "reviewer": "H",
+                             "evidence": [{"id": "EV_1", "kind": "review_acceptance",
+                                           "statement": "H accepts the machine-drafted semantics.",
+                                           "source": {"path": "e.md", "sha256": "c"*64, "size_bytes": 1},
+                                           "location": "chat", "scope_bundle_sha256": "a"*64,
+                                           "scope_contract_sha256": "b"*64, "promotion_scope": "local"}]},
+            "skill": {"bundle_sha256": "a"*64},
+        }
+        findings = verify_skill._verify_semantic_authorship(manifest)
+        self.assertFalse(any("GHOST_ORIGINATION" in (f.get("code") or "") for f in findings))
+
+    def test_pending_authorship_fails(self) -> None:
+        """PENDING authorship is an unresolved semantic boundary — fail closed."""
+        manifest = {
+            "contract": {"triggers": [{"id": "TR_1", "statement": "S", "authorship": "PENDING"}]},
+            "human_review": {"status": "open", "reviewer": None, "evidence": []},
+            "skill": {"bundle_sha256": "a"*64},
+        }
+        findings = verify_skill._verify_semantic_authorship(manifest)
+        self.assertTrue(any("SEMANTIC_AUTHORSHIP_PENDING" in (f.get("code") or "") for f in findings))

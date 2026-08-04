@@ -746,9 +746,53 @@ def _verify_human_review(
     return findings
 
 
-# ---------------------------------------------------------------------------
-# Promotion inspection (Task 16)
-# ---------------------------------------------------------------------------
+def _verify_semantic_authorship(manifest: dict[str, object]) -> list[dict[str, object]]:
+    """Enforce ASMA Pillar III: semantic boundaries must be H-originated or H-accepted.
+
+    Every trigger/non-trigger declares authorship:
+      - "H"        -> pass (H is the authority; the machine verifies the
+                      declaration, never the truth)
+      - "K"        -> pass ONLY if human_review carries digest-scoped
+                      review_acceptance evidence (H accepted machine-drafted
+                      semantics); otherwise GHOST_ORIGINATION
+      - "PENDING"  -> unresolved semantic boundary; fail closed
+    """
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, msg: str, ptr: str = "$") -> None:
+        findings.append({
+            "severity": "error", "dimension": "human", "code": code,
+            "location": {"kind": "json_pointer", "value": ptr}, "message": msg, "evidence": [],
+        })
+
+    contract = manifest.get("contract", {})
+    semantic_items = list(contract.get("triggers", [])) + list(contract.get("non_triggers", []))
+    if not semantic_items:
+        return findings
+
+    bundle_sha256 = str(manifest.get("skill", {}).get("bundle_sha256", ""))
+    hr = manifest.get("human_review", {})
+    accepted_scoped = [
+        ev for ev in hr.get("evidence", [])
+        if ev.get("kind") == "review_acceptance"
+        and str(ev.get("scope_bundle_sha256", "")) == bundle_sha256
+    ]
+
+    for i, item in enumerate(semantic_items):
+        authorship = str(item.get("authorship", "PENDING"))
+        item_id = str(item.get("id", f"item/{i}"))
+        if authorship == "H":
+            continue
+        if authorship == "PENDING":
+            err("SEMANTIC_AUTHORSHIP_PENDING",
+                f"semantic boundary '{item_id}' has unresolved authorship (PENDING)", f"$/contract")
+            continue
+        if authorship == "K" and not accepted_scoped:
+            err("GHOST_ORIGINATION",
+                f"machine-authored semantic boundary '{item_id}' lacks digest-scoped H acceptance evidence",
+                f"$/contract")
+
+    return findings
 
 def _inspect_promotion_readiness(
     manifest: dict[str, object], bundle_root: Path | None
@@ -913,6 +957,9 @@ def verify_skill(
 
     # 13. Human review evidence checks (Task 15)
     findings.extend(_verify_human_review(manifest, bundle_root))
+
+    # 13a. Semantic authorship provenance (ASMA Pillar III)
+    findings.extend(_verify_semantic_authorship(manifest))
 
     # 14. Promotion inspection (Task 16)
     promotion_findings = []

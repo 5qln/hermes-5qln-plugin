@@ -745,6 +745,15 @@ The implementation SHALL encode the following JSON Schema 2020-12 contract witho
         },
         "statement": {
           "$ref": "#/$defs/statement"
+        },
+        "authorship": {
+          "type": "string",
+          "enum": [
+            "H",
+            "K",
+            "PENDING"
+          ],
+          "description": "ASMA Pillar III: who authored this semantic boundary. Required by the Python validator for triggers and non-triggers."
         }
       }
     },

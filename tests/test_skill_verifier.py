@@ -504,7 +504,7 @@ class EvolutionGateTests(unittest.TestCase):
     def test_axis_drift_detected(self) -> None:
         """A direction whose hash does not match its declaration is axis drift."""
         axis = {
-            "direction": "H's original direction: the pilot must prove itself.",
+            "direction": "H's original direction: the loop must serve the human's inquiry.",
             "sha256": "0" * 64,
             "source": "centrifuge-signature.txt",
         }
@@ -515,7 +515,7 @@ class EvolutionGateTests(unittest.TestCase):
     def test_loop_mode_k_authored_passes_with_valid_axis(self) -> None:
         """Within a valid H-originated axis, K-authored semantics may run the loop
         without per-iteration human evidence — the axis IS the standing H direction."""
-        direction = "H's original direction: the pilot must prove itself."
+        direction = "H's original direction: the loop must serve the human's inquiry."
         axis = {
             "direction": direction,
             "sha256": hashlib.sha256(direction.encode()).hexdigest(),

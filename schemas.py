@@ -237,6 +237,11 @@ FIVEQLN_VERIFY_SKILL = {
                 "default": False,
                 "description": "When true, also inspect promotion readiness for bundled-plugin targets.",
             },
+            "loop_mode": {
+                "type": "boolean",
+                "default": False,
+                "description": "When true, verify against the centrifuged axis (standing H direction) so the loop runs without per-iteration human stops. Fails closed on missing/drifted axis.",
+            },
             "overwrite": {
                 "type": "boolean",
                 "default": False,

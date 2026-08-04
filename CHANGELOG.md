@@ -9,6 +9,27 @@ All notable changes are recorded here. Versions follow semantic versioning.
 - Parametric source purity excludes neutral/unclassified entries from its denominator and reports `null` when no classified evidence exists.
 - Symbolic runtime documentation now states that xyzab requires its bundled decoder and phase-log companions.
 
+## 0.8.0 - 2026-08-04
+
+### Added
+- Formation verifier now checks the sealed constitutional kernel (`kernel.txt`, 217 bytes, sha256 feaa46b4…859b) at step 0 of every verification — drift, absence, or unreadability is a fatal structural finding (ASMA Pillar I).
+- Skill-v1 contract items (triggers and non-triggers) now declare `authorship` (`H` | `K` | `PENDING`). Machine-authored semantics fail with `GHOST_ORIGINATION` unless digest-scoped human acceptance evidence exists (ASMA Pillar III).
+- Promotion mode now requires a recorded return question (∞0') in CHANGELOG.md — a promotion without one fails with `DEAD_ENDING` (line 8 / V∅).
+- `--loop-mode` verification: verifies a bundle against the centrifuged axis (`axis_attestation`: H's original direction, verbatim, hash-self-checked). The loop runs within the standing H direction without per-iteration human stops; missing or drifted axis fails closed (`AXIS_MISSING` / `AXIS_DRIFT`). Exposed on the `fiveqln_verify_skill` tool as `loop_mode`.
+- `axis_attestation` declared in the published skill-v1 JSON Schema and architecture doc.
+
+### Changed
+- `fiveqln_verify_skill` tool schema accepts `loop_mode` and forwards it to the verifier.
+
+### Compatibility
+- Manifest format remains `skill-v1`; `axis_attestation` is optional (loop mode only), so existing manifests stay valid.
+- Kernel file unchanged; seal constant mirrors `fractal_memory.CODEX_SHA256`.
+
+### ∞0' (return question)
+What stops the loop that runs on a pinned axis from mistaking the axis for the
+human — evolving K's fluency within the direction until the direction itself is
+no longer questioned?
+
 ## 0.7.0 - 2026-07-28
 
 ### Added

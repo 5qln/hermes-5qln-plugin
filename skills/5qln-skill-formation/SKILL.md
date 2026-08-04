@@ -1,7 +1,7 @@
 ---
 name: 5qln-skill-formation
 description: Guide skill-v1 formation from admission through promotion — scaffold manifests, run the deterministic verifier, prepare behavioral trials, conduct exact-digest human review, and promote bundled-plugin candidates. The machine verifies structure; only H recognises.
-version: 0.7.0
+version: 0.8.0
 author: 5QLN
 license: Proprietary
 metadata:
@@ -78,6 +78,14 @@ Read the report dimensions, not a single pass/fail:
 - `promotion_ready` — only after accepted review + authorisation
 
 Never describe a passing structural report as "certified", "validated skill", or "living 5QLN".
+
+### Loop mode (0.8.0)
+
+```bash
+python verify_skill.py BUNDLE_ROOT/skill-formation-manifest.json --loop-mode
+```
+
+Loop mode verifies against the centrifuged axis instead of per-iteration human gates: the manifest carries `axis_attestation` (H's original direction, verbatim, hash-self-checked). Within a valid axis, machine-authored semantics may run without per-iteration human evidence — the axis IS the standing H direction. Fails closed on `AXIS_MISSING` (no axis), `AXIS_DRIFT` (hash mismatch), seal drift, corruption, or V∅. Exposed on the `fiveqln_verify_skill` tool as `loop_mode`.
 
 ## Behavioral Trial Preparation
 

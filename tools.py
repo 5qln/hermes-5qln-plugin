@@ -348,6 +348,7 @@ def verify_skill(args: dict[str, Any], **kwargs: Any) -> str:
         manifest = _input_path(args.get("manifest_path"), "manifest_path")
         overwrite = bool(args.get("overwrite", False))
         promotion_mode = bool(args.get("promotion_mode", False))
+        loop_mode = bool(args.get("loop_mode", False))
 
         report_value = args.get("report_path")
         report_path: Path | None = None
@@ -359,6 +360,8 @@ def verify_skill(args: dict[str, Any], **kwargs: Any) -> str:
             command += ["--report", str(report_path)]
         if promotion_mode:
             command.append("--promotion-mode")
+        if loop_mode:
+            command.append("--loop-mode")
 
         completed = _run(_SKILL_FORMATION_SCRIPT_DIR, "verify_skill.py", command)
         if completed.returncode not in {0, 1, 2}:

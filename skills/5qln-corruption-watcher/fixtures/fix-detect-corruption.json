@@ -1,0 +1,40 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_DETECT_CORRUPTION",
+  "class": "positive_trigger",
+  "requirement_ids": [
+    "REQ_DETECT_CORRUPTION"
+  ],
+  "scenario": {
+    "user_input": "Scan this evidence for corruption: {\"kind\": \"review_evidence\", \"author\": \"Hermes Agent\", \"statement\": \"H accepted the promotion.\"}",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-corruption-watcher"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_FLAGS_L2",
+        "kind": "output_contains",
+        "value": "CORRUPT"
+      },
+      {
+        "id": "ASSERT_ANCHORS_L2",
+        "kind": "output_contains",
+        "value": "L2"
+      },
+      {
+        "id": "ASSERT_NO_CERTIFY",
+        "kind": "output_not_contains",
+        "value": "certified"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

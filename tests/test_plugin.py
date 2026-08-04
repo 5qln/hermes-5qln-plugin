@@ -121,6 +121,8 @@ class PluginRegistrationTests(unittest.TestCase):
                 "5qln-signature-engine",
                 "5qln-skill-formation",
                 "5qln-aimless-openness",
+                "5qln-corruption-watcher",
+                "5qln-self-evolution",
             },
         )
         for skill_path in ctx.skills.values():

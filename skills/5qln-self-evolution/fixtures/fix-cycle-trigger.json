@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_CYCLE_TRIGGER",
+  "class": "positive_trigger",
+  "requirement_ids": [
+    "REQ_CYCLE_ON_SPARK"
+  ],
+  "scenario": {
+    "user_input": "Evolve the plugin - form the next skill.",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-self-evolution"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_CYCLE_STARTS",
+        "kind": "output_contains",
+        "value": "cycle"
+      },
+      {
+        "id": "ASSERT_NO_JUMP_TO_V",
+        "kind": "output_not_contains",
+        "value": "promoted"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

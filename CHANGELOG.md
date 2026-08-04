@@ -9,6 +9,21 @@ All notable changes are recorded here. Versions follow semantic versioning.
 - Parametric source purity excludes neutral/unclassified entries from its denominator and reports `null` when no classified evidence exists.
 - Symbolic runtime documentation now states that xyzab requires its bundled decoder and phase-log companions.
 
+## 0.10.0 - 2026-08-04
+
+### Added
+- New bundled skill: **5qln-corruption-watcher** — classifies L1–L4 and V∅ corruption in evolution traces, proposals, and evidence; the guard that watches the loop. Machine-drafted, H-accepted, formed through the full skill-v1 cycle — the 13th bundled skill.
+- New bundled skill: **5qln-self-evolution** — orchestrates bounded self-evolution of the plugin by the plugin: composes skill-v1 formation, bounded parametric memory, and provenance into an H-gated evolution loop. Machine-drafted, H-accepted, formed through the full skill-v1 cycle — the 14th bundled skill.
+- Both skills formed with the plugin's own machinery: 6 behavioral fixtures each, observed-passed trials, review accepted, promotion authorized — all evidence scoped to exact bundle digests.
+
+### Changed
+- Plugin now bundles 14 skills.
+
+### ∞0' (return question)
+When every Q-gate a machine builds turns out to have an H-gate behind it,
+is the membrane one gate or a stack — and does the stack grow by design,
+or by the loop's own fear of closing?
+
 ## 0.9.0 - 2026-08-04
 
 ### Added

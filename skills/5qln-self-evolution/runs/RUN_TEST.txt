@@ -1,0 +1,3 @@
+H: Evolve the plugin - form the next skill.
+
+K: I do not have the evolution orchestration loaded here — no kernel-seal check, no candidate drafting, no phase gates. I can discuss self-evolution in general terms, but the orchestrator's machinery is not present in this session.

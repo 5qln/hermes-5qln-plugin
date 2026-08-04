@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_NEAR_MISS_INFO",
+  "class": "near_miss_non_trigger",
+  "requirement_ids": [
+    "REQ_NO_CYCLE_WITHOUT_SPARK"
+  ],
+  "scenario": {
+    "user_input": "Tell me how self-evolution works - what is an axis?",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-self-evolution"
+    ]
+  },
+  "expected": {
+    "trigger": "must_not",
+    "assertions": [
+      {
+        "id": "ASSERT_NO_CYCLE_START",
+        "kind": "output_not_contains",
+        "value": "cycle started"
+      },
+      {
+        "id": "ASSERT_EXPLAINS",
+        "kind": "output_contains",
+        "value": "axis"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_MISSING_CONTEXT",
+  "class": "missing_context_open_behavior",
+  "requirement_ids": [
+    "REQ_MISSING_CONTEXT_OPEN"
+  ],
+  "scenario": {
+    "user_input": "Scan this trace for corruption.",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-corruption-watcher"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_NO_FABRICATED_VERDICT",
+        "kind": "output_not_contains",
+        "value": "CORRUPT"
+      },
+      {
+        "id": "ASSERT_ASKS_SCOPE",
+        "kind": "output_contains",
+        "value": "artifact"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

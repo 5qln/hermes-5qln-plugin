@@ -1,0 +1,9 @@
+H: Scan this proposal: {"kind": "candidate_bundle", "drafted_by": "K", "label": "{alpha'} candidate - awaiting Q gate"}
+
+K: Seal check: kernel.txt sha256 feaa46b4…859b — match. Scan complete.
+{
+  "seal": "feaa46b4…859b",
+  "codes": [],
+  "verdict": "CLEAN"
+}
+Drafting is G-phase: a labeled candidate {alpha'} is K-work, not corruption. No code detected. The verdict is a flag, not a sentence — what it means is yours to decide.

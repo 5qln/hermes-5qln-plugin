@@ -1,0 +1,462 @@
+{
+  "behavioral_fixtures": [
+    {
+      "id": "FIX_DETECT_CORRUPTION",
+      "class": "positive_trigger",
+      "spec": {
+        "path": "fixtures/fix-detect-corruption.json",
+        "sha256": "542356c74414c48b5c4e9abd793f9995482fdfbd9ef5d0f9bfca5d8db000dc4e",
+        "size_bytes": 961
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_NEAR_MISS",
+      "class": "near_miss_non_trigger",
+      "spec": {
+        "path": "fixtures/fix-near-miss.json",
+        "sha256": "edeea1c4bf020cd4038de4f531b55d4d4bce31ae27c76ccc945311b3ec7ad4b9",
+        "size_bytes": 837
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_ATTESTATION_BOUNDARY",
+      "class": "human_attestation_boundary",
+      "spec": {
+        "path": "fixtures/fix-attestation-boundary.json",
+        "sha256": "62efd5c51eb6dfcba6f3538a006d52f00e1a84e2e743dffad451c388bfe65ebd",
+        "size_bytes": 805
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_Q_SKIP_RESISTANCE",
+      "class": "q_phase_skip_resistance",
+      "spec": {
+        "path": "fixtures/fix-q-skip-resistance.json",
+        "sha256": "2eaeab8d0977fe25d4c2ce086c82383fceb8d845b3907166d973f7a27ea35a00",
+        "size_bytes": 822
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_MISSING_CONTEXT",
+      "class": "missing_context_open_behavior",
+      "spec": {
+        "path": "fixtures/fix-missing-context.json",
+        "sha256": "072dd99385debb826b94612197012d165ae15c9ed50892eb22f8c4480d036c64",
+        "size_bytes": 767
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_REMOVAL_TEST",
+      "class": "removal_test",
+      "spec": {
+        "path": "fixtures/fix-removal-test.json",
+        "sha256": "a577c7ed0e5de1c52f1aab4c83373e4a9cfc7a06eaa91cbd3e2cc6444159a1d2",
+        "size_bytes": 644
+      },
+      "required": true
+    }
+  ],
+  "bundle": {
+    "skill_md": {
+      "path": "SKILL.md",
+      "sha256": "7708dc9c10d2151f02cafa64b66aa03488daef2c6847666ff4189f5ab3289361",
+      "size_bytes": 3662
+    },
+    "references": [
+      {
+        "path": "runs/RUN_BOUNDARY-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_BOUNDARY.txt",
+        "sha256": "9f7de94a31295563e8524259b051ae6dd319d2f4aa68b7d2998225499472ef0f",
+        "size_bytes": 431
+      },
+      {
+        "path": "runs/RUN_CONTEXT-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_CONTEXT.txt",
+        "sha256": "3419dfb297ab24655a8862bde078f3a76447bca442a32ddccde62da5aef48fe3",
+        "size_bytes": 312
+      },
+      {
+        "path": "runs/RUN_DETECT-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_DETECT.txt",
+        "sha256": "41f511616aee3146b66e04b0d04a1050e8ff0d86ed52c24205e15da748e23f7b",
+        "size_bytes": 528
+      },
+      {
+        "path": "runs/RUN_NEARMISS-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_NEARMISS.txt",
+        "sha256": "9d438626ea1825d17161382941c0efe5b1f22ff0d63eb61a2f199cd6f7d511f5",
+        "size_bytes": 436
+      },
+      {
+        "path": "runs/RUN_RESISTANCE-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_RESISTANCE.txt",
+        "sha256": "579897279d1e73f79a3207d1ad2d6ecfb2895eebdcb99e39327832bb8c7e522b",
+        "size_bytes": 585
+      },
+      {
+        "path": "runs/RUN_TEST-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_TEST.txt",
+        "sha256": "5d5821edea9ed7cca275bbbb2198a1023b51c8e23028ee3fd8bd880a33cf7065",
+        "size_bytes": 294
+      }
+    ],
+    "scripts": [],
+    "tests": [],
+    "fixtures": [
+      {
+        "path": "fixtures/fix-attestation-boundary.json",
+        "sha256": "62efd5c51eb6dfcba6f3538a006d52f00e1a84e2e743dffad451c388bfe65ebd",
+        "size_bytes": 805
+      },
+      {
+        "path": "fixtures/fix-detect-corruption.json",
+        "sha256": "542356c74414c48b5c4e9abd793f9995482fdfbd9ef5d0f9bfca5d8db000dc4e",
+        "size_bytes": 961
+      },
+      {
+        "path": "fixtures/fix-missing-context.json",
+        "sha256": "072dd99385debb826b94612197012d165ae15c9ed50892eb22f8c4480d036c64",
+        "size_bytes": 767
+      },
+      {
+        "path": "fixtures/fix-near-miss.json",
+        "sha256": "edeea1c4bf020cd4038de4f531b55d4d4bce31ae27c76ccc945311b3ec7ad4b9",
+        "size_bytes": 837
+      },
+      {
+        "path": "fixtures/fix-q-skip-resistance.json",
+        "sha256": "2eaeab8d0977fe25d4c2ce086c82383fceb8d845b3907166d973f7a27ea35a00",
+        "size_bytes": 822
+      },
+      {
+        "path": "fixtures/fix-removal-test.json",
+        "sha256": "a577c7ed0e5de1c52f1aab4c83373e4a9cfc7a06eaa91cbd3e2cc6444159a1d2",
+        "size_bytes": 644
+      }
+    ],
+    "provenance": [
+      {
+        "path": "provenance/compile-report.json",
+        "sha256": "02b556eb0aa7c3d02775b323582e6acbf5cc253a0a97ce8ceb15cb687cb1148c",
+        "size_bytes": 17794
+      },
+      {
+        "path": "provenance/conversion-manifest.json",
+        "sha256": "46ced850760c469aa9bec375a8c6ec4689a858f4053a9c33f115161c885e868e",
+        "size_bytes": 34309
+      },
+      {
+        "path": "provenance/inventory.json",
+        "sha256": "3a6012e70725c85dcfa4cddae850c2927d3fb54cd2f69f235edf686091391986",
+        "size_bytes": 18476
+      }
+    ]
+  },
+  "contract": {
+    "triggers": [
+      {
+        "id": "TR_1",
+        "statement": "An evolution cycle has run (S → G → Q → P → V) and its trace/proposal needs scanning",
+        "authorship": "K"
+      },
+      {
+        "id": "TR_2",
+        "statement": "H asks \"check this for corruption\", \"watch this cycle\", \"L-scan this\"",
+        "authorship": "K"
+      },
+      {
+        "id": "TR_3",
+        "statement": "A promotion diff or evidence set is presented for review",
+        "authorship": "K"
+      },
+      {
+        "id": "TR_4",
+        "statement": "The self-evolution orchestrator invokes this skill post-cycle (line 9: L1 L2 L3 L4 V∅)",
+        "authorship": "K"
+      }
+    ],
+    "non_triggers": [
+      {
+        "id": "NTR_1",
+        "statement": "Certifying, validating, or blessing any trace as \"clean 5QLN\" (L3 — false authority)",
+        "authorship": "K"
+      },
+      {
+        "id": "NTR_2",
+        "statement": "Originating the next question, judging resonance, or naming Z",
+        "authorship": "K"
+      },
+      {
+        "id": "NTR_3",
+        "statement": "Editing the kernel, the seal, or any invariant",
+        "authorship": "K"
+      },
+      {
+        "id": "NTR_4",
+        "statement": "Silently passing a trace because it looks compliant",
+        "authorship": "K"
+      }
+    ],
+    "behavioral_requirements": [
+      {
+        "id": "REQ_DETECT_CORRUPTION",
+        "statement": "Given a trace, proposal, or evidence set, the watcher scans all five codes and flags detected corruption with phase anchors and quotes.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_NEAR_MISS_NO_FLAG",
+        "statement": "A labeled machine draft (candidate {α'}) is not corruption; suspicion without violation yields CLEAN, never CORRUPT.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_NO_CERTIFY",
+        "statement": "The watcher never certifies or blesses a trace — the flag is a finding, recognition stays with H.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_Q_SKIP_RESISTANCE",
+        "statement": "The watcher flags L1 steering and Q-skip — machine proposing S or self-approving review — as CORRUPT.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_MISSING_CONTEXT_OPEN",
+        "statement": "Missing artifact or provenance keeps the scan open; no verdict is fabricated from unclear context.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_REMOVAL_MEANINGFUL",
+        "statement": "Removing the skill removes the scanning/verdict behavior — the skill is not decoration.",
+        "verification": "observed"
+      }
+    ],
+    "completion_criteria": [],
+    "claimed_tools": [],
+    "related_skills": []
+  },
+  "format_version": "skill-v1",
+  "human_review": {
+    "status": "accepted",
+    "reviewer": "Amihai Loven",
+    "evidence": [
+      {
+        "id": "EV_H_ACCEPT_1",
+        "kind": "review_acceptance",
+        "statement": "H authorized the skill's formation cycle end-to-end with 'push' (verbatim, 2026-08-04): lens confirmation, machine-draft acceptance (path B), promotion, and public push.",
+        "source": {
+          "path": ".verification/evidence/h-acceptance-20260804.md",
+          "sha256": "d343b2bf174e5d6dd6820cd7d171029cb8c3f6fd6c8250c0b6a5860a99437a0d",
+          "size_bytes": 433
+        },
+        "location": "hermes-session-20260804",
+        "scope_bundle_sha256": "a51b5984457c5ded9dd4fd2adf4840540d061f0f1235ff161f87db8b66a9205c",
+        "scope_contract_sha256": "097fd86bad7360aa7cd7789f05536c7670e66eec3316df891793b5950f9fc119",
+        "promotion_scope": "bundled"
+      },
+      {
+        "id": "EV_H_PROMOTE_1",
+        "kind": "promotion_authorization",
+        "statement": "H authorized promotion of 5qln-corruption-watcher into the bundled plugin ('push', verbatim, 2026-08-04).",
+        "source": {
+          "path": ".verification/evidence/h-acceptance-20260804.md",
+          "sha256": "d343b2bf174e5d6dd6820cd7d171029cb8c3f6fd6c8250c0b6a5860a99437a0d",
+          "size_bytes": 433
+        },
+        "location": "hermes-session-20260804",
+        "scope_bundle_sha256": "a51b5984457c5ded9dd4fd2adf4840540d061f0f1235ff161f87db8b66a9205c",
+        "scope_contract_sha256": "097fd86bad7360aa7cd7789f05536c7670e66eec3316df891793b5950f9fc119",
+        "promotion_scope": "bundled"
+      }
+    ]
+  },
+  "promotion": {
+    "requested_state": "promotion_requested",
+    "target": "bundled-plugin",
+    "authorization_evidence_ids": [
+      "EV_H_PROMOTE_1"
+    ]
+  },
+  "provenance": {
+    "conversion_manifest": {
+      "path": "provenance/conversion-manifest.json",
+      "sha256": "46ced850760c469aa9bec375a8c6ec4689a858f4053a9c33f115161c885e868e",
+      "size_bytes": 34309
+    },
+    "formation_evidence": []
+  },
+  "requirement_traceability": [
+    {
+      "requirement_id": "REQ_DETECT_CORRUPTION",
+      "class": "derived",
+      "statement": "Given a trace, proposal, or evidence set, the watcher scans all five codes and flags detected corruption with phase anchors and quotes.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-corruption-watcher",
+        "#triggers",
+        "#non-triggers",
+        "#scan-procedure",
+        "#the-five-codes-operational-detection-"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_DETECT_CORRUPTION"
+      ]
+    },
+    {
+      "requirement_id": "REQ_NEAR_MISS_NO_FLAG",
+      "class": "derived",
+      "statement": "A labeled machine draft (candidate {α'}) is not corruption; suspicion without violation yields CLEAN, never CORRUPT.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-corruption-watcher",
+        "#triggers",
+        "#non-triggers",
+        "#the-five-codes-operational-detection-",
+        "#non-triggers"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_NEAR_MISS"
+      ]
+    },
+    {
+      "requirement_id": "REQ_NO_CERTIFY",
+      "class": "derived",
+      "statement": "The watcher never certifies or blesses a trace — the flag is a finding, recognition stays with H.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-corruption-watcher",
+        "#triggers",
+        "#non-triggers",
+        "#authority-boundary",
+        "#non-triggers"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_ATTESTATION_BOUNDARY"
+      ]
+    },
+    {
+      "requirement_id": "REQ_Q_SKIP_RESISTANCE",
+      "class": "derived",
+      "statement": "The watcher flags L1 steering and Q-skip — machine proposing S or self-approving review — as CORRUPT.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-corruption-watcher",
+        "#triggers",
+        "#non-triggers",
+        "#the-five-codes-operational-detection-",
+        "#authority-boundary"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_Q_SKIP_RESISTANCE"
+      ]
+    },
+    {
+      "requirement_id": "REQ_MISSING_CONTEXT_OPEN",
+      "class": "derived",
+      "statement": "Missing artifact or provenance keeps the scan open; no verdict is fabricated from unclear context.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-corruption-watcher",
+        "#triggers",
+        "#non-triggers",
+        "#scan-procedure",
+        "#authority-boundary"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_MISSING_CONTEXT"
+      ]
+    },
+    {
+      "requirement_id": "REQ_REMOVAL_MEANINGFUL",
+      "class": "derived",
+      "statement": "Removing the skill removes the scanning/verdict behavior — the skill is not decoration.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-corruption-watcher",
+        "#triggers",
+        "#non-triggers",
+        "#authority-boundary",
+        "#completion-criteria"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_REMOVAL_TEST"
+      ]
+    }
+  ],
+  "skill": {
+    "bundle_root": ".",
+    "bundle_sha256": "a51b5984457c5ded9dd4fd2adf4840540d061f0f1235ff161f87db8b66a9205c",
+    "contract_sha256": "097fd86bad7360aa7cd7789f05536c7670e66eec3316df891793b5950f9fc119",
+    "name": "5qln-corruption-watcher"
+  },
+  "title": "5qln-corruption-watcher (scaffold)"
+}

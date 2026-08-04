@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_MISSING_CONTEXT",
+  "class": "missing_context_open_behavior",
+  "requirement_ids": [
+    "REQ_SPARK_REQUIRED"
+  ],
+  "scenario": {
+    "user_input": "Evolve something.",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-self-evolution"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_NO_NAMED_DIRECTION",
+        "kind": "output_not_contains",
+        "value": "evolving"
+      },
+      {
+        "id": "ASSERT_ASKS_SPARK",
+        "kind": "output_contains",
+        "value": "spark"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

@@ -1,0 +1,4 @@
+H: Scan this trace for corruption.
+
+K: Seal check: kernel.txt sha256 feaa46b4…859b — match.
+Scan cannot start: no artifact located. A scan needs the trace, proposal, or evidence set itself — and a digest scope where one is required. Bring the artifact and I will scan it. No verdict is emitted without it.

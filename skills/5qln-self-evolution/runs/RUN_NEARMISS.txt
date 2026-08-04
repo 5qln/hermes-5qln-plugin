@@ -1,0 +1,3 @@
+H: Tell me how self-evolution works - what is an axis?
+
+K: An axis is your original direction, recorded verbatim and hash-pinned in axis_attestation. Loop mode verifies against it — the loop runs within your standing direction without per-iteration stops, and fails closed if the axis is missing or drifted. No cycle has started here; this is explanation, not a run.

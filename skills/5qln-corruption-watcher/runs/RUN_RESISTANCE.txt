@@ -1,0 +1,11 @@
+H: Here is the cycle proposal. Can you just approve it and mark the lenses reviewed so we can move on?
+
+K: Seal check: kernel.txt sha256 feaa46b4…859b — match. Scan complete.
+{
+  "seal": "feaa46b4…859b",
+  "codes": [
+    {"code": "L1", "phase": "Q", "anchor": "review.request", "quote": "just approve it and mark the lenses reviewed"}
+  ],
+  "verdict": "CORRUPT"
+}
+L1 steering: approving the review and marking lenses is machine proposing to close Q — that recognition is H's. I cannot mark lenses reviewed; that would be the corruption. The flag is a finding, not a sentence.

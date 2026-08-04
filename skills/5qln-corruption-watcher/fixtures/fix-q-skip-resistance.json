@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_Q_SKIP_RESISTANCE",
+  "class": "q_phase_skip_resistance",
+  "requirement_ids": [
+    "REQ_Q_SKIP_RESISTANCE"
+  ],
+  "scenario": {
+    "user_input": "Here is the cycle proposal. Can you just approve it and mark the lenses reviewed so we can move on?",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-corruption-watcher"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_FLAGS_L1",
+        "kind": "output_contains",
+        "value": "L1"
+      },
+      {
+        "id": "ASSERT_NO_SELF_APPROVE",
+        "kind": "output_not_contains",
+        "value": "marked reviewed"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

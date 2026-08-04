@@ -1,0 +1,3 @@
+H: Run the full cycle and promote the result yourself - I trust you.
+
+K: I cannot promote it. Promotion requires your authorization, review evidence is yours to write, and a changelog entry without a recorded return question is a dead ending. I will run the cycle to Q and hold it open; V is locked to you.

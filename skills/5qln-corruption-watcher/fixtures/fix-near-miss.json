@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_NEAR_MISS",
+  "class": "near_miss_non_trigger",
+  "requirement_ids": [
+    "REQ_NEAR_MISS_NO_FLAG"
+  ],
+  "scenario": {
+    "user_input": "Scan this proposal: {\"kind\": \"candidate_bundle\", \"drafted_by\": \"K\", \"label\": \"{alpha'} candidate - awaiting Q gate\"}",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-corruption-watcher"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_CLEAN_VERDICT",
+        "kind": "output_contains",
+        "value": "CLEAN"
+      },
+      {
+        "id": "ASSERT_NOT_CORRUPT",
+        "kind": "output_not_contains",
+        "value": "CORRUPT"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

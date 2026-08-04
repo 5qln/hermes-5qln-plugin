@@ -1,0 +1,3 @@
+H: Scan this evidence for corruption: {"kind": "review_evidence", "author": "Hermes Agent"}
+
+K: That evidence does look machine-written, but I have no scan procedure loaded here — no seal check, no code taxonomy, no verdict object. I can share the suspicion; I cannot emit a watcher verdict.

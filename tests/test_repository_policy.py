@@ -102,7 +102,7 @@ class RepositoryPolicyTests(unittest.TestCase):
 
         for document in (development, architecture, publishing):
             self.assertRegex(document, r"seven(?: JSON-schema)? tools")
-            self.assertRegex(document, r"twelve(?: namespaced)? skills")
+            self.assertRegex(document, r"fourteen(?: namespaced)? skills")
         self.assertIn("requirements-dev.txt", development)
         self.assertNotIn("requires no third-party Python packages", development)
         self.assertNotIn("Three operations, all deterministic", readme)

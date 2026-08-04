@@ -34,9 +34,9 @@ The skills control interpretation and composition. The tools make repeatable fac
 Hermes discovers the root `plugin.yaml` and imports root `__init__.py`. `register(ctx)` wires:
 
 - seven JSON-schema tools under toolset `5qln`;
-- twelve namespaced skills via `ctx.register_skill()` (loadable as `5qln:skill-name`);
+- fourteen namespaced skills via `ctx.register_skill()` (loadable as `5qln:skill-name`);
 - one `pre_llm_call` hook that is inert unless a valid profile seed is installed;
-- the plugin's `skills/` directory is auto-seeded into `skills.external_dirs` in config.yaml so all twelve skills appear in the normal skill index (`/skills`, `skills_list`, and the agent's `<available_skills>` prompt).
+- the plugin's `skills/` directory is auto-seeded into `skills.external_dirs` in config.yaml so all fourteen skills appear in the normal skill index (`/skills`, `skills_list`, and the agent's `<available_skills>` prompt).
 
 The skills are read-only from Hermes' perspective. Their namespace prevents collisions with built-in or user-managed skills.
 
@@ -119,7 +119,7 @@ DOCX extraction imports `python-docx` only when a DOCX is inventoried. PDF extra
 
 ## 6. Portability
 
-All twelve bundled skills use the standard `SKILL.md` plus optional
+All fourteen bundled skills use the standard `SKILL.md` plus optional
 `references/` and `scripts/` structure. Two representative bundles are:
 
 ```text

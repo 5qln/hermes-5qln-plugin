@@ -1,7 +1,7 @@
 ---
 name: 5qln-skill-formation
 description: Guide skill-v1 formation from admission through promotion — scaffold manifests, run the deterministic verifier, prepare behavioral trials, conduct exact-digest human review, and promote bundled-plugin candidates. The machine verifies structure; only H recognises.
-version: 0.9.0
+version: 0.10.0
 author: 5QLN
 license: Proprietary
 metadata:

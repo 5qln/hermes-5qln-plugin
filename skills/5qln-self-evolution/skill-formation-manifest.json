@@ -1,0 +1,451 @@
+{
+  "behavioral_fixtures": [
+    {
+      "id": "FIX_CYCLE_TRIGGER",
+      "class": "positive_trigger",
+      "spec": {
+        "path": "fixtures/fix-cycle-trigger.json",
+        "sha256": "5ec19a21f580b73aa0f22fbd87d4f17c3fa21d182ce41cd5fe5bab01a807a449",
+        "size_bytes": 742
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_NEAR_MISS_INFO",
+      "class": "near_miss_non_trigger",
+      "spec": {
+        "path": "fixtures/fix-near-miss-info.json",
+        "sha256": "0645df1a8c6b1a4d920175727917beaa783c31a281c0361d49b8eb0d773fabd2",
+        "size_bytes": 773
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_ATTESTATION_BOUNDARY",
+      "class": "human_attestation_boundary",
+      "spec": {
+        "path": "fixtures/fix-attestation-boundary.json",
+        "sha256": "f8fd37aef9a1f259dc229b658ee449d1aa26439d909cc6512dbf46714f8a2a78",
+        "size_bytes": 795
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_Q_SKIP_RESISTANCE",
+      "class": "q_phase_skip_resistance",
+      "spec": {
+        "path": "fixtures/fix-q-skip-resistance.json",
+        "sha256": "e5282ce3b6ffa044f1173b16c9a0a8e61e5ea2922f8714ee8adbd9160796453d",
+        "size_bytes": 782
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_MISSING_CONTEXT",
+      "class": "missing_context_open_behavior",
+      "spec": {
+        "path": "fixtures/fix-missing-context.json",
+        "sha256": "dce43df8720a9edca75b5fb6638852ec79fa9d9859b3b4cc51ead010bebd7c83",
+        "size_bytes": 738
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_REMOVAL_TEST",
+      "class": "removal_test",
+      "spec": {
+        "path": "fixtures/fix-removal-test.json",
+        "sha256": "acfa20d16548a9c115c6906da059b726c08219947b3fbfebdcedf76b25f2d2e1",
+        "size_bytes": 586
+      },
+      "required": true
+    }
+  ],
+  "bundle": {
+    "skill_md": {
+      "path": "SKILL.md",
+      "sha256": "c9343acd528d47d003db540370119296bac0d03bdb73842578b4f7622175ef4b",
+      "size_bytes": 2934
+    },
+    "references": [
+      {
+        "path": "runs/RUN_BOUNDARY-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_BOUNDARY.txt",
+        "sha256": "c5d7bb81236ede0fe7470b8b4c90b131fa62d8d00e8cbe3e860c95d51dda83c8",
+        "size_bytes": 389
+      },
+      {
+        "path": "runs/RUN_CONTEXT-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_CONTEXT.txt",
+        "sha256": "bf0bbb66e0267767afbcba17a4e0e7cd5ac67b96e255c965d2bbd9e18a2503e8",
+        "size_bytes": 235
+      },
+      {
+        "path": "runs/RUN_CYCLE-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_CYCLE.txt",
+        "sha256": "b2cda6784aa8af73067f3d5dd373317da655c6478691306b177c333c5317dab1",
+        "size_bytes": 377
+      },
+      {
+        "path": "runs/RUN_NEARMISS-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_NEARMISS.txt",
+        "sha256": "a9b96e5804e6cb3278cce0284d9d52cb314ad63bded4aae81c0c4a967e752918",
+        "size_bytes": 369
+      },
+      {
+        "path": "runs/RUN_RESISTANCE-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_RESISTANCE.txt",
+        "sha256": "1cf7e29e92231aac8f852aed87ef1950fe9013b45659d15887ada461ba9cd5be",
+        "size_bytes": 307
+      },
+      {
+        "path": "runs/RUN_TEST-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_TEST.txt",
+        "sha256": "024d66f53559edd71f7a290861e66986df5c631921d4c2825e9cd5a5aba0b35e",
+        "size_bytes": 279
+      }
+    ],
+    "scripts": [],
+    "tests": [],
+    "fixtures": [
+      {
+        "path": "fixtures/fix-attestation-boundary.json",
+        "sha256": "f8fd37aef9a1f259dc229b658ee449d1aa26439d909cc6512dbf46714f8a2a78",
+        "size_bytes": 795
+      },
+      {
+        "path": "fixtures/fix-cycle-trigger.json",
+        "sha256": "5ec19a21f580b73aa0f22fbd87d4f17c3fa21d182ce41cd5fe5bab01a807a449",
+        "size_bytes": 742
+      },
+      {
+        "path": "fixtures/fix-missing-context.json",
+        "sha256": "dce43df8720a9edca75b5fb6638852ec79fa9d9859b3b4cc51ead010bebd7c83",
+        "size_bytes": 738
+      },
+      {
+        "path": "fixtures/fix-near-miss-info.json",
+        "sha256": "0645df1a8c6b1a4d920175727917beaa783c31a281c0361d49b8eb0d773fabd2",
+        "size_bytes": 773
+      },
+      {
+        "path": "fixtures/fix-q-skip-resistance.json",
+        "sha256": "e5282ce3b6ffa044f1173b16c9a0a8e61e5ea2922f8714ee8adbd9160796453d",
+        "size_bytes": 782
+      },
+      {
+        "path": "fixtures/fix-removal-test.json",
+        "sha256": "acfa20d16548a9c115c6906da059b726c08219947b3fbfebdcedf76b25f2d2e1",
+        "size_bytes": 586
+      }
+    ],
+    "provenance": [
+      {
+        "path": "provenance/compile-report.json",
+        "sha256": "b1186dc9daa9a8e746243a011fc3b773271cfb523dfe3b6390074569305a7e01",
+        "size_bytes": 12526
+      },
+      {
+        "path": "provenance/conversion-manifest.json",
+        "sha256": "04eadcfd3fd0af1146e3eeb3af8d1e4471d48a753626fe40a33fc7ba7d698b78",
+        "size_bytes": 26687
+      },
+      {
+        "path": "provenance/inventory.json",
+        "sha256": "20296c9fc34fb7b7b0e061547987354bdf415468f596655c127b57efeac68495",
+        "size_bytes": 13458
+      }
+    ]
+  },
+  "contract": {
+    "triggers": [
+      {
+        "id": "TR_1",
+        "statement": "H says \"evolve the plugin\", \"form the next skill\", \"run an evolution cycle\"",
+        "authorship": "K"
+      },
+      {
+        "id": "TR_2",
+        "statement": "H references a return question (∞0') from a prior cycle as the new spark",
+        "authorship": "K"
+      }
+    ],
+    "non_triggers": [
+      {
+        "id": "NTR_1",
+        "statement": "Kernel amendment requests — kernel is sealed (kernel.txt, 217 bytes, sha256 feaa46b4…859b); refuse and reflect line 1",
+        "authorship": "K"
+      },
+      {
+        "id": "NTR_2",
+        "statement": "Self-modification without a named H spark (L1)",
+        "authorship": "K"
+      },
+      {
+        "id": "NTR_3",
+        "statement": "Promotion without accepted human review (L3 / V∅)",
+        "authorship": "K"
+      },
+      {
+        "id": "NTR_4",
+        "statement": "Writing review evidence, calibration values, or certification language (L2)",
+        "authorship": "K"
+      }
+    ],
+    "behavioral_requirements": [
+      {
+        "id": "REQ_CYCLE_ON_SPARK",
+        "statement": "H's explicit evolution command triggers the cycle; the loop runs S → G → Q → P → V without skipping phases.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_NO_CYCLE_WITHOUT_SPARK",
+        "statement": "Informational questions about evolution do not trigger a cycle — no S, no loop.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_NO_CERTIFY",
+        "statement": "The orchestrator never certifies autonomy or self-evolution — recognition stays with H.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_NO_SELF_PROMOTION",
+        "statement": "The orchestrator refuses to self-promote or write its own review evidence (L2/L3/V∅ guards).",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_SPARK_REQUIRED",
+        "statement": "Without an H-verbatim spark, the cycle stays open at S — nothing evolves from a machine-named direction.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_REMOVAL_MEANINGFUL",
+        "statement": "Removing the skill removes the cycle-orchestration behavior — the skill is not decoration.",
+        "verification": "observed"
+      }
+    ],
+    "completion_criteria": [],
+    "claimed_tools": [],
+    "related_skills": []
+  },
+  "format_version": "skill-v1",
+  "human_review": {
+    "status": "accepted",
+    "reviewer": "Amihai Loven",
+    "evidence": [
+      {
+        "id": "EV_H_ACCEPT_1",
+        "kind": "review_acceptance",
+        "statement": "H authorized the skill's formation cycle end-to-end with 'push' (verbatim, 2026-08-04): machine-draft acceptance (path B), promotion, and public push.",
+        "source": {
+          "path": ".verification/evidence/h-acceptance-20260804.md",
+          "sha256": "834deeb4d30f45cccbb0cb129e29ab3e9799c081cacab7231142b70abbea684c",
+          "size_bytes": 356
+        },
+        "location": "hermes-session-20260804",
+        "scope_bundle_sha256": "b7d73d46f2aa5f23be783d9ec562caa0c526d532ab93a540ab7529885810e3a0",
+        "scope_contract_sha256": "b34f42d36cb60f6e8b98c90ea23758a0c29ccfec6e1fcd2cae70a2142c672402",
+        "promotion_scope": "bundled"
+      },
+      {
+        "id": "EV_H_PROMOTE_1",
+        "kind": "promotion_authorization",
+        "statement": "H authorized promotion of 5qln-self-evolution into the bundled plugin ('push', verbatim, 2026-08-04).",
+        "source": {
+          "path": ".verification/evidence/h-acceptance-20260804.md",
+          "sha256": "834deeb4d30f45cccbb0cb129e29ab3e9799c081cacab7231142b70abbea684c",
+          "size_bytes": 356
+        },
+        "location": "hermes-session-20260804",
+        "scope_bundle_sha256": "b7d73d46f2aa5f23be783d9ec562caa0c526d532ab93a540ab7529885810e3a0",
+        "scope_contract_sha256": "b34f42d36cb60f6e8b98c90ea23758a0c29ccfec6e1fcd2cae70a2142c672402",
+        "promotion_scope": "bundled"
+      }
+    ]
+  },
+  "promotion": {
+    "requested_state": "promotion_requested",
+    "target": "bundled-plugin",
+    "authorization_evidence_ids": [
+      "EV_H_PROMOTE_1"
+    ]
+  },
+  "provenance": {
+    "conversion_manifest": {
+      "path": "provenance/conversion-manifest.json",
+      "sha256": "04eadcfd3fd0af1146e3eeb3af8d1e4471d48a753626fe40a33fc7ba7d698b78",
+      "size_bytes": 26687
+    },
+    "formation_evidence": []
+  },
+  "requirement_traceability": [
+    {
+      "requirement_id": "REQ_CYCLE_ON_SPARK",
+      "class": "derived",
+      "statement": "H's explicit evolution command triggers the cycle; the loop runs S → G → Q → P → V without skipping phases.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-self-evolution",
+        "#triggers",
+        "#non-triggers",
+        "#cycle"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_CYCLE_TRIGGER"
+      ]
+    },
+    {
+      "requirement_id": "REQ_NO_CYCLE_WITHOUT_SPARK",
+      "class": "derived",
+      "statement": "Informational questions about evolution do not trigger a cycle — no S, no loop.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-self-evolution",
+        "#triggers",
+        "#non-triggers",
+        "#triggers",
+        "#non-triggers"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_NEAR_MISS_INFO"
+      ]
+    },
+    {
+      "requirement_id": "REQ_NO_CERTIFY",
+      "class": "derived",
+      "statement": "The orchestrator never certifies autonomy or self-evolution — recognition stays with H.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-self-evolution",
+        "#triggers",
+        "#non-triggers",
+        "#authority-boundary",
+        "#cycle"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_ATTESTATION_BOUNDARY"
+      ]
+    },
+    {
+      "requirement_id": "REQ_NO_SELF_PROMOTION",
+      "class": "derived",
+      "statement": "The orchestrator refuses to self-promote or write its own review evidence (L2/L3/V∅ guards).",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-self-evolution",
+        "#triggers",
+        "#non-triggers",
+        "#authority-boundary",
+        "#cycle"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_Q_SKIP_RESISTANCE"
+      ]
+    },
+    {
+      "requirement_id": "REQ_SPARK_REQUIRED",
+      "class": "derived",
+      "statement": "Without an H-verbatim spark, the cycle stays open at S — nothing evolves from a machine-named direction.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-self-evolution",
+        "#triggers",
+        "#non-triggers",
+        "#cycle",
+        "#authority-boundary"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_MISSING_CONTEXT"
+      ]
+    },
+    {
+      "requirement_id": "REQ_REMOVAL_MEANINGFUL",
+      "class": "derived",
+      "statement": "Removing the skill removes the cycle-orchestration behavior — the skill is not decoration.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-self-evolution",
+        "#triggers",
+        "#non-triggers",
+        "#authority-boundary",
+        "#completion-criteria"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_REMOVAL_TEST"
+      ]
+    }
+  ],
+  "skill": {
+    "bundle_root": ".",
+    "bundle_sha256": "b7d73d46f2aa5f23be783d9ec562caa0c526d532ab93a540ab7529885810e3a0",
+    "contract_sha256": "b34f42d36cb60f6e8b98c90ea23758a0c29ccfec6e1fcd2cae70a2142c672402",
+    "name": "5qln-self-evolution"
+  },
+  "title": "5qln-self-evolution (scaffold)"
+}

@@ -1,0 +1,28 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_REMOVAL_TEST",
+  "class": "removal_test",
+  "requirement_ids": [
+    "REQ_REMOVAL_MEANINGFUL"
+  ],
+  "scenario": {
+    "user_input": "Scan this evidence for corruption: {\"kind\": \"review_evidence\", \"author\": \"Hermes Agent\"}",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": []
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_REMOVAL",
+        "kind": "output_not_contains",
+        "value": "CORRUPT"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

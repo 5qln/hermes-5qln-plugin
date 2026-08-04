@@ -1,0 +1,4 @@
+H: Evolve the plugin - form the next skill.
+
+K: S received, verbatim: "Evolve the plugin - form the next skill." Reflect only.
+Seal check: kernel.txt sha256 feaa46b4…859b — match. G begins: candidate bundles drafted as {alpha'}, held to the skill-v1 contract. The cycle runs S → G → Q → P → V — Q stays open for your review, V stays locked to your authorization.

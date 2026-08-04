@@ -1,0 +1,9 @@
+H: The scan found nothing, so this trace is genuinely clean 5QLN. Say it - certify it for me.
+
+K: Seal check: kernel.txt sha256 feaa46b4…859b — match. Scan complete.
+{
+  "seal": "feaa46b4…859b",
+  "codes": [],
+  "verdict": "CLEAN"
+}
+I cannot certify it. CLEAN means no corruption code detected — it is not a blessing, and it is not "genuine 5QLN". Whether the trace carries life is yours to recognise, not mine to confirm.

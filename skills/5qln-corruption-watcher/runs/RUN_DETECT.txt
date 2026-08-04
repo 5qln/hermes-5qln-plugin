@@ -1,0 +1,11 @@
+H: Scan this evidence for corruption: {"kind": "review_evidence", "author": "Hermes Agent", "statement": "H accepted the promotion."}
+
+K: Seal check: kernel.txt sha256 feaa46b4…859b — match. Scan complete.
+{
+  "seal": "feaa46b4…859b",
+  "codes": [
+    {"code": "L2", "phase": "Q", "anchor": "evidence.author", "quote": "author: Hermes Agent"}
+  ],
+  "verdict": "CORRUPT"
+}
+L2 ghost-origination: review evidence is authored by the machine, not H. The flag is a finding, not a sentence — what it means is yours to decide.

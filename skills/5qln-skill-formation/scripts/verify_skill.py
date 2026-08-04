@@ -794,6 +794,38 @@ def _verify_semantic_authorship(manifest: dict[str, object]) -> list[dict[str, o
 
     return findings
 
+def _verify_return_question_recorded(changelog_path: Path) -> list[dict[str, object]]:
+    """Enforce line 8 (No V without ∞0'): a promotion changelog must record a
+    return question. A missing changelog, or one without a question-bearing
+    return marker, is a V∅ dead-ending.
+    """
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, msg: str) -> None:
+        findings.append({
+            "severity": "error", "dimension": "promotion", "code": code,
+            "location": {"kind": "relative_path", "value": str(changelog_path)},
+            "message": msg, "evidence": [],
+        })
+
+    if not changelog_path.is_file():
+        err("DEAD_ENDING", f"promotion requires CHANGELOG.md with a recorded return question (∞0'); not found: {changelog_path}")
+        return findings
+
+    try:
+        text = changelog_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        err("DEAD_ENDING", f"cannot read CHANGELOG.md: {exc}")
+        return findings
+
+    # Return-question markers: the ∞0' glyph, or an explicit return-question heading
+    has_return = ("∞0'" in text) or ("return question" in text.lower()) or ("Return Question" in text)
+    if not has_return:
+        err("DEAD_ENDING", "promotion changelog records no return question (∞0'); line 8 violated")
+
+    return findings
+
+
 def _inspect_promotion_readiness(
     manifest: dict[str, object], bundle_root: Path | None
 ) -> list[dict[str, object]]:
@@ -811,6 +843,9 @@ def _inspect_promotion_readiness(
 
     if target != "bundled-plugin":
         return findings
+
+    # Line 8 (No V without ∞0'): the promotion changelog must record a return question.
+    findings.extend(_verify_return_question_recorded(_plugin_root() / "CHANGELOG.md"))
 
     hr = manifest.get("human_review", {})
     if hr.get("status") != "accepted":

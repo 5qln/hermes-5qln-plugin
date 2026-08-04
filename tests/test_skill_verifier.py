@@ -447,3 +447,36 @@ class EvolutionGateTests(unittest.TestCase):
         }
         findings = verify_skill._verify_semantic_authorship(manifest)
         self.assertTrue(any("SEMANTIC_AUTHORSHIP_PENDING" in (f.get("code") or "") for f in findings))
+
+    # ---- Slice 3: Pillar V∅ — changelog ∞0' enforcement in promotion mode ----
+
+    def test_promotion_requires_recorded_return_question(self) -> None:
+        """Promotion-mode fails when CHANGELOG.md lacks a recorded ∞0'."""
+        changelog = self.tmp / "CHANGELOG.md"
+        changelog.write_text("# Changelog\n\n## 0.7.0\n- bumped version\n", encoding="utf-8")
+        manifest = {
+            "promotion": {"target": "bundled-plugin", "requested_state": "promotion_requested",
+                          "authorization_evidence_ids": ["EV_1"]},
+            "human_review": {"status": "accepted", "reviewer": "H",
+                             "evidence": [{"id": "EV_1", "kind": "promotion_authorization",
+                                           "statement": "go", "source": {"path": "e.md", "sha256": "c"*64, "size_bytes": 1},
+                                           "location": "chat", "scope_bundle_sha256": "a"*64,
+                                           "scope_contract_sha256": "b"*64, "promotion_scope": "bundled"}]},
+        }
+        findings = verify_skill._verify_return_question_recorded(changelog)
+        self.assertTrue(any("DEAD_ENDING" in (f.get("code") or "") for f in findings))
+
+    def test_promotion_passes_with_return_question(self) -> None:
+        """A changelog carrying a return question (∞0') satisfies line 8."""
+        changelog = self.tmp / "CHANGELOG.md"
+        changelog.write_text(
+            "# Changelog\n\n## 0.8.0\n- formed 5qln-aimless-openness\n- ∞0': what does a clean scan license?\n",
+            encoding="utf-8",
+        )
+        findings = verify_skill._verify_return_question_recorded(changelog)
+        self.assertEqual(findings, [])
+
+    def test_missing_changelog_fails_promotion(self) -> None:
+        """No CHANGELOG.md at all is a V∅ dead-ending."""
+        findings = verify_skill._verify_return_question_recorded(self.tmp / "CHANGELOG.md")
+        self.assertTrue(any("DEAD_ENDING" in (f.get("code") or "") for f in findings))

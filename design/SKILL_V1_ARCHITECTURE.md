@@ -1357,7 +1357,7 @@ tests/
 └── fixtures/skill-v1/
 ```
 
-Retain exact registration assertions and update them to eleven skills and seven tools.
+Retain exact registration assertions and update them to twelve skills and seven tools.
 
 ### Docs and release metadata
 
@@ -1473,7 +1473,7 @@ Acceptance criteria:
 
 - `python -m compileall -q .` passes;
 - full unittest discovery passes;
-- clean-repository registration smoke test reports eleven skills and seven tools;
+- clean-repository registration smoke test reports twelve skills and seven tools;
 - legacy conversion workflows and all existing tests continue to pass;
 - no unrelated working-tree change is included;
 - public diff contains no personal data, session/wiki provenance, private evidence, or confidential credentials.

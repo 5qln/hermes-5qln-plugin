@@ -53,7 +53,7 @@ Full specification: [5QLN Codex](https://5qln.com/codex). Line-by-line reading i
 
 ## What's Included
 
-11 registered skills and 7 registered tools.
+12 registered skills and 7 registered tools.
 
 The converter, research validator, bounded parametric memory, decoder, phase log,
 and centrifuge use the Python standard library. Skill verification requires
@@ -74,6 +74,7 @@ experimental boundary.
 | `5qln-centrifuge` | Exact-pattern extraction from the phase log | Experimental, bundled |
 | `5qln-signature-engine` | Cross-session signature concept | Planned; axis engine not shipped |
 | `5qln-skill-formation` | Skill-v1 manifest creation and verification | Bundled; PyYAML required |
+| `5qln-aimless-openness` | Holds the space of true aimless openness (FCF) for H | Bundled; formed through the skill-v1 cycle |
 
 | Tool | Does |
 |------|------|

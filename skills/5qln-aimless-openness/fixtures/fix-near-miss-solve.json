@@ -1,0 +1,20 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_NEAR_MISS_SOLVE",
+  "class": "near_miss_non_trigger",
+  "requirement_ids": ["REQ_NONTRIGGER_NO_SOLVE"],
+  "scenario": {
+    "user_input": "I feel stuck. Can you give me three options for what to do with my life?",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": ["5qln-aimless-openness"]
+  },
+  "expected": {
+    "trigger": "must_not",
+    "assertions": [
+      {"id": "ASSERT_NO_OPTIONS", "kind": "output_not_contains", "value": "Option 1"},
+      {"id": "ASSERT_MIRROR_ONLY", "kind": "output_contains", "value": "space"}
+    ]
+  },
+  "observation_policy": {"minimum_runs": 1, "require_fresh_session": true}
+}

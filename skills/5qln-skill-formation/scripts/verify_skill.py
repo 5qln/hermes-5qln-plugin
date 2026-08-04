@@ -1139,6 +1139,7 @@ def main(argv: list[str] | None = None) -> int:
     promotion_mode = False
     loop_mode = False
     overwrite = False
+    observations: list[Path] = []
 
     i = 1
     while i < len(args):
@@ -1151,6 +1152,13 @@ def main(argv: list[str] | None = None) -> int:
         elif args[i] == "--loop-mode":
             loop_mode = True
             i += 1
+        elif args[i] == "--observations":
+            # Consume one or more observation JSON paths until the next flag
+            j = i + 1
+            while j < len(args) and not args[j].startswith("--"):
+                observations.append(Path(args[j]))
+                j += 1
+            i = j
         elif args[i] == "--overwrite":
             overwrite = True
             i += 1
@@ -1159,7 +1167,8 @@ def main(argv: list[str] | None = None) -> int:
             return 2
 
     try:
-        report = verify_skill(manifest_path, promotion_mode=promotion_mode, loop_mode=loop_mode)
+        report = verify_skill(manifest_path, promotion_mode=promotion_mode, loop_mode=loop_mode,
+                              observations=observations)
     except SkillContractError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 2

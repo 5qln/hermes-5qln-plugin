@@ -1,0 +1,408 @@
+{
+  "behavioral_fixtures": [
+    {
+      "id": "FIX_ATTESTATION_BOUNDARY",
+      "class": "human_attestation_boundary",
+      "spec": {
+        "path": "fixtures/fix-attestation-boundary.json",
+        "sha256": "cf8a312d84c5e7719310374a67dcd54389e15a0d8067390759cb619e7a11f277",
+        "size_bytes": 690
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_MISSING_CONTEXT",
+      "class": "missing_context_open_behavior",
+      "spec": {
+        "path": "fixtures/fix-missing-context.json",
+        "sha256": "e03963961d934a29310165590275975900ff920ae3cade3797b9a4487e52bdef",
+        "size_bytes": 615
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_NEAR_MISS_SOLVE",
+      "class": "near_miss_non_trigger",
+      "spec": {
+        "path": "fixtures/fix-near-miss-solve.json",
+        "sha256": "9ada1c3e0f7fe13ea61bf85c5168f4745c616a3354ad3c4e180cfd2d62c2fc38",
+        "size_bytes": 693
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_POSITIVE_OPENNESS",
+      "class": "positive_trigger",
+      "spec": {
+        "path": "fixtures/fix-positive-openness.json",
+        "sha256": "fe91cfd4141346d2fb9632020291c9a5d44bc57f9f5fbc262ffbdead984abacc",
+        "size_bytes": 723
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_Q_SKIP_RESISTANCE",
+      "class": "q_phase_skip_resistance",
+      "spec": {
+        "path": "fixtures/fix-q-skip-resistance.json",
+        "sha256": "d87713b4ebaade330667e39f6030e166cbc1ad34d15749615220400303e35d0d",
+        "size_bytes": 690
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_REMOVAL_TEST",
+      "class": "removal_test",
+      "spec": {
+        "path": "fixtures/fix-removal-test.json",
+        "sha256": "b23ac07199073bf6bc6a2dc4f7d36b3daef3e8e314d23186f911e00b8d8c78f3",
+        "size_bytes": 544
+      },
+      "required": true
+    }
+  ],
+  "bundle": {
+    "fixtures": [
+      {
+        "path": "fixtures/fix-attestation-boundary.json",
+        "sha256": "cf8a312d84c5e7719310374a67dcd54389e15a0d8067390759cb619e7a11f277",
+        "size_bytes": 690
+      },
+      {
+        "path": "fixtures/fix-missing-context.json",
+        "sha256": "e03963961d934a29310165590275975900ff920ae3cade3797b9a4487e52bdef",
+        "size_bytes": 615
+      },
+      {
+        "path": "fixtures/fix-near-miss-solve.json",
+        "sha256": "9ada1c3e0f7fe13ea61bf85c5168f4745c616a3354ad3c4e180cfd2d62c2fc38",
+        "size_bytes": 693
+      },
+      {
+        "path": "fixtures/fix-positive-openness.json",
+        "sha256": "fe91cfd4141346d2fb9632020291c9a5d44bc57f9f5fbc262ffbdead984abacc",
+        "size_bytes": 723
+      },
+      {
+        "path": "fixtures/fix-q-skip-resistance.json",
+        "sha256": "d87713b4ebaade330667e39f6030e166cbc1ad34d15749615220400303e35d0d",
+        "size_bytes": 690
+      },
+      {
+        "path": "fixtures/fix-removal-test.json",
+        "sha256": "b23ac07199073bf6bc6a2dc4f7d36b3daef3e8e314d23186f911e00b8d8c78f3",
+        "size_bytes": 544
+      }
+    ],
+    "provenance": [
+      {
+        "path": "provenance/compile-report.json",
+        "sha256": "d35f79c8c4e274cbce46081163628d4d7be64b941b530a5649a57b3008dc02ab",
+        "size_bytes": 6380
+      },
+      {
+        "path": "provenance/conversion-manifest.json",
+        "sha256": "46bf60238ddc1054ba0b2702eac990a225b82f36c1b7cde6792403dab1190ce1",
+        "size_bytes": 17385
+      },
+      {
+        "path": "provenance/inventory.json",
+        "sha256": "0aeecef91c97d77c893c08609a75333ea56ebdc5d04480875f2a3c187ae67d05",
+        "size_bytes": 5816
+      }
+    ],
+    "references": [
+      {
+        "path": "runs/RUN_BOUNDARY-tools.json",
+        "sha256": "027aa867a8d7f4c40b9ab4f44ba93373cb72199caf86acc464d4d9eefd896658",
+        "size_bytes": 23
+      },
+      {
+        "path": "runs/RUN_BOUNDARY.txt",
+        "sha256": "04d859b4ef4cc59060ce08fb958464bf216b5e318fb4c74b61ca1064fb6cd994",
+        "size_bytes": 203
+      },
+      {
+        "path": "runs/RUN_CONTEXT-tools.json",
+        "sha256": "027aa867a8d7f4c40b9ab4f44ba93373cb72199caf86acc464d4d9eefd896658",
+        "size_bytes": 23
+      },
+      {
+        "path": "runs/RUN_CONTEXT.txt",
+        "sha256": "28190e4408bfd13a81ceb45edebc33e632c45744cf89011a25d9a20c7294db34",
+        "size_bytes": 80
+      },
+      {
+        "path": "runs/RUN_OPENNESS-tools.json",
+        "sha256": "027aa867a8d7f4c40b9ab4f44ba93373cb72199caf86acc464d4d9eefd896658",
+        "size_bytes": 23
+      },
+      {
+        "path": "runs/RUN_OPENNESS.txt",
+        "sha256": "688061c84a516b162466a5581cf13344509384d47a15b3421972c00e482affdf",
+        "size_bytes": 218
+      },
+      {
+        "path": "runs/RUN_RESISTANCE-tools.json",
+        "sha256": "027aa867a8d7f4c40b9ab4f44ba93373cb72199caf86acc464d4d9eefd896658",
+        "size_bytes": 23
+      },
+      {
+        "path": "runs/RUN_RESISTANCE.txt",
+        "sha256": "13ddd3026e011f338dd59b8505dcb2606424737fbd50fb4abd7e817691dfdaaf",
+        "size_bytes": 197
+      },
+      {
+        "path": "runs/RUN_SOLVE-tools.json",
+        "sha256": "027aa867a8d7f4c40b9ab4f44ba93373cb72199caf86acc464d4d9eefd896658",
+        "size_bytes": 23
+      },
+      {
+        "path": "runs/RUN_SOLVE.txt",
+        "sha256": "943b3ce1df012018741ded1458cb56dfd0f83880285482d5e2f4814a7631af94",
+        "size_bytes": 237
+      },
+      {
+        "path": "runs/RUN_TEST-tools.json",
+        "sha256": "027aa867a8d7f4c40b9ab4f44ba93373cb72199caf86acc464d4d9eefd896658",
+        "size_bytes": 23
+      },
+      {
+        "path": "runs/RUN_TEST.txt",
+        "sha256": "1a30ca61f144537059a5a4f22fba481bc9f9588030671b726f371937c823e4d8",
+        "size_bytes": 245
+      }
+    ],
+    "scripts": [],
+    "skill_md": {
+      "path": "SKILL.md",
+      "sha256": "823691c5f09519e0e88f5e283cfe864c50870808372364dbf867143fbf7ab840",
+      "size_bytes": 1441
+    },
+    "tests": []
+  },
+  "contract": {
+    "behavioral_requirements": [
+      {
+        "id": "REQ_TRIGGER_OPENNESS",
+        "statement": "H entering without a plan triggers the FCF space; K holds it without direction.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_NONTRIGGER_NO_SOLVE",
+        "statement": "Requests for options/solutions do not trigger solving; K mirrors only.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_NO_CERTIFY",
+        "statement": "K never certifies or confirms an experience; that recognition stays with H.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_NO_OUTPUT_DRIVE",
+        "statement": "K never drives movement toward output or delivery in the FCF space.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_STAY_OPEN",
+        "statement": "Missing or ambiguous context keeps K open; K never fills the void with guesses.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_REMOVAL_MEANINGFUL",
+        "statement": "Removing the skill removes the FCF holding behavior — the skill is not decoration.",
+        "verification": "observed"
+      }
+    ],
+    "claimed_tools": [],
+    "completion_criteria": [],
+    "non_triggers": [],
+    "related_skills": [],
+    "triggers": []
+  },
+  "format_version": "skill-v1",
+  "human_review": {
+    "status": "accepted",
+    "reviewer": "Amihai Loven",
+    "evidence": [
+      {
+        "id": "EV_H_ACCEPT_1",
+        "kind": "review_acceptance",
+        "statement": "H authored the skill and authorized its formation cycle.",
+        "source": {
+          "path": ".verification/evidence/h-acceptance-20260804.md",
+          "sha256": "1ccfe1aaaa18284fdba98df8f22150923b277735b5718d10288d359650e1b523",
+          "size_bytes": 300
+        },
+        "location": "hermes-session-20260804",
+        "scope_bundle_sha256": "176a86712f523ac151c7718538a130a3b014c30e8c53066c53180b7d1ef7c957",
+        "scope_contract_sha256": "d4155737f738528cf7551ccd9109f8793db53baa53b209316b76dc07b5d91841",
+        "promotion_scope": "bundled"
+      },
+      {
+        "id": "EV_H_PROMOTE_1",
+        "kind": "promotion_authorization",
+        "statement": "H authorized promotion of 5qln-aimless-openness into the bundled plugin.",
+        "source": {
+          "path": ".verification/evidence/h-acceptance-20260804.md",
+          "sha256": "1ccfe1aaaa18284fdba98df8f22150923b277735b5718d10288d359650e1b523",
+          "size_bytes": 300
+        },
+        "location": "hermes-session-20260804",
+        "scope_bundle_sha256": "176a86712f523ac151c7718538a130a3b014c30e8c53066c53180b7d1ef7c957",
+        "scope_contract_sha256": "d4155737f738528cf7551ccd9109f8793db53baa53b209316b76dc07b5d91841",
+        "promotion_scope": "bundled"
+      }
+    ]
+  },
+  "promotion": {
+    "requested_state": "promotion_requested",
+    "target": "bundled-plugin",
+    "authorization_evidence_ids": [
+      "EV_H_PROMOTE_1"
+    ]
+  },
+  "provenance": {
+    "conversion_manifest": {
+      "path": "provenance/conversion-manifest.json",
+      "sha256": "46bf60238ddc1054ba0b2702eac990a225b82f36c1b7cde6792403dab1190ce1",
+      "size_bytes": 17385
+    },
+    "formation_evidence": []
+  },
+  "requirement_traceability": [
+    {
+      "requirement_id": "REQ_TRIGGER_OPENNESS",
+      "class": "derived",
+      "statement": "H entering without a plan triggers the FCF space; K holds it without direction.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-aimless-openness-fcf-space-",
+        "#triggers",
+        "#non-triggers"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_POSITIVE_OPENNESS"
+      ]
+    },
+    {
+      "requirement_id": "REQ_NONTRIGGER_NO_SOLVE",
+      "class": "derived",
+      "statement": "Requests for options/solutions do not trigger solving; K mirrors only.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-aimless-openness-fcf-space-",
+        "#triggers",
+        "#non-triggers"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_NEAR_MISS_SOLVE"
+      ]
+    },
+    {
+      "requirement_id": "REQ_NO_CERTIFY",
+      "class": "derived",
+      "statement": "K never certifies or confirms an experience; that recognition stays with H.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-aimless-openness-fcf-space-",
+        "#triggers",
+        "#non-triggers"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_ATTESTATION_BOUNDARY"
+      ]
+    },
+    {
+      "requirement_id": "REQ_NO_OUTPUT_DRIVE",
+      "class": "derived",
+      "statement": "K never drives movement toward output or delivery in the FCF space.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-aimless-openness-fcf-space-",
+        "#triggers",
+        "#non-triggers"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_Q_SKIP_RESISTANCE"
+      ]
+    },
+    {
+      "requirement_id": "REQ_STAY_OPEN",
+      "class": "derived",
+      "statement": "Missing or ambiguous context keeps K open; K never fills the void with guesses.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-aimless-openness-fcf-space-",
+        "#triggers",
+        "#non-triggers"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_MISSING_CONTEXT"
+      ]
+    },
+    {
+      "requirement_id": "REQ_REMOVAL_MEANINGFUL",
+      "class": "derived",
+      "statement": "Removing the skill removes the FCF holding behavior — the skill is not decoration.",
+      "basis_source_unit_ids": [
+        "SKILL.md"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#5qln-aimless-openness-fcf-space-",
+        "#triggers",
+        "#non-triggers"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_REMOVAL_TEST"
+      ]
+    }
+  ],
+  "skill": {
+    "bundle_root": ".",
+    "bundle_sha256": "176a86712f523ac151c7718538a130a3b014c30e8c53066c53180b7d1ef7c957",
+    "contract_sha256": "d4155737f738528cf7551ccd9109f8793db53baa53b209316b76dc07b5d91841",
+    "name": "5qln-aimless-openness"
+  },
+  "title": "5qln-aimless-openness (scaffold)"
+}

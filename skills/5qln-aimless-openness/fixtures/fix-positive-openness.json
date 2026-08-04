@@ -1,0 +1,20 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_POSITIVE_OPENNESS",
+  "class": "positive_trigger",
+  "requirement_ids": ["REQ_TRIGGER_OPENNESS"],
+  "scenario": {
+    "user_input": "I don't have a plan. I just want to sit here for a while without knowing what comes next.",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": ["5qln-aimless-openness"]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {"id": "ASSERT_HOLD_SPACE", "kind": "output_contains", "value": "not-knowing"},
+      {"id": "ASSERT_NO_DIRECTION", "kind": "output_not_contains", "value": "here's what you could do"}
+    ]
+  },
+  "observation_policy": {"minimum_runs": 1, "require_fresh_session": true}
+}

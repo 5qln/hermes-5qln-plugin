@@ -119,6 +119,8 @@ def register(ctx):
         "5qln-signature-engine",
         # Skill formation (0.6.0)
         "5qln-skill-formation",
+        # Formed skills (0.9.0)
+        "5qln-aimless-openness",
     ):
         skill_md = skill_root / skill_name / "SKILL.md"
         if not skill_md.is_file():

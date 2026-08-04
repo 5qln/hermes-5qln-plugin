@@ -9,6 +9,23 @@ All notable changes are recorded here. Versions follow semantic versioning.
 - Parametric source purity excludes neutral/unclassified entries from its denominator and reports `null` when no classified evidence exists.
 - Symbolic runtime documentation now states that xyzab requires its bundled decoder and phase-log companions.
 
+## 0.9.0 - 2026-08-04
+
+### Added
+- New bundled skill: **5qln-aimless-openness** — holds the space of true aimless openness (FCF) for H; K acts only as an alerted, sensitive mirror with no agenda, direction, or productivity drive. H-authored, formed through the full skill-v1 cycle (scaffold → verify → 6 behavioral trials observed-passed → H review accepted → promotion authorized).
+- First fully-formed skill produced by the plugin's own formation machinery — the 12th bundled skill.
+
+### Changed
+- Plugin now bundles 12 skills.
+
+### Fixed
+- `verify_skill.py` CLI now parses the documented `--observations` flag (was declared in usage but not parsed).
+
+### ∞0' (return question)
+What does the first formed skill prove — that the machinery works, or that
+holding space without producing is itself a kind of formation that the machine
+cannot perform?
+
 ## 0.8.0 - 2026-08-04
 
 ### Added

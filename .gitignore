@@ -12,3 +12,6 @@ source-inventory.json
 conversion-manifest.json
 compiler-report.json
 
+
+# Formation evidence — never published (skill-v1 contract)
+.verification/

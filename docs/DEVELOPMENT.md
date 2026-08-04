@@ -26,7 +26,7 @@ python -m unittest discover -s tests -v
 
 The tests verify:
 
-- Hermes-style registration of all seven tools, the pre-LLM hook, and all eleven skills;
+- Hermes-style registration of all seven tools, the pre-LLM hook, and all twelve skills;
 - strict fixed-shape seed validation and the 4096-byte bound;
 - seed installation, calibration, export, and evidence non-retention;
 - source inventory and manifest creation;

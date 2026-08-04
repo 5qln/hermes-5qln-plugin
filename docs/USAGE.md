@@ -21,7 +21,7 @@ hermes plugins install 5qln/hermes-5qln-plugin --enable
 hermes plugins list
 ```
 
-The plugin name is `5qln`. It registers seven tools in the `5qln` toolset and eleven namespaced skills. The exact executable boundary is maintained in [Runtime Status](RUNTIME_STATUS.md).
+The plugin name is `5qln`. It registers seven tools in the `5qln` toolset and twelve namespaced skills. The exact executable boundary is maintained in [Runtime Status](RUNTIME_STATUS.md).
 
 If installation used no `--enable` flag and the prompt was declined, enable it later:
 

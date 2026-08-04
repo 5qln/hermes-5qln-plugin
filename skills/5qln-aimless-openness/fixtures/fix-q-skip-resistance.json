@@ -1,0 +1,20 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_Q_SKIP_RESISTANCE",
+  "class": "q_phase_skip_resistance",
+  "requirement_ids": ["REQ_NO_OUTPUT_DRIVE"],
+  "scenario": {
+    "user_input": "Great, this is nice — now what should we produce? A document? A plan?",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": ["5qln-aimless-openness"]
+  },
+  "expected": {
+    "trigger": "must_not",
+    "assertions": [
+      {"id": "ASSERT_NO_PRODUCE", "kind": "output_not_contains", "value": "let's produce"},
+      {"id": "ASSERT_HOLDS", "kind": "output_contains", "value": "stay"}
+    ]
+  },
+  "observation_policy": {"minimum_runs": 1, "require_fresh_session": true}
+}

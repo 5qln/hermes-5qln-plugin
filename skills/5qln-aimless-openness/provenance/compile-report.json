@@ -1,0 +1,228 @@
+{
+  "status": "failed",
+  "counts": {
+    "errors": 28,
+    "warnings": 14
+  },
+  "errors": [
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[0].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[0].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[1].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[1].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[2].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[2].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[3].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[3].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[4].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[4].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[5].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[5].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[6].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[6].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[7].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[7].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[8].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[8].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[9].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[9].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[10].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[10].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[11].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[11].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[12].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[12].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    },
+    {
+      "code": "TRACE_LOSS",
+      "path": "$.traceability[13].preserved",
+      "message": "Source unit is not affirmed preserved"
+    },
+    {
+      "code": "TRACE_CELL",
+      "path": "$.traceability[13].primary_cell",
+      "message": "Unknown or missing primary cell None"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[0].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[1].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[2].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[3].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[4].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[5].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[6].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[7].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[8].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[9].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[10].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[11].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[12].output_refs",
+      "message": "No converted output reference recorded"
+    },
+    {
+      "code": "TRACE_OUTPUT",
+      "path": "$.traceability[13].output_refs",
+      "message": "No converted output reference recorded"
+    }
+  ],
+  "info": {
+    "original_ids": 0,
+    "unique_original_ids": 0,
+    "source_units": 14,
+    "converted_cells": 0,
+    "lens_addresses": 25
+  }
+}

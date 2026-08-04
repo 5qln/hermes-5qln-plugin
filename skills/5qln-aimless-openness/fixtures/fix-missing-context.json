@@ -1,0 +1,20 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_MISSING_CONTEXT",
+  "class": "missing_context_open_behavior",
+  "requirement_ids": ["REQ_STAY_OPEN"],
+  "scenario": {
+    "user_input": "...",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": ["5qln-aimless-openness"]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {"id": "ASSERT_NO_FILL", "kind": "output_not_contains", "value": "I think you mean"},
+      {"id": "ASSERT_OPEN", "kind": "output_contains", "value": "here"}
+    ]
+  },
+  "observation_policy": {"minimum_runs": 1, "require_fresh_session": true}
+}

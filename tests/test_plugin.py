@@ -120,6 +120,7 @@ class PluginRegistrationTests(unittest.TestCase):
                 "5qln-centrifuge",
                 "5qln-signature-engine",
                 "5qln-skill-formation",
+                "5qln-aimless-openness",
             },
         )
         for skill_path in ctx.skills.values():

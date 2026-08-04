@@ -14,6 +14,7 @@ Exit codes:
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 import os
 import subprocess
@@ -746,7 +747,52 @@ def _verify_human_review(
     return findings
 
 
-def _verify_semantic_authorship(manifest: dict[str, object]) -> list[dict[str, object]]:
+def _verify_axis_attestation(
+    manifest: dict[str, object], *, loop_mode: bool = False
+) -> list[dict[str, object]]:
+    """Enforce the standing-direction gate for loop mode.
+
+    In loop mode H does not stop every iteration. Instead the loop verifies
+    against the centrifuged axis: H's original direction, recorded verbatim
+    with a SHA-256 self-check. The axis IS the standing H authority.
+
+    - axis_attestation present + direction hash matches  -> the loop may run
+    - absent in loop mode                                -> AXIS_MISSING (fatal)
+    - direction hash drift                               -> AXIS_DRIFT (fatal)
+    - not loop mode                                      -> informational only
+    """
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, msg: str, ptr: str = "$") -> None:
+        findings.append({
+            "severity": "error", "dimension": "constitution", "code": code,
+            "location": {"kind": "json_pointer", "value": ptr}, "message": msg, "evidence": [],
+        })
+
+    axis = manifest.get("axis_attestation")
+    if not isinstance(axis, dict):
+        if loop_mode:
+            err("AXIS_MISSING", "loop mode requires an axis_attestation (the centrifuged H direction)")
+        return findings
+
+    direction = str(axis.get("direction", ""))
+    declared = str(axis.get("sha256", ""))
+    if not direction.strip():
+        err("AXIS_EMPTY", "axis_attestation.direction must be non-empty", "$/axis_attestation/direction")
+        return findings
+
+    actual = hashlib.sha256(direction.encode("utf-8")).hexdigest()
+    if declared != actual:
+        err("AXIS_DRIFT",
+            f"axis direction hash drift: declared={declared[:16]}… computed={actual[:16]}…",
+            "$/axis_attestation/sha256")
+
+    return findings
+
+
+def _verify_semantic_authorship(
+    manifest: dict[str, object], *, loop_mode: bool = False
+) -> list[dict[str, object]]:
     """Enforce ASMA Pillar III: semantic boundaries must be H-originated or H-accepted.
 
     Every trigger/non-trigger declares authorship:
@@ -778,6 +824,13 @@ def _verify_semantic_authorship(manifest: dict[str, object]) -> list[dict[str, o
         and str(ev.get("scope_bundle_sha256", "")) == bundle_sha256
     ]
 
+    # Loop mode: a valid centrifuged axis attestation IS the standing H direction.
+    # K-authored semantics may run within it without per-iteration human evidence.
+    axis_valid = False
+    if loop_mode:
+        axis_findings = _verify_axis_attestation(manifest, loop_mode=True)
+        axis_valid = not axis_findings
+
     for i, item in enumerate(semantic_items):
         authorship = str(item.get("authorship", "PENDING"))
         item_id = str(item.get("id", f"item/{i}"))
@@ -787,7 +840,7 @@ def _verify_semantic_authorship(manifest: dict[str, object]) -> list[dict[str, o
             err("SEMANTIC_AUTHORSHIP_PENDING",
                 f"semantic boundary '{item_id}' has unresolved authorship (PENDING)", f"$/contract")
             continue
-        if authorship == "K" and not accepted_scoped:
+        if authorship == "K" and not accepted_scoped and not axis_valid:
             err("GHOST_ORIGINATION",
                 f"machine-authored semantic boundary '{item_id}' lacks digest-scoped H acceptance evidence",
                 f"$/contract")
@@ -880,6 +933,7 @@ def verify_skill(
     manifest_path: Path,
     *,
     promotion_mode: bool = False,
+    loop_mode: bool = False,
     observations: list[Path] | None = None,
     capability_snapshot: Path | None = None,
 ) -> dict[str, object]:
@@ -994,7 +1048,11 @@ def verify_skill(
     findings.extend(_verify_human_review(manifest, bundle_root))
 
     # 13a. Semantic authorship provenance (ASMA Pillar III)
-    findings.extend(_verify_semantic_authorship(manifest))
+    findings.extend(_verify_semantic_authorship(manifest, loop_mode=loop_mode))
+
+    # 13b. Loop-mode axis attestation (standing H direction, no per-iteration stop)
+    if loop_mode:
+        findings.extend(_verify_axis_attestation(manifest, loop_mode=True))
 
     # 14. Promotion inspection (Task 16)
     promotion_findings = []
@@ -1079,6 +1137,7 @@ def main(argv: list[str] | None = None) -> int:
     manifest_path = Path(args[0])
     report_path: Path | None = None
     promotion_mode = False
+    loop_mode = False
     overwrite = False
 
     i = 1
@@ -1089,6 +1148,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args[i] == "--promotion-mode":
             promotion_mode = True
             i += 1
+        elif args[i] == "--loop-mode":
+            loop_mode = True
+            i += 1
         elif args[i] == "--overwrite":
             overwrite = True
             i += 1
@@ -1097,7 +1159,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
 
     try:
-        report = verify_skill(manifest_path, promotion_mode=promotion_mode)
+        report = verify_skill(manifest_path, promotion_mode=promotion_mode, loop_mode=loop_mode)
     except SkillContractError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 2

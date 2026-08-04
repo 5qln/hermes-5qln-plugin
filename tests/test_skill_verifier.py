@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -480,3 +481,54 @@ class EvolutionGateTests(unittest.TestCase):
         """No CHANGELOG.md at all is a V∅ dead-ending."""
         findings = verify_skill._verify_return_question_recorded(self.tmp / "CHANGELOG.md")
         self.assertTrue(any("DEAD_ENDING" in (f.get("code") or "") for f in findings))
+
+    # ---- Slice 4: loop mode — axis-attested standing direction (no per-iteration H stop) ----
+
+    def _axis_manifest(self, axis: dict | None = None) -> dict:
+        m = {
+            "contract": {"triggers": [{"id": "TR_1", "statement": "S", "authorship": "K"}],
+                         "non_triggers": [{"id": "NTR_1", "statement": "N", "authorship": "K"}]},
+            "human_review": {"status": "open", "reviewer": None, "evidence": []},
+            "skill": {"bundle_sha256": "a"*64},
+        }
+        if axis is not None:
+            m["axis_attestation"] = axis
+        return m
+
+    def test_loop_mode_requires_axis_attestation(self) -> None:
+        """Loop mode without an axis attestation fails closed — no standing direction."""
+        manifest = self._axis_manifest()
+        findings = verify_skill._verify_axis_attestation(manifest, loop_mode=True)
+        self.assertTrue(any("AXIS_MISSING" in (f.get("code") or "") for f in findings))
+
+    def test_axis_drift_detected(self) -> None:
+        """A direction whose hash does not match its declaration is axis drift."""
+        axis = {
+            "direction": "H's original direction: the pilot must prove itself.",
+            "sha256": "0" * 64,
+            "source": "centrifuge-signature.txt",
+        }
+        findings = verify_skill._verify_axis_attestation(
+            self._axis_manifest(axis), loop_mode=True)
+        self.assertTrue(any("AXIS_DRIFT" in (f.get("code") or "") for f in findings))
+
+    def test_loop_mode_k_authored_passes_with_valid_axis(self) -> None:
+        """Within a valid H-originated axis, K-authored semantics may run the loop
+        without per-iteration human evidence — the axis IS the standing H direction."""
+        direction = "H's original direction: the pilot must prove itself."
+        axis = {
+            "direction": direction,
+            "sha256": hashlib.sha256(direction.encode()).hexdigest(),
+            "source": "centrifuge-signature.txt",
+        }
+        manifest = self._axis_manifest(axis)
+        findings = verify_skill._verify_axis_attestation(manifest, loop_mode=True)
+        self.assertEqual(findings, [])
+        auth_findings = verify_skill._verify_semantic_authorship(manifest, loop_mode=True)
+        self.assertFalse(any("GHOST_ORIGINATION" in (f.get("code") or "") for f in auth_findings))
+
+    def test_loop_mode_without_axis_still_ghost_originates(self) -> None:
+        """No axis → K-authored semantics still GHOST_ORIGINATION even in loop mode."""
+        manifest = self._axis_manifest()
+        findings = verify_skill._verify_semantic_authorship(manifest, loop_mode=True)
+        self.assertTrue(any("GHOST_ORIGINATION" in (f.get("code") or "") for f in findings))

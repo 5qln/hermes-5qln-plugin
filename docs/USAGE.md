@@ -7,9 +7,10 @@
 3. Run a conversion workflow
 4. Create and validate a deep-research prompt
 5. Operate a portable parametric fractal
-6. Interpret results
-7. Update and remove
-8. Troubleshoot
+6. Form a skill-v1 bundle
+7. Interpret results
+8. Update and remove
+9. Troubleshoot
 
 ## 1. Install and verify
 
@@ -213,7 +214,49 @@ After a full Hermes restart, the plugin's `pre_llm_call` hook injects fixed K-la
 
 A passing mechanical test does not establish signature or resonance. Use the clean-profile A/B protocol in [Portable Parametric Fractal](PARAMETRIC_FRACTAL.md), and reserve recognition for explicit H evidence.
 
-## 6. Interpret results
+## 6. Form a skill-v1 bundle
+
+Form a new 5QLN-governed skill from a candidate bundle directory.
+
+### Scaffold the formation manifest
+
+```bash
+python3 skills/5qln-skill-formation/scripts/new_skill_manifest.py BUNDLE_ROOT \
+    --out BUNDLE_ROOT/skill-formation-manifest.json \
+    --conversion-manifest provenance/conversion-manifest.json
+```
+
+The scaffold inventories the bundle, computes digests, and leaves
+human-dependent fields (triggers, fixtures, review, promotion) open.
+
+### Verify structurally (formation gate)
+
+```bash
+python3 skills/5qln-skill-formation/scripts/verify_skill.py BUNDLE_ROOT/skill-formation-manifest.json
+```
+
+Every verification first checks the sealed kernel (217 bytes, sha256
+`feaa46b4…859b`) — drift or absence is fatal. Triggers and non-triggers must
+declare `authorship` (`H`, `K`, or `PENDING`); machine-authored semantics fail
+with `GHOST_ORIGINATION` unless digest-scoped human acceptance evidence exists.
+
+### Verify in loop mode (standing direction)
+
+```bash
+python3 skills/5qln-skill-formation/scripts/verify_skill.py BUNDLE_ROOT/skill-formation-manifest.json \
+    --loop-mode
+```
+
+Loop mode verifies against `axis_attestation` — H's original direction,
+recorded verbatim with a SHA-256 self-check — so the loop runs without
+per-iteration human stops. Missing or drifted axis fails closed
+(`AXIS_MISSING` / `AXIS_DRIFT`). The Hermes tool exposes this as
+`fiveqln_verify_skill` with `loop_mode: true`.
+
+A structural pass is not certification: it never proves a skill is living,
+resonant, or complete — that recognition remains with H.
+
+## 7. Interpret results
 
 `success` describes tool execution. `valid` describes the compiled manifest or research prompt.
 
@@ -234,7 +277,7 @@ A passed manifest report means only that encoded conversion-integrity rules pass
 
 The inventory, manifest, compiler-report, prompt-report, seed-install, and seed-export operations refuse to replace an existing output by default. Use their explicit overwrite or replace option only after checking the target.
 
-## 7. Update and remove
+## 8. Update and remove
 
 ```bash
 hermes plugins update 5qln
@@ -244,7 +287,7 @@ hermes plugins remove 5qln
 
 Review release notes and repository changes before updating third-party code.
 
-## 8. Troubleshoot
+## 9. Troubleshoot
 
 ### Plugin is installed but tools are absent
 

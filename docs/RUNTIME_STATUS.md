@@ -46,6 +46,21 @@ xyzab state remains at `$XYZAB_STATE_DIR/xyzab_state.json`, defaulting to
 The parametric fractal is independent of xyzab and the phase log. It does not
 replace them and is not evidence that a cycle has occurred.
 
+## Shipped skill-v1 formation gates (0.8.0)
+
+The skill-v1 verifier (`verify_skill.py`, exposed as `fiveqln_verify_skill`)
+enforces four constitutional gates at runtime:
+
+| Gate | Code | Behavior |
+|---|---|---|
+| Kernel seal | `SEAL_DRIFT` / `SEAL_MISSING` / `SEAL_UNREADABLE` | Every verification hashes `kernel.txt` (217 bytes, sha256 `feaa46b4…859b`) first; drift or absence is fatal |
+| Semantic authorship | `GHOST_ORIGINATION` / `SEMANTIC_AUTHORSHIP_PENDING` | Triggers and non-triggers declare `authorship` (`H`/`K`/`PENDING`); machine-authored semantics require digest-scoped human acceptance evidence |
+| V∅ return | `DEAD_ENDING` | Promotion mode requires a recorded return question (∞0') in CHANGELOG.md |
+| Loop mode | `AXIS_MISSING` / `AXIS_DRIFT` | `--loop-mode` verifies against `axis_attestation` (H's original direction, verbatim, hash-self-checked); the loop runs without per-iteration human stops, and fails closed if the axis is absent or drifted |
+
+The verifier checks structure and digest scope; it never certifies a skill as
+living, resonant, or complete — that recognition remains with H.
+
 ## Not shipped
 
 The following names remain research or historical concepts and are not executable

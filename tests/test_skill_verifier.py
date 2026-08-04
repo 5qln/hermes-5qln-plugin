@@ -353,3 +353,31 @@ class SkillObservedRunTests(unittest.TestCase):
         status, findings = verify_skill._ingest_observed_runs(manifest, [obs])
         self.assertTrue(any("OBSERVATION_HASH" in (f.get("code") or "") for f in findings))
 
+
+
+class EvolutionGateTests(unittest.TestCase):
+    """ASMA hard gates: kernel seal, semantic authorship, V∅ changelog."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    # ---- Slice 1: Pillar I — kernel seal enforcement ----
+
+    def test_kernel_seal_drift_is_fatal(self) -> None:
+        """A kernel.txt whose bytes differ from the seal is a fatal finding."""
+        drifted = self.tmp / "kernel.txt"
+        drifted.write_text("H = drifted | A = drifted\n", encoding="utf-8")
+        findings = verify_skill._verify_kernel_seal(drifted)
+        self.assertTrue(any("SEAL_DRIFT" in (f.get("code") or "") for f in findings))
+        self.assertTrue(all(f.get("severity") == "error" for f in findings))
+
+    def test_kernel_seal_matches_plugin_root(self) -> None:
+        """The real plugin kernel.txt matches the published seal."""
+        real_kernel = ROOT / "kernel.txt"
+        self.assertTrue(real_kernel.exists(), "kernel.txt must exist at plugin root")
+        findings = verify_skill._verify_kernel_seal(real_kernel)
+        self.assertEqual(findings, [])

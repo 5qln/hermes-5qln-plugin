@@ -17,6 +17,12 @@ MAX_FILE_BYTES = 10 * 1024 * 1024
 MAX_TOTAL_BYTES = 50 * 1024 * 1024
 MAX_DEPTH = 32
 
+# The sealed 5QLN constitutional kernel: 217 bytes, immutable.
+# If kernel.txt drifts from this digest, every downstream verification
+# must fail closed. Mirrors fractal_memory.CODEX_SHA256.
+CODEX_SHA256 = "feaa46b4147d4e023cdd3fd59c051d063e8ec654ee7b38a481dcd5e4c781859b"
+KERNEL_FILE = "kernel.txt"
+
 _EXCLUDED_PATHS: tuple[str, ...] = (
     "skill-formation-manifest.json",
 )

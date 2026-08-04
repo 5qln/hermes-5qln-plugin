@@ -24,6 +24,8 @@ from pathlib import Path
 from typing import Any
 
 from skill_common import (
+    CODEX_SHA256,
+    KERNEL_FILE,
     MAX_FILE_BYTES,
     SkillContractError,
     atomic_write_json,
@@ -34,6 +36,62 @@ from skill_common import (
     sha256_bytes,
     validate_skill_manifest,
 )
+
+# ---------------------------------------------------------------------------
+# Constitutional kernel seal (ASMA Pillar I)
+# ---------------------------------------------------------------------------
+
+def _plugin_root() -> Path:
+    """Locate the plugin root from this script's own location.
+
+    verify_skill.py lives at skills/5qln-skill-formation/scripts/.
+    The plugin root is four parents up (scripts -> 5qln-skill-formation ->
+    skills -> plugin root).
+    """
+    return Path(__file__).resolve().parents[3]
+
+
+def _kernel_path(plugin_root: Path | None = None) -> Path:
+    """Resolve kernel.txt inside the plugin tree."""
+    root = plugin_root if plugin_root is not None else _plugin_root()
+    return root / KERNEL_FILE
+
+
+def _verify_kernel_seal(kernel_path: Path | None = None) -> list[dict[str, object]]:
+    """Verify kernel.txt matches the sealed constitutional digest.
+
+    Fail closed: any drift from CODEX_SHA256 is a fatal structural finding.
+    A missing kernel.txt is likewise fatal — a verifier that cannot see the
+    kernel cannot certify structure as constitutionally bounded.
+    """
+    path = kernel_path if kernel_path is not None else _kernel_path()
+    findings: list[dict[str, object]] = []
+
+    def err(code: str, message: str) -> None:
+        findings.append({
+            "severity": "error",
+            "dimension": "constitution",
+            "code": code,
+            "location": {"kind": "relative_path", "value": str(path)},
+            "message": message,
+            "evidence": [],
+        })
+
+    if not path.is_file():
+        err("SEAL_MISSING", f"kernel file not found: {path}")
+        return findings
+
+    try:
+        actual = sha256_bytes(path.read_bytes())
+    except OSError as exc:
+        err("SEAL_UNREADABLE", f"cannot read kernel file: {exc}")
+        return findings
+
+    if actual != CODEX_SHA256:
+        err("SEAL_DRIFT", f"kernel seal drift: expected {CODEX_SHA256[:16]}…, got {actual[:16]}…")
+
+    return findings
+
 
 # ---------------------------------------------------------------------------
 # SKILL.md frontmatter parsing (Task 7)
@@ -784,6 +842,9 @@ def verify_skill(
         err("JSON_INVALID", f"manifest is not valid JSON: {e}")
         return _build_report(manifest_path, {}, findings, warnings, {}, promotion_mode,
                              execution_success=False)
+
+    # 0. Constitutional kernel seal (ASMA Pillar I) — fail closed
+    findings.extend(_verify_kernel_seal())
 
     # 2. Schema validation
     schema_findings = validate_skill_manifest(manifest)

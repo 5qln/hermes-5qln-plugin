@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "counts": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "errors": [],
+  "warnings": [],
+  "info": {
+    "original_ids": 0,
+    "unique_original_ids": 0,
+    "source_units": 27,
+    "converted_cells": 9,
+    "lens_addresses": 25
+  }
+}

@@ -1,0 +1,21 @@
+H: Reduce /opt/data/5qln-lineage/corpus.txt to a seed — keep it bounded.
+
+K: 5QLN FRACTAL SEED — card
+  format        5qln-fractal-seed/1
+  codex pin     feaa46b4147d4e02…
+  mode          both
+  arity         5 (holographic: every node is a complete seed)
+  original      4795203 bytes
+  leaves        318 × 15104 bytes
+  depth         4
+  seed size     2099145 bytes (json)
+  compression   0.315 (cargo/original)
+  root ≡        1285cff056f67e5e406e4ffcf7da99e6…
+  alpha kind    text
+  root alpha    "The seeds within the apple are the reinvested earnings of the payer, the new plants the company builds with the retained"
+  ∞0'           What does the whole say that this fragment only begins to say: "The seeds within the apple are the reinvested earnings of the payer, the new pla"?
+  ∞0' source    mechanical
+  self-negation This seed is a pointer, not the data itself. Essence expansion regenerat…
+
+[seed written to /tmp/trial1.seed.json]
+

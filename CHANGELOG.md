@@ -4,6 +4,19 @@ All notable changes are recorded here. Versions follow semantic versioning.
 
 ## Unreleased
 
+## 0.11.0 - 2026-08-12
+
+### Added
+- New bundled skill: **5qln-fractal-data-loop** — the reduce/expand data operator: any-size data to a bounded seed (5-ary, holographic — every node a complete seed) and back; witness mode regenerates exact bytes with per-level ≡ verification and localized honest failure, essence mode unfolds verbatim outlines at dialable depth. Machine-drafted, H-accepted, formed through the full skill-v1 cycle (conversion compiled 0 errors, 6 behavioral fixtures observed-passed, review accepted, promotion authorized) — the 15th bundled skill.
+- Ships as `fractal_data_loop.py`, deliberately distinct from the unshipped `fractal_loop.py` vertical-descent research concept.
+
+### Changed
+- Plugin now bundles 15 skills.
+
+### ∞0' (return question)
+What would an α be that is chosen by what opens, not by what repeats?
+
+
 ### Fixed
 - Footer-shaped bare S input now recognizes Unicode-letter field prefixes as well as ASCII ones, including Greek confusables combined with colon-like separators.
 - Parametric source purity excludes neutral/unclassified entries from its denominator and reports `null` when no classified evidence exists.

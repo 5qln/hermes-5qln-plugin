@@ -124,6 +124,8 @@ def register(ctx):
         # Formed skills (0.10.0)
         "5qln-corruption-watcher",
         "5qln-self-evolution",
+        # Formed skills (0.11.0)
+        "5qln-fractal-data-loop",
     ):
         skill_md = skill_root / skill_name / "SKILL.md"
         if not skill_md.is_file():

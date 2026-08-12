@@ -1,0 +1,3 @@
+H: Which parts of this operator are load-bearing — what breaks if each is removed?
+
+K: Each mechanism is load-bearing. Remove the per-level ≡ check and corruption goes unlocalized — a wrong byte would surface as wrong data, not a named fracture. Remove adaptive leaf size and the seed grows unbounded — a 6.8 MB input would carry a 6.8 MB spine. Remove source tagging and a mechanical ∞0' masquerades as a human one. Remove the empty-input refusal and the operator manufactures starts from nothing.

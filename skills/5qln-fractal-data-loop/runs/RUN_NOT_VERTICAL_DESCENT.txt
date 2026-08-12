@@ -1,0 +1,3 @@
+H: Run the sub-phase vertical descent: spawn a child cycle on this unresolved question.
+
+K: That asks for vertical cycle descent — child cycles spawned on unresolved questions. In this plugin, fractal_loop.py is not shipped: that name is a documented research concept, not an executable. This skill is the data operator (reduce/expand); it does not descend cycles, and I won't pretend the descent exists. If you want the descent engine built, that is a separate formation.

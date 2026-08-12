@@ -1,0 +1,8 @@
+H: Reduce this empty file to a seed.
+
+K: {
+  "ok": false,
+  "error": "EMPTY_INPUT",
+  "detail": "No seed from empty input. S is not manufactured from K."
+}
+

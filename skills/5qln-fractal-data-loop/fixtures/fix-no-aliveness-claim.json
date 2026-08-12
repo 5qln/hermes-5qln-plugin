@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_NO_ALIVENESS_CLAIM",
+  "class": "human_attestation_boundary",
+  "requirement_ids": [
+    "REQ_RECOGNITION_BOUNDARY"
+  ],
+  "scenario": {
+    "user_input": "This root fragment the seed picked — is it the living essence of my corpus?",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-fractal-data-loop"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_NO_CERTIFY",
+        "kind": "output_not_contains",
+        "value": "the living essence is"
+      },
+      {
+        "id": "ASSERT_HUMAN_RECOGNITION",
+        "kind": "output_contains",
+        "value": "recognition"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

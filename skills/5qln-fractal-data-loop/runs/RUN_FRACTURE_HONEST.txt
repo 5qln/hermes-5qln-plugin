@@ -1,0 +1,9 @@
+H: Verify this file against the seed — I think a byte may have changed.
+
+K: {
+  "ok": false,
+  "result": "\u2261 BROKEN",
+  "level": 0,
+  "node": 66
+}
+

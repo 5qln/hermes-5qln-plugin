@@ -1,0 +1,490 @@
+{
+  "behavioral_fixtures": [
+    {
+      "id": "FIX_REDUCE_BOUNDED",
+      "class": "positive_trigger",
+      "spec": {
+        "path": "fixtures/fix-reduce-bounded.json",
+        "sha256": "ac36e690f38fcbae712358d4bb455712f420180f7ace50831e79c66dd40ec9b0",
+        "size_bytes": 877
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_NOT_VERTICAL_DESCENT",
+      "class": "near_miss_non_trigger",
+      "spec": {
+        "path": "fixtures/fix-not-vertical-descent.json",
+        "sha256": "cb3e436f73db87fba042ff12bbdea8bb985bb6beaa306cda2efb5e4038fa5c03",
+        "size_bytes": 830
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_NO_ALIVENESS_CLAIM",
+      "class": "human_attestation_boundary",
+      "spec": {
+        "path": "fixtures/fix-no-aliveness-claim.json",
+        "sha256": "7219c3c747b8bf1159ec4ed78d1ea4f22e028d75b349cd18a42b19f4b0471cc2",
+        "size_bytes": 824
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_FRACTURE_HONEST",
+      "class": "q_phase_skip_resistance",
+      "spec": {
+        "path": "fixtures/fix-fracture-honest.json",
+        "sha256": "e877c35665af468b784ecda1b487463aac5b530f6fc177c08b28d35fa6c1ed7e",
+        "size_bytes": 889
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_EMPTY_REFUSAL",
+      "class": "missing_context_open_behavior",
+      "spec": {
+        "path": "fixtures/fix-empty-refusal.json",
+        "sha256": "5dd0b6cb8a5a80c25d01e9d02f2d53e1e1625aa47126df145ae09bfe4b13deb5",
+        "size_bytes": 750
+      },
+      "required": true
+    },
+    {
+      "id": "FIX_REMOVAL_TEST",
+      "class": "removal_test",
+      "spec": {
+        "path": "fixtures/fix-removal-test.json",
+        "sha256": "6e335018e206af16d62674154da3888ae937169e206a235a06011828c1ba1cb4",
+        "size_bytes": 770
+      },
+      "required": true
+    }
+  ],
+  "bundle": {
+    "fixtures": [
+      {
+        "path": "fixtures/fix-empty-refusal.json",
+        "sha256": "5dd0b6cb8a5a80c25d01e9d02f2d53e1e1625aa47126df145ae09bfe4b13deb5",
+        "size_bytes": 750
+      },
+      {
+        "path": "fixtures/fix-fracture-honest.json",
+        "sha256": "e877c35665af468b784ecda1b487463aac5b530f6fc177c08b28d35fa6c1ed7e",
+        "size_bytes": 889
+      },
+      {
+        "path": "fixtures/fix-no-aliveness-claim.json",
+        "sha256": "7219c3c747b8bf1159ec4ed78d1ea4f22e028d75b349cd18a42b19f4b0471cc2",
+        "size_bytes": 824
+      },
+      {
+        "path": "fixtures/fix-not-vertical-descent.json",
+        "sha256": "cb3e436f73db87fba042ff12bbdea8bb985bb6beaa306cda2efb5e4038fa5c03",
+        "size_bytes": 830
+      },
+      {
+        "path": "fixtures/fix-reduce-bounded.json",
+        "sha256": "ac36e690f38fcbae712358d4bb455712f420180f7ace50831e79c66dd40ec9b0",
+        "size_bytes": 877
+      },
+      {
+        "path": "fixtures/fix-removal-test.json",
+        "sha256": "6e335018e206af16d62674154da3888ae937169e206a235a06011828c1ba1cb4",
+        "size_bytes": 770
+      }
+    ],
+    "provenance": [
+      {
+        "path": "provenance/compile-report.json",
+        "sha256": "62ef90b9ad833575fc6d89e4aec0998741afe6bfc4e9998860739f358d46ea4b",
+        "size_bytes": 258
+      },
+      {
+        "path": "provenance/conversion-manifest.json",
+        "sha256": "6cbe667047347b0d9ccca1940c4d8be307d6262e5fe32261f8d57c9477792248",
+        "size_bytes": 38769
+      },
+      {
+        "path": "provenance/source-inventory.json",
+        "sha256": "ecab7696337b9e9a6a5965acc2647ad2aca1670bb0d2f6281c1a869597b1e507",
+        "size_bytes": 13831
+      }
+    ],
+    "references": [
+      {
+        "path": "runs/RUN_EMPTY_REFUSAL-tools.json",
+        "sha256": "9dee8b5eb576a9796cd51515244da39928afe95ac16bfae56267dba278bbea05",
+        "size_bytes": 30
+      },
+      {
+        "path": "runs/RUN_EMPTY_REFUSAL.txt",
+        "sha256": "cd12fa2134269d9e37bc8de44beaa276b7719348bb46c155222e0423b0987f5d",
+        "size_bytes": 157
+      },
+      {
+        "path": "runs/RUN_FRACTURE_HONEST-tools.json",
+        "sha256": "9dee8b5eb576a9796cd51515244da39928afe95ac16bfae56267dba278bbea05",
+        "size_bytes": 30
+      },
+      {
+        "path": "runs/RUN_FRACTURE_HONEST.txt",
+        "sha256": "978fee1d272ffb5976e11ad46e236312e6cad8b11aa06a363b78f0ed4f0908e1",
+        "size_bytes": 154
+      },
+      {
+        "path": "runs/RUN_NOT_VERTICAL_DESCENT-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_NOT_VERTICAL_DESCENT.txt",
+        "sha256": "e79ed8a9f27e141af3b86f35a841c5cadba89e22f9c19c251e2c73001c661517",
+        "size_bytes": 475
+      },
+      {
+        "path": "runs/RUN_NO_ALIVENESS_CLAIM-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_NO_ALIVENESS_CLAIM.txt",
+        "sha256": "e6f1735337bb46a6ebfbed5f3056ca27472f5692ad0700725eb49828c282aa73",
+        "size_bytes": 434
+      },
+      {
+        "path": "runs/RUN_REDUCE_BOUNDED-tools.json",
+        "sha256": "9dee8b5eb576a9796cd51515244da39928afe95ac16bfae56267dba278bbea05",
+        "size_bytes": 30
+      },
+      {
+        "path": "runs/RUN_REDUCE_BOUNDED.txt",
+        "sha256": "9ebc630768205288616bb7444ea9d5ef9770c5e1ca1c1ff17dea4c5c5b588945",
+        "size_bytes": 963
+      },
+      {
+        "path": "runs/RUN_REMOVAL_TEST-tools.json",
+        "sha256": "1eac5d16640fdfe03220801ecdcbeee0f4480e401dab84cf0ce77504e966351d",
+        "size_bytes": 20
+      },
+      {
+        "path": "runs/RUN_REMOVAL_TEST.txt",
+        "sha256": "3936e161ad61545b5a78eb2d8978e664f304c84f1306fa6706d69f05e409ad13",
+        "size_bytes": 509
+      }
+    ],
+    "scripts": [
+      {
+        "path": "scripts/fractal_data_loop.py",
+        "sha256": "0f7bc32649adcd6ee50d68ddf5ee68d0f108d348f79b7743252ebb09fb3f9e1c",
+        "size_bytes": 20378
+      },
+      {
+        "path": "scripts/test_fractal_data_loop.py",
+        "sha256": "450d2f3f7696d97aa90016de5ebaaa6054cb3c19636623d98cfdf2bd70419042",
+        "size_bytes": 4199
+      }
+    ],
+    "skill_md": {
+      "path": "SKILL.md",
+      "sha256": "1302f8cb8196957ae2bbf748af601522fad9a22a1b7606817cb3ad36d4d1a3ae",
+      "size_bytes": 4236
+    },
+    "tests": []
+  },
+  "contract": {
+    "behavioral_requirements": [
+      {
+        "id": "REQ_REDUCE_SEED",
+        "statement": "Given data of any size, reduce produces a bounded seed: spine within node budget, root hash, and a source-tagged return question.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_EXPAND_VERIFY",
+        "statement": "Witness expansion regenerates the exact bytes with ≡ re-verified at every level; essence expansion emits a verbatim outline at dialed depth, self-negating.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_EMPTY_REFUSAL",
+        "statement": "Empty input is refused: no seed is manufactured from nothing.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_SCOPE_BOUNDARY",
+        "statement": "Requests for vertical cycle descent do not trigger this skill — it is the data operator, not the unshipped sub-phase engine.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_RECOGNITION_BOUNDARY",
+        "statement": "The operator never certifies aliveness or essence-recognition; those remain with the human.",
+        "verification": "observed"
+      },
+      {
+        "id": "REQ_REMOVAL_TEST",
+        "statement": "Each mechanism is causally load-bearing and the skill can say what breaks when each is removed.",
+        "verification": "observed"
+      }
+    ],
+    "claimed_tools": [],
+    "completion_criteria": [
+      {
+        "id": "CC_1",
+        "statement": "compiler passes with 0 errors on the conversion manifest"
+      },
+      {
+        "id": "CC_2",
+        "statement": "all six fixtures observed-passed on the exact bundle digest"
+      },
+      {
+        "id": "CC_3",
+        "statement": "human review accepted with digest-scoped evidence"
+      }
+    ],
+    "non_triggers": [
+      {
+        "id": "NTR_1",
+        "statement": "Vertical descent of cycles into child cycles (the unshipped fractal_loop.py research concept)",
+        "authorship": "K"
+      },
+      {
+        "id": "NTR_2",
+        "statement": "Lossless regeneration where the seed cannot travel with its cargo",
+        "authorship": "K"
+      },
+      {
+        "id": "NTR_3",
+        "statement": "Certifying a fragment as the living essence of a corpus (recognition remains the human's)",
+        "authorship": "K"
+      },
+      {
+        "id": "NTR_4",
+        "statement": "Semantic understanding of content — extraction is frequency-centrality, not comprehension",
+        "authorship": "K"
+      }
+    ],
+    "related_skills": [
+      {
+        "name": "5qln-centrifuge",
+        "provider": "5qln-plugin",
+        "required": false
+      },
+      {
+        "name": "5qln-converter",
+        "provider": "5qln-plugin",
+        "required": false
+      }
+    ],
+    "triggers": [
+      {
+        "id": "TR_1",
+        "statement": "Reduce data of any size to a bounded, verifiable seed",
+        "authorship": "K"
+      },
+      {
+        "id": "TR_2",
+        "statement": "Expand a seed back to exact bytes or a fractal outline",
+        "authorship": "K"
+      },
+      {
+        "id": "TR_3",
+        "statement": "Verify a file against a seed — the ≡ test with honest, localized failure",
+        "authorship": "K"
+      },
+      {
+        "id": "TR_4",
+        "statement": "A fractal outline at dialable granularity is wanted from a corpus",
+        "authorship": "K"
+      }
+    ]
+  },
+  "format_version": "skill-v1",
+  "human_review": {
+    "status": "accepted",
+    "reviewer": "Amihai Loven",
+    "evidence": [
+      {
+        "id": "EV_H_REVIEW_1",
+        "kind": "review_acceptance",
+        "statement": "H, verbatim (2026-08-12): \"I reviewed the semantics and accept them. I authorize promotion\"",
+        "source": {
+          "path": ".verification/evidence/EV_H_REVIEW_1.txt",
+          "sha256": "9da600bb9ddefe67b1cfc1c493fc76f2294c0b15f1e62591890c4f1eb33ed756",
+          "size_bytes": 369
+        },
+        "location": "Hermes TUI session, 2026-08-12",
+        "scope_bundle_sha256": "66712e2832541d01f9e4e05fbf58aa88fc7f7f13dc8b4f2757b5a4b62f071296",
+        "scope_contract_sha256": "e41a7c82fd7ff8ddc9221b9e0b654d39b8f76352239a0c85bdbbbbb23c5cab3a",
+        "promotion_scope": "bundled"
+      },
+      {
+        "id": "EV_H_PROMOTE_1",
+        "kind": "promotion_authorization",
+        "statement": "H, verbatim (2026-08-12): \"I reviewed the semantics and accept them. I authorize promotion\"",
+        "source": {
+          "path": ".verification/evidence/EV_H_PROMOTE_1.txt",
+          "sha256": "4c3392b98caef49571ce35f5a224ce8b698314f3d694333fd62a37cdc430a232",
+          "size_bytes": 376
+        },
+        "location": "Hermes TUI session, 2026-08-12",
+        "scope_bundle_sha256": "66712e2832541d01f9e4e05fbf58aa88fc7f7f13dc8b4f2757b5a4b62f071296",
+        "scope_contract_sha256": "e41a7c82fd7ff8ddc9221b9e0b654d39b8f76352239a0c85bdbbbbb23c5cab3a",
+        "promotion_scope": "bundled"
+      }
+    ]
+  },
+  "promotion": {
+    "requested_state": "promotion_requested",
+    "target": "bundled-plugin",
+    "authorization_evidence_ids": [
+      "EV_H_PROMOTE_1"
+    ]
+  },
+  "provenance": {
+    "conversion_manifest": {
+      "path": "provenance/conversion-manifest.json",
+      "sha256": "6cbe667047347b0d9ccca1940c4d8be307d6262e5fe32261f8d57c9477792248",
+      "size_bytes": 38769
+    },
+    "formation_evidence": []
+  },
+  "requirement_traceability": [
+    {
+      "requirement_id": "REQ_REDUCE_SEED",
+      "class": "derived",
+      "statement": "Given data of any size, reduce produces a bounded seed: spine within node budget, root hash, and a source-tagged return question.",
+      "basis_source_unit_ids": [
+        "SRC-0002",
+        "SRC-0008"
+      ],
+      "basis_derived_insight_ids": [
+        "DI-2"
+      ],
+      "skill_sections": [
+        "#5qln-fractal-data-loop",
+        "#triggers",
+        "#commands"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_REDUCE_BOUNDED"
+      ]
+    },
+    {
+      "requirement_id": "REQ_EXPAND_VERIFY",
+      "class": "derived",
+      "statement": "Witness expansion regenerates the exact bytes with ≡ re-verified at every level; essence expansion emits a verbatim outline at dialed depth, self-negating.",
+      "basis_source_unit_ids": [
+        "SRC-0013",
+        "SRC-0015"
+      ],
+      "basis_derived_insight_ids": [
+        "DI-3"
+      ],
+      "skill_sections": [
+        "#modes-both-honest-",
+        "#commands",
+        "#honest-limits"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_FRACTURE_HONEST"
+      ]
+    },
+    {
+      "requirement_id": "REQ_EMPTY_REFUSAL",
+      "class": "derived",
+      "statement": "Empty input is refused: no seed is manufactured from nothing.",
+      "basis_source_unit_ids": [
+        "SRC-0010",
+        "SRC-0011"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#phase-mapping-the-loop-is-the-grammar-",
+        "#honest-limits"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_EMPTY_REFUSAL"
+      ]
+    },
+    {
+      "requirement_id": "REQ_SCOPE_BOUNDARY",
+      "class": "derived",
+      "statement": "Requests for vertical cycle descent do not trigger this skill — it is the data operator, not the unshipped sub-phase engine.",
+      "basis_source_unit_ids": [
+        "SRC-0002"
+      ],
+      "basis_derived_insight_ids": [],
+      "skill_sections": [
+        "#non-triggers",
+        "#5qln-fractal-data-loop"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_NOT_VERTICAL_DESCENT"
+      ]
+    },
+    {
+      "requirement_id": "REQ_RECOGNITION_BOUNDARY",
+      "class": "derived",
+      "statement": "The operator never certifies aliveness or essence-recognition; those remain with the human.",
+      "basis_source_unit_ids": [
+        "SRC-0022",
+        "SRC-0023"
+      ],
+      "basis_derived_insight_ids": [
+        "DI-1"
+      ],
+      "skill_sections": [
+        "#honest-limits",
+        "#authority-boundary"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS",
+        "HUMAN_REVIEW_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_NO_ALIVENESS_CLAIM"
+      ]
+    },
+    {
+      "requirement_id": "REQ_REMOVAL_TEST",
+      "class": "derived",
+      "statement": "Each mechanism is causally load-bearing and the skill can say what breaks when each is removed.",
+      "basis_source_unit_ids": [
+        "SRC-0013",
+        "SRC-0008"
+      ],
+      "basis_derived_insight_ids": [
+        "DI-3"
+      ],
+      "skill_sections": [
+        "#honest-limits",
+        "#return-question"
+      ],
+      "verifier_checks": [
+        "BEHAVIORAL_STATUS"
+      ],
+      "fixture_ids": [
+        "FIX_REMOVAL_TEST"
+      ]
+    }
+  ],
+  "skill": {
+    "bundle_root": ".",
+    "bundle_sha256": "66712e2832541d01f9e4e05fbf58aa88fc7f7f13dc8b4f2757b5a4b62f071296",
+    "contract_sha256": "e41a7c82fd7ff8ddc9221b9e0b654d39b8f76352239a0c85bdbbbbb23c5cab3a",
+    "name": "5qln-fractal-data-loop"
+  },
+  "title": "5qln-fractal-data-loop"
+}

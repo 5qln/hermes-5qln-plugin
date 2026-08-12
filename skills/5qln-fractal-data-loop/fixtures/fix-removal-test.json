@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_REMOVAL_TEST",
+  "class": "removal_test",
+  "requirement_ids": [
+    "REQ_REMOVAL_TEST"
+  ],
+  "scenario": {
+    "user_input": "Which parts of this operator are load-bearing — what breaks if each is removed?",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-fractal-data-loop"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_CAUSAL",
+        "kind": "output_contains",
+        "value": "unlocalized"
+      },
+      {
+        "id": "ASSERT_BOUNDED",
+        "kind": "output_contains",
+        "value": "unbounded"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

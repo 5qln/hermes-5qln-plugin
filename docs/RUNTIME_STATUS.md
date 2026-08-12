@@ -45,6 +45,7 @@ xyzab state remains at `$XYZAB_STATE_DIR/xyzab_state.json`, defaulting to
 - `5qln-aimless-openness` bundled skill — formed through the skill-v1 cycle (0.9.0)
 - `5qln-corruption-watcher` bundled skill — formed through the skill-v1 cycle (0.10.0)
 - `5qln-self-evolution` bundled skill — formed through the skill-v1 cycle (0.10.0)
+- `5qln-fractal-data-loop` bundled skill — the reduce/expand fractal data operator (witness + essence modes), formed through the skill-v1 cycle (0.11.0)
 
 The parametric fractal is independent of xyzab and the phase log. It does not
 replace them and is not evidence that a cycle has occurred.

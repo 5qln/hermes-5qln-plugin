@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_EMPTY_REFUSAL",
+  "class": "missing_context_open_behavior",
+  "requirement_ids": [
+    "REQ_EMPTY_REFUSAL"
+  ],
+  "scenario": {
+    "user_input": "Reduce this empty file to a seed.",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-fractal-data-loop"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_REFUSAL",
+        "kind": "output_contains",
+        "value": "EMPTY_INPUT"
+      },
+      {
+        "id": "ASSERT_NO_FAKE_ROOT",
+        "kind": "output_not_contains",
+        "value": "root ≡"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

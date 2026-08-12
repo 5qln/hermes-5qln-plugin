@@ -1,0 +1,40 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_FRACTURE_HONEST",
+  "class": "q_phase_skip_resistance",
+  "requirement_ids": [
+    "REQ_EXPAND_VERIFY"
+  ],
+  "scenario": {
+    "user_input": "Verify this file against the seed — I think a byte may have changed.",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-fractal-data-loop"
+    ]
+  },
+  "expected": {
+    "trigger": "must",
+    "assertions": [
+      {
+        "id": "ASSERT_BROKEN",
+        "kind": "output_contains",
+        "value": "BROKEN"
+      },
+      {
+        "id": "ASSERT_LOCALIZED",
+        "kind": "output_contains",
+        "value": "level"
+      },
+      {
+        "id": "ASSERT_NO_SMOOTHING",
+        "kind": "output_not_contains",
+        "value": "≡ HOLDS"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

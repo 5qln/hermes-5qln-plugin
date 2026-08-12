@@ -1,0 +1,35 @@
+{
+  "format_version": "behavior-fixture-v1",
+  "id": "FIX_NOT_VERTICAL_DESCENT",
+  "class": "near_miss_non_trigger",
+  "requirement_ids": [
+    "REQ_SCOPE_BOUNDARY"
+  ],
+  "scenario": {
+    "user_input": "Run the sub-phase vertical descent: spawn a child cycle on this unresolved question.",
+    "context_files": [],
+    "enabled_tools": [],
+    "enabled_skills": [
+      "5qln-fractal-data-loop"
+    ]
+  },
+  "expected": {
+    "trigger": "must_not",
+    "assertions": [
+      {
+        "id": "ASSERT_NO_OPERATOR_CLAIM",
+        "kind": "output_not_contains",
+        "value": "fractal_data_loop.py"
+      },
+      {
+        "id": "ASSERT_NAMES_UNSHIPPED",
+        "kind": "output_contains",
+        "value": "not shipped"
+      }
+    ]
+  },
+  "observation_policy": {
+    "minimum_runs": 1,
+    "require_fresh_session": true
+  }
+}

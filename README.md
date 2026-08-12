@@ -53,7 +53,7 @@ Full specification: [5QLN Codex](https://5qln.com/codex). Line-by-line reading i
 
 ## What's Included
 
-14 registered skills and 7 registered tools.
+15 registered skills and 7 registered tools.
 
 The converter, research validator, bounded parametric memory, decoder, phase log,
 and centrifuge use the Python standard library. Skill verification requires
@@ -77,6 +77,7 @@ experimental boundary.
 | `5qln-aimless-openness` | Holds the space of true aimless openness (FCF) for H | Bundled; formed through the skill-v1 cycle |
 | `5qln-corruption-watcher` | Classifies L1–L4 and V∅ corruption in evolution traces and evidence | Bundled; formed through the skill-v1 cycle |
 | `5qln-self-evolution` | Orchestrates bounded, H-gated self-evolution of the plugin | Bundled; formed through the skill-v1 cycle |
+| `5qln-fractal-data-loop` | The reduce/expand fractal data operator: any-size data to a bounded seed and back; witness (lossless, ≡-verified) and essence (verbatim outline) modes | Bundled; formed through the skill-v1 cycle |
 
 | Tool | Does |
 |------|------|

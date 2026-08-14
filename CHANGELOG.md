@@ -2,7 +2,7 @@
 
 All notable changes are recorded here. Versions follow semantic versioning.
 
-## Unreleased
+## 0.12.0 - 2026-08-14
 
 ### Added
 - Axis stasis detector in the centrifuge skill: `axis_stasis.py` flags when the
@@ -11,6 +11,21 @@ All notable changes are recorded here. Versions follow semantic versioning.
   STASIS / MOVING / STILL / INSUFFICIENT_DATA. Flags only — never drafts
   search-policy changes or injects; corruption stays the watcher's lane.
   13 stdlib unit tests in `test_axis_stasis.py`.
+- Three new bundled skills, machine-drafted and promoted on H's direct
+  authorization (2026-08-14): **5qln-coaching-the-stance** (operate the
+  coaching surface — training the one human capacity AI cannot generate:
+  standing in not-knowing), **5qln-seed-exchange-protocol** (govern the
+  interlock between fabrics — seeds cross, cycles stay local),
+  **5qln-voice-source-interface** (the voice-formation source-interface for
+  the 50+ generation: transcribe what already exists, never build what they
+  must learn).
+
+### Changed
+- Plugin now bundles 18 skills.
+- Honest formation note: the three new skills carry
+  `behavioral_status=not_declared` (no observation fixtures declared) —
+  recorded, not hidden. Structural gate passed and `promotion_ready: true`
+  for all three after re-scoping manifests to the final bundle digests.
 
 ### ∞0' (return question)
 What does the loop do when the axis is still — is stillness ever the right

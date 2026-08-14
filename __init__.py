@@ -126,6 +126,10 @@ def register(ctx):
         "5qln-self-evolution",
         # Formed skills (0.11.0)
         "5qln-fractal-data-loop",
+        # Formed skills (0.12.0)
+        "5qln-coaching-the-stance",
+        "5qln-seed-exchange-protocol",
+        "5qln-voice-source-interface",
     ):
         skill_md = skill_root / skill_name / "SKILL.md"
         if not skill_md.is_file():

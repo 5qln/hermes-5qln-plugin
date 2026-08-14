@@ -53,7 +53,7 @@ Full specification: [5QLN Codex](https://5qln.com/codex). Line-by-line reading i
 
 ## What's Included
 
-15 registered skills and 7 registered tools.
+18 registered skills and 7 registered tools.
 
 The converter, research validator, bounded parametric memory, decoder, phase log,
 and centrifuge use the Python standard library. Skill verification requires
@@ -78,6 +78,9 @@ experimental boundary.
 | `5qln-corruption-watcher` | Classifies L1–L4 and V∅ corruption in evolution traces and evidence | Bundled; formed through the skill-v1 cycle |
 | `5qln-self-evolution` | Orchestrates bounded, H-gated self-evolution of the plugin | Bundled; formed through the skill-v1 cycle |
 | `5qln-fractal-data-loop` | The reduce/expand fractal data operator: any-size data to a bounded seed and back; witness (lossless, ≡-verified) and essence (verbatim outline) modes | Bundled; formed through the skill-v1 cycle |
+| `5qln-coaching-the-stance` | Operates the coaching surface — training the one human capacity AI cannot generate: standing in not-knowing | Bundled; formed through the skill-v1 cycle |
+| `5qln-seed-exchange-protocol` | Governs the interlock between fabrics — generations, systems, agents; seeds cross, cycles stay local | Bundled; formed through the skill-v1 cycle |
+| `5qln-voice-source-interface` | Operates the voice-formation interface — the source-interface for the 50+ generation | Bundled; formed through the skill-v1 cycle |
 
 | Tool | Does |
 |------|------|

@@ -1,5 +1,5 @@
 name: 5qln
-version: 0.11.0
+version: 0.12.0
 description: 5QLN language runtime for Hermes Agent — deterministic conversion tools, a self-contained minimum cycle engine (xyzab + structural decoding + phase log), skill formation, and clearly marked experimental guides. Skills auto-seed into the skill index on install.
 provides_tools:
   - fiveqln_inventory_source

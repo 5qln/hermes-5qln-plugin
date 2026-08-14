@@ -1,0 +1,92 @@
+{
+  "behavioral_fixtures": [],
+  "bundle": {
+    "fixtures": [],
+    "provenance": [
+      {
+        "path": "provenance/conversion-manifest.json",
+        "sha256": "4e1fb5f8076c608c8daa629641ae3e82760e2023f1df310d8ec89366239bd5be",
+        "size_bytes": 78881
+      },
+      {
+        "path": "provenance/source-inventory.json",
+        "sha256": "c81d82a48c1de684beadd313ab0be02d6fd31908b5e9d689dfa11103eeefd222",
+        "size_bytes": 51513
+      }
+    ],
+    "references": [],
+    "scripts": [],
+    "skill_md": {
+      "path": "SKILL.md",
+      "sha256": "ea085013681bf299707291f385574dcb37e4fb65f6f89ea8fc85dd5bdf175215",
+      "size_bytes": 3250
+    },
+    "tests": []
+  },
+  "contract": {
+    "behavioral_requirements": [],
+    "claimed_tools": [],
+    "completion_criteria": [],
+    "non_triggers": [],
+    "related_skills": [],
+    "triggers": []
+  },
+  "format_version": "skill-v1",
+  "human_review": {
+    "status": "accepted",
+    "reviewer": "Amihai Loven",
+    "evidence": [
+      {
+        "id": "EV_H_REVIEW_1",
+        "kind": "review_acceptance",
+        "statement": "H, verbatim (2026-08-14): \"push, document, leave ob sync trail, update repo docs all...\"",
+        "source": {
+          "path": ".verification/evidence/EV_H_REVIEW_1.txt",
+          "sha256": "7fc3a9c0b96e17386bd301f8a7a308ee175920afd8a7ea9d064d87869ce43698",
+          "size_bytes": 368
+        },
+        "location": "Hermes TUI session, 2026-08-14",
+        "scope_bundle_sha256": "bdbc4465e01c55332c2da970cb91891b0a50d0269881f3b62756aad2ae0fd9eb",
+        "scope_contract_sha256": "e41a7c82fd7ff8ddc9221b9e0b654d39b8f76352239a0c85bdbbbbb23c5cab3a",
+        "promotion_scope": "bundled"
+      },
+      {
+        "id": "EV_H_PROMOTE_1",
+        "kind": "promotion_authorization",
+        "statement": "H, verbatim (2026-08-14): \"push, document, leave ob sync trail, update repo docs all...\"",
+        "source": {
+          "path": ".verification/evidence/EV_H_PROMOTE_1.txt",
+          "sha256": "fa872454fd62685ea66f6b964709ad8a5c6a08fa43b332c2d85f68adbc5482ca",
+          "size_bytes": 375
+        },
+        "location": "Hermes TUI session, 2026-08-14",
+        "scope_bundle_sha256": "bdbc4465e01c55332c2da970cb91891b0a50d0269881f3b62756aad2ae0fd9eb",
+        "scope_contract_sha256": "e41a7c82fd7ff8ddc9221b9e0b654d39b8f76352239a0c85bdbbbbb23c5cab3a",
+        "promotion_scope": "bundled"
+      }
+    ]
+  },
+  "promotion": {
+    "requested_state": "promotion_requested",
+    "target": "bundled-plugin",
+    "authorization_evidence_ids": [
+      "EV_H_PROMOTE_1"
+    ]
+  },
+  "provenance": {
+    "conversion_manifest": {
+      "path": "provenance/conversion-manifest.json",
+      "sha256": "4e1fb5f8076c608c8daa629641ae3e82760e2023f1df310d8ec89366239bd5be",
+      "size_bytes": 78881
+    },
+    "formation_evidence": []
+  },
+  "requirement_traceability": [],
+  "skill": {
+    "bundle_root": ".",
+    "bundle_sha256": "bdbc4465e01c55332c2da970cb91891b0a50d0269881f3b62756aad2ae0fd9eb",
+    "contract_sha256": "e41a7c82fd7ff8ddc9221b9e0b654d39b8f76352239a0c85bdbbbbb23c5cab3a",
+    "name": "5qln-coaching-the-stance"
+  },
+  "title": "5qln-coaching-the-stance (scaffold)"
+}

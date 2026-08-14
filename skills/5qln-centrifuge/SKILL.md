@@ -63,6 +63,21 @@ python3 centrifuge_parametric.py reset --confirm  # Wipe trail (dangerous)
 | Phase velocity | `phase_velocity_minutes.{S,G,Q,P,V}` | average minutes between gates |
 | Liveness | `liveness_avg` | 0–10 average across V-phases |
 
+### Axis stasis (trail-based detector)
+
+```bash
+python3 axis_stasis.py check              # verdict over the last 3 readings
+python3 axis_stasis.py check --consecutive 5
+python3 axis_stasis.py check --json       # machine-readable
+```
+
+Reads the same trail. Verdicts: `STASIS` (axis constant, content moving),
+`MOVING`, `STILL` (loop not running), `INSUFFICIENT_DATA`. Flags only — never
+drafts search-policy changes or injects; corruption stays the corruption
+watcher's lane. Only as true as the centrifuge's heuristics. On STASIS the
+next step is a `{α'}` search-policy draft to H via the self-evolution
+orchestrator — never auto-injection.
+
 ### Trail file
 
 `$QLN_WIKI/state/centrifuge_trail.json` — JSON array of readings, each with timestamp, SHA-256 pin, and all six parametric dimensions. The `serve` command outputs a dashboard-ready summary with timeseries for purity, direction, scope, corruption, and liveness.

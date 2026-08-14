@@ -11,6 +11,7 @@ future work. A skill description is not evidence that its backend exists.
 | structural decoder | `skills/symbolic-interpretation/scripts/decoding.py` | Bundled; standard library only |
 | transition/source log | `skills/5qln-learning-aligner/scripts/phase_log.py` | Bundled; written automatically by successful `xyzab open` |
 | centrifuge | `skills/5qln-centrifuge/scripts/centrifuge.py` | Bundled exact-pattern reader; reports no data until transitions exist |
+| axis stasis detector | `skills/5qln-centrifuge/scripts/axis_stasis.py` | Trail-based flag: STASIS/MOVING/STILL/INSUFFICIENT_DATA; flags only, never injects |
 
 A successful gate opening records its transition in the phase log. The gate
 command accepts `--source-tag`, `--signal`, and `--session-id`; omitted source

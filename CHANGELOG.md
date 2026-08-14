@@ -4,6 +4,18 @@ All notable changes are recorded here. Versions follow semantic versioning.
 
 ## Unreleased
 
+### Added
+- Axis stasis detector in the centrifuge skill: `axis_stasis.py` flags when the
+  axis has stopped turning — K consecutive trail readings where
+  `alpha_direction`/`inf0p_scope` are constant while content moves. Verdicts:
+  STASIS / MOVING / STILL / INSUFFICIENT_DATA. Flags only — never drafts
+  search-policy changes or injects; corruption stays the watcher's lane.
+  13 stdlib unit tests in `test_axis_stasis.py`.
+
+### ∞0' (return question)
+What does the loop do when the axis is still — is stillness ever the right
+state, and who decides?
+
 ## 0.11.0 - 2026-08-12
 
 ### Added
